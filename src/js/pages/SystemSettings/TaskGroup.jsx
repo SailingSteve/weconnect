@@ -47,6 +47,7 @@ const TaskGroup = ({ classes, match }) => {
     setAppContextValue('editTaskDefinitionDrawerOpen', true);
     setAppContextValue('editTaskDefinitionDrawerTaskDefinitionId', -1);
     setAppContextValue('editTaskDefinitionDrawerTaskGroup', taskGroup);
+    setAppContextValue('editTaskDefinitionDrawerLabel', 'Add Task');
   };
 
   // eslint-disable-next-line no-unused-vars
@@ -54,6 +55,7 @@ const TaskGroup = ({ classes, match }) => {
     setAppContextValue('editTaskDefinitionDrawerOpen', true);
     setAppContextValue('editTaskDefinitionDrawerTaskDefinition', taskDefinition);
     setAppContextValue('editTaskDefinitionDrawerTaskGroup', taskGroup);
+    setAppContextValue('editTaskDefinitionDrawerLabel', 'Edit Task');
   };
 
   const editTaskGroupClick = () => {
