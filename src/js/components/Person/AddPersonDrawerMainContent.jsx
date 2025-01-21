@@ -6,7 +6,7 @@ import arrayContains from '../../common/utils/arrayContains';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
 import { useAddPersonToTeamMutation } from '../../react-query/mutations';
-import makeRequestParams from '../../react-query/requestParamsUtils';
+import makeRequestParams from '../../react-query/makeRequestParams';
 import { SpanWithLinkStyle } from '../Style/linkStyles';
 import AddPersonForm from './AddPersonForm';
 

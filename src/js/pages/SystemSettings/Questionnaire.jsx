@@ -1,10 +1,10 @@
 import { Edit } from '@mui/icons-material';
-import { Button } from '@mui/material';
+import { Button, CircularProgress } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import styled from 'styled-components';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import { renderLog } from '../../common/utils/logging';
@@ -19,27 +19,22 @@ import useFetchData from '../../react-query/fetchData';
 const Questionnaire = ({ classes, match }) => {
   renderLog('Questionnaire');
   const { setAppContextValue, getAppContextValue } = useConnectAppContext();
+  const location = useLocation();
 
-  const dummy = {
-    questionnaireName: '---',
-    questionnaireTitle: '---',
-    questionnaireInstructions: 'Dev note: There is enough info in the URL to handle the edge case of the bookmarking this page, or hard refreshing while on this page... someday...',
-  };
   const [questionList, setQuestionList] = useState([]);
-  const [questionnaire] = useState(getAppContextValue('selectedQuestionnaire') || dummy);
-  // eslint-disable-next-line no-unused-vars
-  const [questionnaireList, setQuestionnaireList] = useState([]);
+  const [questionnaire, setQuestionnaire] = useState(getAppContextValue('selectedQuestionnaire'));
 
   const { data: dataQList, isSuccess: isSuccessQList, isFetching: isFetchingQList } = useFetchData(['questionnaire-list-retrieve'], {});
   useEffect(() => {
     console.log('useFetchData in Questionnaire useEffect:', dataQList, isSuccessQList, isFetchingQList);
-    if (dataQList !== undefined && isFetchingQList === false && questionnaire) {
+    if (dataQList !== undefined && isFetchingQList === false) {
       console.log('useFetchData in Questionnaire useEffect data is good:', dataQList, isSuccessQList, isFetchingQList);
       console.log('Successfully retrieved questionnaire-list-retrieve...');
-      const questionnaireListTemp = dataQList.questionnaireList;
-      setQuestionnaireList(questionnaireListTemp);
+      const qNumber = location.pathname.substring(location.pathname.lastIndexOf('/') + 1);
+      const oneQ = dataQList.questionnaireList.find((questionn) => questionn.id === parseInt(qNumber));
+      setQuestionnaire(oneQ);
     }
-  }, [dataQList, questionnaire]);
+  }, [dataQList, isSuccessQList]);
 
   const { data: dataQuestionList, isSuccess: isSuccessQuestionList, isFetching: isFetchingQuestionList } =
     useFetchData(['question-list-retrieve'], { questionnaireId: questionnaire ? questionnaire.questionnaireId : '-1' });
@@ -49,8 +44,6 @@ const Questionnaire = ({ classes, match }) => {
       console.log('useFetchData question-list-retrieve in Questionnaire useEffect data is good:', dataQuestionList, isSuccessQuestionList, isFetchingQuestionList);
       const questionListTemp = dataQuestionList.questionList;
       console.log('Successfully retrieved question-list-retrieve... questionListTemp', questionListTemp);
-      // const questionsForThisQuestionnaire = questionListTemp.filter((question) => question.questionnaireId !== questionnaire.questionnaireId);
-      // console.log('questionsForThisQuestionnaire: ', questionsForThisQuestionnaire);
       setQuestionList(questionListTemp);
     }
   }, [dataQuestionList]);
@@ -68,6 +61,14 @@ const Questionnaire = ({ classes, match }) => {
   const editQuestionnaireClick = () => {
     setAppContextValue('editQuestionnaireDrawerOpen', true);
   };
+
+  if (isFetchingQList || questionnaire === undefined ) {
+    return (
+      <div style={{ padding: '150px 30px 30px 50%' }}>
+        <CircularProgress />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -87,7 +88,7 @@ const Questionnaire = ({ classes, match }) => {
           {' '}
           &gt;
           {' '}
-          {questionnaire.questionnaireName}
+          <span style={{ padding: '0 20px 0 10px' }}>{questionnaire.questionnaireName}</span>
           <SpanWithLinkStyle onClick={editQuestionnaireClick}>
             <EditStyled />
           </SpanWithLinkStyle>

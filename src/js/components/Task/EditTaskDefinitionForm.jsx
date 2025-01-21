@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
 import { useTaskDefinitionSaveMutation } from '../../react-query/mutations';
-import makeRequestParams from '../../react-query/requestParamsUtils';
+import makeRequestParams from '../../react-query/makeRequestParams';
 
 // const TASK_DEFINITION_FIELDS_IN_FORM = [
 //   'googleDriveFolderId',

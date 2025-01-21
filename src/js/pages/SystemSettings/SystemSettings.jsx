@@ -9,6 +9,7 @@ import { Link, useNavigate } from 'react-router';
 import styled from 'styled-components';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import { renderLog } from '../../common/utils/logging';
+import { SpanWithLinkStyle } from '../../components/Style/linkStyles';
 import { PageContentContainer } from '../../components/Style/pageLayoutStyles';
 import webAppConfig from '../../config';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
@@ -100,7 +101,9 @@ const SystemSettings = ({ classes }) => {
             <QuestionnaireInnerWrapper>
               {/* {console.log('questionnaireList.map((questionnaire)', questionnaire.questionnaireId)} */}
               <GoToQuestionairePage onClick={() => goToQuestionnairePageClick(questionnaire)}>
-                {questionnaire.questionnaireName}
+                <SpanWithLinkStyle>
+                  {questionnaire.questionnaireName}
+                </SpanWithLinkStyle>
               </GoToQuestionairePage>
               <EditQuestionnaire onClick={() => editQuestionnaireClick(questionnaire)}>
                 <EditStyled />
