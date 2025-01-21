@@ -36,14 +36,13 @@ const EditPersonForm = ({ classes }) => {
 
     console.log('savePerson data:', JSON.stringify(activePerson));
 
-    let data = '';
+    const data = {};
     // for (const key in activePerson) {
     Object.keys(activePerson).forEach((key) => {
       const initialValue = initialPerson[key] || '';
       const activeValue = activePerson[key] || '';
       if (initialValue !== activeValue) {
-        data += `${key}=${activeValue}&`;
-        data += `${key}Changed=${true}&`;
+        data[key] = activeValue;
       }
     });
     const plainParams = {
