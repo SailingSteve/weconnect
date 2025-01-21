@@ -1,37 +1,23 @@
 import { withStyles } from '@mui/styles';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
-import weConnectQueryFn from '../../react-query/WeConnectQuery';
+import { useRemoveTeamMemberMutation } from '../../react-query/mutations';
 import { DeleteStyled, EditStyled } from '../Style/iconStyles';
 
 
 const PersonSummaryRow = ({ person, rowNumberForDisplay, teamId }) => {
   renderLog('PersonSummaryRow');  // Set LOG_RENDER_EVENTS to log all renders
   const { setAppContextValue } = useConnectAppContext();
-
-  const queryClient = useQueryClient();
-
-  // const [removeTeamMember, { error, data }] = RemoveTeamMemberMutation(person.personId , teamId);
-  // console.log('RemoveTeamMemberMutation called: ', error, data);
-
-  const removeTeamMemberMutation = useMutation({
-    mutationFn: (personId) => weConnectQueryFn('remove-person-from-team', {
-      personId,
-      teamId,
-    }),
-    onSuccess: () => {
-      console.log('--------- removeTeamMemberMutation mutated ---------');
-      queryClient.invalidateQueries('team-list-retrieve').then(() => {});
-    },
-  });
+  const { mutate } = useRemoveTeamMemberMutation();
 
   const removeTeamMemberClick = () => {
-    removeTeamMemberMutation.mutate(person.id);
+    const personId = person.id;
+    const params = { personId, teamId };
+    mutate(params);
   };
 
   const editPersonClick = (hasEditRights = true) => {

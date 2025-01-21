@@ -4,6 +4,7 @@ import { httpLog } from '../common/utils/logging';
 import webAppConfig from '../config';
 
 export const weConnectQueryFn = async (queryKey, params) => {
+  console.log('weConnectQueryFn params: ', params);
   const url = new URL(`${queryKey}/`, webAppConfig.STAFF_API_SERVER_API_ROOT_URL);
   url.search = new URLSearchParams(params);
   console.log('weConnectQueryFn url.href: ', url.href);

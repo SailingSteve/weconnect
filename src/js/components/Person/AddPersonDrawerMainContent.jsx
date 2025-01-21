@@ -1,4 +1,3 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import { useParams } from 'react-router';
 import styled from 'styled-components';
@@ -6,7 +5,8 @@ import SearchBar2024 from '../../common/components/Search/SearchBar2024';
 import arrayContains from '../../common/utils/arrayContains';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
-import weConnectQueryFn from '../../react-query/WeConnectQuery';
+import { useAddPersonToTeamMutation } from '../../react-query/mutations';
+import makeRequestParams from '../../react-query/requestParamsUtils';
 import { SpanWithLinkStyle } from '../Style/linkStyles';
 import AddPersonForm from './AddPersonForm';
 
@@ -15,10 +15,10 @@ import AddPersonForm from './AddPersonForm';
 const AddPersonDrawerMainContent = () => {
   renderLog('AddPersonDrawerMainContent');
   const { getAppContextValue } = useConnectAppContext();
+  const { mutate } = useAddPersonToTeamMutation();
 
   const params  = useParams();
   console.log('AddPersonDrawerMainContent params: ', params);
-  const queryClient = useQueryClient();
 
   const [staffToDisplayList, setStaffToDisplayList] = useState([]);
   // eslint-disable-next-line no-unused-vars
@@ -59,16 +59,6 @@ const AddPersonDrawerMainContent = () => {
     setStaffToDisplayList(staffToDisplay);
   }
 
-  const addPersonToTeamMutation = useMutation({
-    mutationFn: (person) => weConnectQueryFn('add-person-to-team', {
-      personId: person.id,
-      teamId,
-      teamMemberFirstName: person.firstName,
-      teamMemberLastName: person.lastName,
-      teamName,
-    }),
-  });
-
   // TODO: 1/6/25: revive search
   // const searchFunction = (incomingSearchText) => {
   // let searchingJustStarted = false;
@@ -89,13 +79,18 @@ const AddPersonDrawerMainContent = () => {
   };
 
   const addClicked = (person) => {
-    addPersonToTeamMutation.mutate(person);
-    if (addPersonToTeamMutation.isSuccess) {
-      queryClient.invalidateQueries('team-list-retrieve').then(() => {
-        // This removes the recently "added" staff, from the list of staff who can be added, the staffToDisplayList
-        const updatedStaffToDisplayList = staffToDisplayList.filter((staff) => staff.id !== person.id);
-        setStaffToDisplayList(updatedStaffToDisplayList);
-      });
+    const plainParams = {
+      personId: person.id,
+      teamId,
+      teamMemberFirstName: person.firstName,
+      teamMemberLastName: person.lastName,
+      teamName,
+    };
+    mutate(makeRequestParams(plainParams, {}));
+    if (mutate.isSuccess) {
+      // This removes the recently "added" staff, from the list of staff who can be added, the staffToDisplayList
+      const updatedStaffToDisplayList = staffToDisplayList.filter((staff) => staff.id !== person.id);
+      setStaffToDisplayList(updatedStaffToDisplayList);
     }
   };
 

@@ -1,24 +1,22 @@
 import { Button, FormControl, TextField } from '@mui/material';
 import { withStyles } from '@mui/styles';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
-import weConnectQueryFn from '../../react-query/WeConnectQuery';
-
+import usePersonSaveMutation from '../../react-query/personSaveMutation';
+import makeRequestParams from '../../react-query/requestParamsUtils';
 
 const AddPersonForm = ({ classes }) => {  //  classes, teamId
   renderLog('AddPersonForm');
   const { getAppContextValue } = useConnectAppContext();
+  const { mutate } = usePersonSaveMutation();
 
   const [teamId, setTeamId] = useState(-1);
   const [teamName, setTeamName] = useState('');
   const [saveButtonActive, setSaveButtonActive] = React.useState(false);
 
-
-  const queryClient = useQueryClient();
   const firstNameFldRef = useRef('');
   const lastNameFldRef = useRef('');
   const emailFldRef = useRef('');
@@ -29,24 +27,6 @@ const AddPersonForm = ({ classes }) => {  //  classes, teamId
     setTeamName(getAppContextValue('addPersonDrawerTeam').teamName);
   }, [getAppContextValue]);
 
-  const saveNewPersonMutation = useMutation({
-    mutationFn: (params) => weConnectQueryFn(['person-save'], params),
-    onSuccess: () => {
-      console.log('--------- saveNewPersonMutation  mutated before invalidate ---------');
-      queryClient.invalidateQueries(['team-list-retrieve']).then(() => {});
-    },
-    onError: (err) => { console.log('saveNewPersonMutation error: ', err); },
-  });
-
-  const makeSavePersonDict = (data) => {
-    let requestParams = '';
-    Object.keys(data).forEach((key) => {
-      requestParams += `${key}ToBeSaved=${data[key]}&`;
-      requestParams += `${key}Changed=${true}&`;
-    });
-    requestParams += `personId=-1&teamId=${teamId}&teamName=${teamName}`;
-    return encodeURI(requestParams);
-  };
 
   const saveNewPerson = () => {
     const data = {
@@ -54,9 +34,12 @@ const AddPersonForm = ({ classes }) => {  //  classes, teamId
       lastName: lastNameFldRef.current.value,
       emailPersonal: emailFldRef.current.value,
     };
-    const requestParams = makeSavePersonDict(data);
-    // http://localhost:4500/apis/v1/person-save/?personId=-1&emailPersonalChanged=true&emailPersonalToBeSaved=steve%40gmail.com&firstNameChanged=true&firstNameToBeSaved=Steve&lastNameChanged=true&lastNameToBeSaved=Smithl&teamId=1&teamName=Levi
-    saveNewPersonMutation.mutate(requestParams);
+    const plainParams = {
+      personId: -1,
+      teamId,
+      teamName,
+    };
+    mutate(makeRequestParams(plainParams, data));
   };
 
   const updateSaveButton = () => {

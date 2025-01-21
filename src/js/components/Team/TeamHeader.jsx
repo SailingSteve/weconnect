@@ -1,12 +1,12 @@
 import { withStyles } from '@mui/styles';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { Link } from 'react-router';
 import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
-import weConnectQueryFn from '../../react-query/WeConnectQuery';
+import { useRemoveTeamMutation } from '../../react-query/mutations';
 import { DeleteStyled, EditStyled } from '../Style/iconStyles';
 
 
@@ -14,23 +14,13 @@ import { DeleteStyled, EditStyled } from '../Style/iconStyles';
 const TeamHeader = ({ classes, showHeaderLabels, showIcons, team }) => {
   renderLog('TeamHeader');
   const { getAppContextValue, setAppContextValue } = useConnectAppContext();
+  const { mutate } = useRemoveTeamMutation();
 
-  const queryClient = useQueryClient();
   const [teamLocal] = useState(useQueryClient(team || getAppContextValue('teamForAddTeamDrawer')));
-
-  const removeTeamMutation = useMutation({
-    mutationFn: (teamId) => weConnectQueryFn('team-delete', {
-      teamId,
-    }),
-    onSuccess: () => {
-      console.log('--------- removeMemberMutation mutated ---------');
-      queryClient.invalidateQueries('team-list-retrieve').then(() => {});
-    },
-  });
 
   const removeTeamClick = () => {
     console.log('removeTeamMutation team: ', teamLocal.id);
-    removeTeamMutation.mutate(teamLocal.id);
+    mutate({teamId: teamLocal.id});
   };
 
   const editTeamClick = () => {

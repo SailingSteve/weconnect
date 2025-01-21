@@ -8,7 +8,7 @@ import React, { Suspense, useRef } from 'react';
 import styled from 'styled-components';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import { renderLog } from '../../common/utils/logging';
-import makeRequestParams from '../../common/utils/requestParamsUtils';
+import makeRequestParams from '../../react-query/requestParamsUtils';
 import weConnectQueryFn from '../../react-query/WeConnectQuery';
 
 

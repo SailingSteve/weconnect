@@ -1,17 +1,18 @@
 import { Button, FormControl, TextField } from '@mui/material';
 import { withStyles } from '@mui/styles';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
 import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
 import webAppConfig from '../../config';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
-import weConnectQueryFn from '../../react-query/WeConnectQuery';
+import usePersonSaveMutation from '../../react-query/personSaveMutation';
+import makeRequestParams from '../../react-query/requestParamsUtils';
 
 const EditPersonForm = ({ classes }) => {
   renderLog('EditPersonForm');
   const { getAppContextValue } = useConnectAppContext();
+  const { mutate } = usePersonSaveMutation();
 
   const [saveButtonActive, setSaveButtonActive] = useState(false);
   const [initialPerson] = useState(getAppContextValue('personDrawersPerson'));
@@ -23,32 +24,6 @@ const EditPersonForm = ({ classes }) => {
   const jobTitle = useRef('');
   const lastName = useRef('');
   const location = useRef('');
-  const queryClient = useQueryClient();
-
-  const personSaveMutation = useMutation({
-    mutationFn: (params) => weConnectQueryFn('person-save', params),
-    onSuccess: () => {
-      console.log('--------- personSaveMutation  EditPersonForm mutated ---------');
-      queryClient.invalidateQueries(['team-list-retrieve']).then(() => {});
-    },
-  });
-
-
-  const makeChangedPersonDict = () => {
-    let requestParams = '';
-    // for (const key in activePerson) {
-    Object.keys(activePerson).forEach((key) => {
-      const initialValue = initialPerson[key] || '';
-      const activeValue = activePerson[key] || '';
-      if (initialValue !== activeValue) {
-        requestParams += `${key}=${activeValue}&`;
-        requestParams += `${key}Changed=${true}&`;
-      }
-    });
-    requestParams += `personId=${activePerson.id}}&`;
-    console.log('makeChangedPersonDict :', encodeURI(requestParams));
-    return encodeURI(requestParams);
-  };
 
   const savePerson = () => {
     activePerson.emailPersonal = emailPersonal.current.value;
@@ -60,8 +35,22 @@ const EditPersonForm = ({ classes }) => {
     setActivePerson(activePerson);
 
     console.log('savePerson data:', JSON.stringify(activePerson));
-    const requestParams = makeChangedPersonDict();
-    personSaveMutation.mutate(requestParams);
+
+    let data = '';
+    // for (const key in activePerson) {
+    Object.keys(activePerson).forEach((key) => {
+      const initialValue = initialPerson[key] || '';
+      const activeValue = activePerson[key] || '';
+      if (initialValue !== activeValue) {
+        data += `${key}=${activeValue}&`;
+        data += `${key}Changed=${true}&`;
+      }
+    });
+    const plainParams = {
+      personId: activePerson.id,
+    };
+
+    mutate(makeRequestParams(plainParams, data));
     setSaveButtonActive(false);
   };
 

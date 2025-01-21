@@ -5,8 +5,8 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
-import makeRequestParams from '../../common/utils/requestParamsUtils';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
+import makeRequestParams from '../../react-query/requestParamsUtils';
 import weConnectQueryFn from '../../react-query/WeConnectQuery';
 
 

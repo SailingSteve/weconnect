@@ -1,16 +1,16 @@
 import { ContentCopy } from '@mui/icons-material';
 import { Button, Checkbox, FormControl, FormControlLabel, TextField } from '@mui/material'; // FormLabel, Radio, RadioGroup,
 import { withStyles } from '@mui/styles';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import styled from 'styled-components';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import { renderLog } from '../../common/utils/logging';
-import makeRequestParams from '../../common/utils/requestParamsUtils';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
-import weConnectQueryFn from '../../react-query/WeConnectQuery';
+import useQuestionSaveMutation from '../../react-query/questionSaveMutation';
+import makeRequestParams from '../../react-query/requestParamsUtils';
 import { SpanWithLinkStyle } from '../Style/linkStyles';
 
 const PERSON_FIELDS_ACCEPTED = [
@@ -33,6 +33,7 @@ const PERSON_FIELDS_ACCEPTED = [
 const EditQuestionForm = ({ classes }) => {
   renderLog('EditQuestionForm');
   const {  getAppContextValue } = useConnectAppContext();
+  const { mutate } = useQuestionSaveMutation();
 
   const [question] = useState(getAppContextValue('selectedQuestion'));
   const [questionnaire] = useState(getAppContextValue('selectedQuestionnaire'));
@@ -75,13 +76,13 @@ const EditQuestionForm = ({ classes }) => {
     }
   }, [question]);
 
-  const questionSaveMutation = useMutation({
-    mutationFn: (requestParams) => weConnectQueryFn('question-save', requestParams),
-    onSuccess: () => {
-      // console.log('--------- questionSaveMutation mutated --------- ');
-      queryClient.invalidateQueries('question-list-retrieve').then(() => {});
-    },
-  });
+  // const questionSaveMutation = useMutation({
+  //   mutationFn: (requestParams) => weConnectQueryFn('question-save', requestParams),
+  //   onSuccess: () => {
+  //     // console.log('--------- questionSaveMutation mutated --------- ');
+  //     queryClient.invalidateQueries('question-list-retrieve').then(() => {});
+  //   },
+  // });
 
   // eslint-disable-next-line no-unused-vars
   const copyFieldMappingRule = (fieldMappingRule) => {
@@ -116,7 +117,8 @@ const EditQuestionForm = ({ classes }) => {
         requireAnswer: (requireAnswerFldRef.current.value === 'on'),
         statusActive: (statusActiveFldRef.current.value === 'on'),
       });
-      questionSaveMutation.mutate(requestParams);
+      mutate(requestParams);
+      // questionSaveMutation.mutate(requestParams);
       console.log('saveQuestionnaire requestParams:', requestParams);
       setSaveButtonActive(false);
     }
