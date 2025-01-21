@@ -35,7 +35,7 @@ const DrawerTemplateA = ({ classes, drawerId, drawerOpenGlobalVariableName, head
     }
   };
 
-  useEffect(() => {  // Replaces onAppObservableStoreChange and will be called whenever the context value changes
+  useEffect(() => {
     console.log('DrawerTemplateA: Context value changed: ',
       drawerId, drawerOpenGlobalVariableName, getAppContextValue(drawerOpenGlobalVariableName));
     setScrolledDown(getAppContextValue('scrolledDownDrawer'));

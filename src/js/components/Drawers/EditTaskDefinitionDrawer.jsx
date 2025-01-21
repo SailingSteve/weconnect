@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { renderLog } from '../../common/utils/logging';
-import AppObservableStore, { messageService } from '../../stores/AppObservableStore';
+import { useConnectAppContext } from '../../contexts/ConnectAppContext';
 import EditTaskDefinitionDrawerMainContent from '../Task/EditTaskDefinitionDrawerMainContent';
 import DrawerTemplateA from './DrawerTemplateA';
 
@@ -10,23 +10,17 @@ const EditTaskDefinitionDrawer = () => {
   const [headerTitleJsx, setHeaderTitleJsx] = useState(<></>);
   const [headerFixedJsx] = useState(<></>);
 
-  const onAppObservableStoreChange = () => {
-    const questionnaireIdTemp = AppObservableStore.getGlobalVariableState('editTaskDefinitionDrawerTaskDefinitionId');
-    if (questionnaireIdTemp >= 0) {
+  const { getAppContextValue } = useConnectAppContext();
+
+  useEffect(() => {
+    const taskGroup = getAppContextValue('editTaskDefinitionDrawerTaskGroup');
+    if (taskGroup >= 0) {
       setHeaderTitleJsx(<>Edit Task</>);
     } else {
       setHeaderTitleJsx(<>Add Task</>);
     }
-  };
-
-  React.useEffect(() => {
-    const appStateSubscription = messageService.getMessage().subscribe(() => onAppObservableStoreChange());
-    onAppObservableStoreChange();
-
-    return () => {
-      appStateSubscription.unsubscribe();
-    };
   }, []);
+
 
   return (
     <DrawerTemplateA

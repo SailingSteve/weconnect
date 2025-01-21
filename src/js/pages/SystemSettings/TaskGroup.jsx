@@ -4,7 +4,7 @@ import { withStyles } from '@mui/styles';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link, useParams } from 'react-router';
+import { Link, useLocation, useParams } from 'react-router';
 import styled from 'styled-components';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import { renderLog } from '../../common/utils/logging';
@@ -18,9 +18,12 @@ import useFetchData from '../../react-query/fetchData';
 // eslint-disable-next-line no-unused-vars
 const TaskGroup = ({ classes, match }) => {
   renderLog('TaskGroup');
-  const { setAppContextValue } = useConnectAppContext();
+  const { setAppContextValue, getAppContextValue } = useConnectAppContext();
 
+  const location = useLocation();
   const [taskGroupId] = useState(parseInt(useParams().taskGroupId));
+  const [taskGroupFromContext] = useState(getAppContextValue('editTaskGroupDrawerTaskGroup'));
+  const [taskGroupName] = useState(location.state.taskGroupName);
   const [taskGroup, setTaskGroup] = useState(undefined);
 
   const [taskDefinitionList, setTaskDefinitionList] = useState(undefined);
@@ -34,7 +37,7 @@ const TaskGroup = ({ classes, match }) => {
       setTaskDefinitionList(dataTSL ? dataTSL.taskDefinitionList : undefined);
       // We don't need this list for this object, but extracting as an example for other objects
       // setTaskList(dataTSL ? dataTSL.taskList : []);
-      const oneGroup = dataTSL.taskList.find((group) => group.taskGroupId === parseInt(taskGroupId));
+      const oneGroup = dataTSL.taskGroupList.find((group) => parseInt(group.taskGroupId) === parseInt(taskGroupId));
       setTaskGroup(oneGroup);
     }
   }, [dataTSL, isSuccessTSL, isFetchingTSL]);
@@ -72,11 +75,11 @@ const TaskGroup = ({ classes, match }) => {
       </Helmet>
       <PageContentContainer>
         <TaskGroupTitleWrapper>
-          <Link to="/system-settings">TaskGroups</Link>
+          <Link to="/system-settings">Task Groups</Link>
           {' '}
           &gt;
           {' '}
-          {taskGroup && taskGroup.taskGroupName}
+          {taskGroupName}
           <SpanWithLinkStyle onClick={editTaskGroupClick}>
             <EditStyled />
           </SpanWithLinkStyle>

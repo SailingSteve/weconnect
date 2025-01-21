@@ -13,7 +13,7 @@ const EditQuestionnaireDrawer = () => {
   const [headerFixedJsx] = useState(<></>);
 
 
-  useEffect(() => {  // Replaces onAppObservableStoreChange and will be called whenever the context value changes
+  useEffect(() => {
     if (getAppContextValue('editQuestionnaireDrawerOpen')) {
       console.log('EditQuestionnaireDrawer: Context value changed:', true);
       const questionnaire = getAppContextValue('selectedQuestionnaire');

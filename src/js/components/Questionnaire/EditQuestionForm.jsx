@@ -118,7 +118,6 @@ const EditQuestionForm = ({ classes }) => {
         statusActive: (statusActiveFldRef.current.value === 'on'),
       });
       mutate(requestParams);
-      // questionSaveMutation.mutate(requestParams);
       console.log('saveQuestionnaire requestParams:', requestParams);
       setSaveButtonActive(false);
     }

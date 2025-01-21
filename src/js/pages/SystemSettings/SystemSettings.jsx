@@ -123,7 +123,7 @@ const SystemSettings = ({ classes }) => {
         {taskGroupList.map((taskGroup) => (
           <OneQuestionnaireWrapper key={`taskGroup-${taskGroup.id}`}>
             <QuestionnaireInnerWrapper>
-              <Link to={`/task-group/${taskGroup.id}`}>
+              <Link to={`/task-group/${taskGroup.id}`} state={taskGroup}>
                 {taskGroup.taskGroupName}
               </Link>
               <EditTaskGroup onClick={() => editTaskGroupClick(taskGroup)}>

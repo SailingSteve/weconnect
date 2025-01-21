@@ -1,13 +1,12 @@
 import { Button, FormControl, TextField } from '@mui/material';
 import { withStyles } from '@mui/styles';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
+import { useGroupSaveMutation } from '../../react-query/mutations';
 import makeRequestParams from '../../react-query/requestParamsUtils';
-import weConnectQueryFn from '../../react-query/WeConnectQuery';
 
 // const TASK_GROUP_FIELDS_IN_FORM = [
 //   'taskGroupName', 'taskGroupDescription', 'taskGroupIsForTeam'];
@@ -15,13 +14,13 @@ import weConnectQueryFn from '../../react-query/WeConnectQuery';
 const EditTaskGroupForm = ({ classes }) => {
   renderLog('EditTaskGroupForm');
   const { getAppContextValue } = useConnectAppContext();
+  const { mutate } = useGroupSaveMutation();
 
   const [group] = useState(getAppContextValue('editTaskGroupDrawerTaskGroup'));
   const [groupNameValue, setGroupNameValue] = useState('');
   const [groupDescValue, setGroupDescValue] = useState('');
   const [saveButtonActive, setSaveButtonActive] = useState(false);
 
-  const queryClient = useQueryClient();
   const groupNameFldRef = useRef('');
   const groupDescFldRef = useRef('');
 
@@ -35,14 +34,6 @@ const EditTaskGroupForm = ({ classes }) => {
     }
   }, [group]);
 
-  const groupSaveMutation = useMutation({
-    mutationFn: (requestParams) => weConnectQueryFn('task-group-save', requestParams),
-    onSuccess: () => {
-      // console.log('--------- groupSaveMutation mutated --------- ');
-      queryClient.invalidateQueries('task-group-retrieve').then(() => {});
-    },
-  });
-
   const saveTaskGroup = () => {
     const requestParams = makeRequestParams({
       taskGroupId: group ? group.id : '-1',
@@ -50,8 +41,7 @@ const EditTaskGroupForm = ({ classes }) => {
       taskGroupName: groupNameFldRef.current.value,
       taskGroupDescription: groupDescFldRef.current.value,
     });
-    groupSaveMutation.mutate(requestParams);
-    console.log('saveTaskGroup requestParams:', requestParams);
+    mutate(requestParams);
     setSaveButtonActive(false);
   };
 

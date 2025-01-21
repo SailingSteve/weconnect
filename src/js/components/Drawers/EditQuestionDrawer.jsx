@@ -11,7 +11,7 @@ const EditQuestionDrawer = () => {
   const [headerTitleJsx, setHeaderTitleJsx] = useState(<></>);
   const [headerFixedJsx] = useState(<></>);
 
-  useEffect(() => {  // Replaces onAppObservableStoreChange and will be called whenever the context value changes
+  useEffect(() => {
     console.log('EditQuestionDrawer: Context value changed:', true);
     const question = getAppContextValue('selectedQuestion');
     if (question && question.id >= 0) {

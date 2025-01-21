@@ -13,8 +13,8 @@ const EditTaskGroupDrawer = () => {
   const [headerFixedJsx] = useState(<></>);
 
   useEffect(() => {
-    const group = getAppContextValue('editTaskGroupDrawerTaskGroup');
-    if (group) {
+    const taskGroup = getAppContextValue('editTaskGroupDrawerTaskGroup');
+    if (taskGroup) {
       setHeaderTitleJsx(<>Add Task Grouping</>);
     } else {
       setHeaderTitleJsx(<>Edit Task Grouping</>);

@@ -1,13 +1,12 @@
 import { Button, FormControl, TextField } from '@mui/material';
 import { withStyles } from '@mui/styles';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
+import { useTaskDefinitionSaveMutation } from '../../react-query/mutations';
 import makeRequestParams from '../../react-query/requestParamsUtils';
-import weConnectQueryFn from '../../react-query/WeConnectQuery';
 
 // const TASK_DEFINITION_FIELDS_IN_FORM = [
 //   'googleDriveFolderId',
@@ -23,6 +22,7 @@ import weConnectQueryFn from '../../react-query/WeConnectQuery';
 const EditTaskDefinitionForm = ({ classes }) => {
   renderLog('EditTaskDefinitionForm');  // Set LOG_RENDER_EVENTS to log all renders
   const { getAppContextValue } = useConnectAppContext();
+  const { mutate } = useTaskDefinitionSaveMutation();
 
   const [group] = useState(getAppContextValue('editTaskDefinitionDrawerTaskGroup'));
   const [taskDefinition] = useState(getAppContextValue('editTaskDefinitionDrawerTaskDefinition'));
@@ -32,7 +32,6 @@ const EditTaskDefinitionForm = ({ classes }) => {
   const [taskUrlValue, setTaskUrlValue] = useState('');
   const [saveButtonActive, setSaveButtonActive] = useState(false);
 
-  const queryClient = useQueryClient();
   const taskNameFldRef = useRef('');
   const taskDescFldRef = useRef('');
   const taskInstFldRef = useRef('');
@@ -52,13 +51,6 @@ const EditTaskDefinitionForm = ({ classes }) => {
     }
   }, [taskDefinition]);
 
-  const taskDefinitionSaveMutation = useMutation({
-    mutationFn: (requestParams) => weConnectQueryFn('task-definition-save', requestParams),
-    onSuccess: () => {
-      queryClient.invalidateQueries('task-status-list-retrieve').then(() => {});
-    },
-  });
-
   const saveTaskDefinition = () => {
     const requestParams = makeRequestParams({
       taskDefinitionId: taskDefinition ? taskDefinition.id : '-1',
@@ -69,8 +61,7 @@ const EditTaskDefinitionForm = ({ classes }) => {
       taskInstructions: taskInstFldRef.current.value,
       taskActionUrl: taskUrlFldRef.current.value,
     });
-    taskDefinitionSaveMutation.mutate(requestParams);
-    console.log('saveTask requestParams:', requestParams);
+    mutate(requestParams);
     setSaveButtonActive(false);
   };
 

@@ -1,18 +1,18 @@
 import { Button, FormControl, TextField } from '@mui/material';
 import { withStyles } from '@mui/styles';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
+import { useQuestionnaireSaveMutation } from '../../react-query/mutations';
 import makeRequestParams from '../../react-query/requestParamsUtils';
-import weConnectQueryFn from '../../react-query/WeConnectQuery';
 
 
 const EditQuestionnaireForm = ({ classes }) => {
   renderLog('EditQuestionnaireForm');
   const { getAppContextValue } = useConnectAppContext();
+  const { mutate } = useQuestionnaireSaveMutation();
 
   const [questionnaire]  = useState(getAppContextValue('selectedQuestionnaire'));
   const [saveButtonActive, setSaveButtonActive] = useState(false);
@@ -20,7 +20,6 @@ const EditQuestionnaireForm = ({ classes }) => {
   const [titleFldValue, setTitleFldValue] = useState('');
   const [instructionsFldValue, setInstructionsFldValue] = useState('');
 
-  const queryClient = useQueryClient();
   const nameFldRef = useRef('');
   const titleFldRef = useRef('');
   const instructionsFldRef = useRef('');
@@ -37,14 +36,6 @@ const EditQuestionnaireForm = ({ classes }) => {
     }
   }, [questionnaire]);
 
-  const questionnaireSaveMutation = useMutation({
-    mutationFn: (requestParams) => weConnectQueryFn('questionnaire-save', requestParams),
-    onSuccess: () => {
-      // console.log('--------- questionnaireSaveMutation mutated ---------');
-      queryClient.invalidateQueries('questionnaire-list-retrieve').then(() => {});
-    },
-  });
-
   const saveQuestionnaire = () => {
     const params = {
       questionnaireName: nameFldRef.current.value,
@@ -54,9 +45,7 @@ const EditQuestionnaireForm = ({ classes }) => {
     const plainParams = {
       questionnaireId: questionnaire ? questionnaire.id : '-1',
     };
-    const requestParams = makeRequestParams(plainParams, params);
-    questionnaireSaveMutation.mutate(requestParams);
-    // console.log('saveQuestionnaire requestParams:', requestParams);
+    mutate(makeRequestParams(plainParams, params));
     setSaveButtonActive(false);
   };
 
