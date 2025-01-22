@@ -5,7 +5,6 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useParams } from 'react-router';
 import { renderLog } from '../common/utils/logging';
-import AddPersonDrawer from '../components/Drawers/AddPersonDrawer';
 import { PageContentContainer } from '../components/Style/pageLayoutStyles';
 import TeamHeader from '../components/Team/TeamHeader';
 import TeamMemberList from '../components/Team/TeamMemberList';
@@ -22,7 +21,6 @@ const TeamHome = ({ classes }) => {
   const params  = useParams();
   const [team, setTeam] = useState({});
   const [teamId] = useState(params.teamId);
-  const displayAddDrawer = getAppContextValue('addPersonDrawerOpen');
 
   const updateTeam = (tList) => {
     const oneTeam = tList.find((staff) => staff.teamId === parseInt(teamId));
@@ -90,7 +88,6 @@ const TeamHome = ({ classes }) => {
         </Button>
         <TeamHeader team={team} showHeaderLabels={(team && team.teamMemberList && team.teamMemberList.length > 0)} showIcons={false} />
         <TeamMemberList teamId={teamId} />
-        {displayAddDrawer ? <AddPersonDrawer /> : null }
       </PageContentContainer>
     </div>
   );

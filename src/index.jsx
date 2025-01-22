@@ -3,9 +3,8 @@ import { createRoot } from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 import App from './App';
 import ErrorBoundary from './js/common/components/Widgets/ErrorBoundary';
-// import WeVoteRouter from './js/common/components/Widgets/WeVoteRouter';
 import { isAndroid } from './js/common/utils/isCordovaOrWebApp';
-// importStartCordovaToken -- Do not remove this line!
+
 
 // The following line is rewritten to true by the buildSrcCordova.js node script
 const isIndexCordova = false;

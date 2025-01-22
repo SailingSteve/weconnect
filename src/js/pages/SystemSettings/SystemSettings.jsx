@@ -1,4 +1,3 @@
-import { Edit } from '@mui/icons-material';
 import { Button } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import { useQueryClient } from '@tanstack/react-query';
@@ -7,8 +6,8 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate } from 'react-router';
 import styled from 'styled-components';
-import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import { renderLog } from '../../common/utils/logging';
+import { EditStyled } from '../../components/Style/iconStyles';
 import { SpanWithLinkStyle } from '../../components/Style/linkStyles';
 import { PageContentContainer } from '../../components/Style/pageLayoutStyles';
 import webAppConfig from '../../config';
@@ -20,9 +19,7 @@ const SystemSettings = ({ classes }) => {
   renderLog('SystemSettings');
   const { setAppContextValue } = useConnectAppContext();
 
-  // eslint-disable-next-line no-unused-vars
   const [questionnaireList, setQuestionnaireList] = useState([]);
-  // eslint-disable-next-line no-unused-vars
   const [taskGroupList, setTaskGroupList] = useState([]);
 
   const navigate = useNavigate();
@@ -65,7 +62,6 @@ const SystemSettings = ({ classes }) => {
     setAppContextValue('editTaskGroupDrawerTaskGroup', undefined);
   };
 
-  // eslint-disable-next-line no-unused-vars
   const editTaskGroupClick = (taskGroup) => {
     setAppContextValue('editTaskGroupDrawerOpen', true);
     setAppContextValue('editTaskGroupDrawerTaskGroup', taskGroup);
@@ -178,13 +174,6 @@ const EditTaskGroup = styled('div')`
 `;
 
 const GoToQuestionairePage = styled('div')`
-`;
-
-const EditStyled = styled(Edit)`
-  color: ${DesignTokenColors.neutral100};
-  height: 16px;
-  margin-left: 2px;
-  width: 16px;
 `;
 
 const OneQuestionnaireWrapper = styled('div')`

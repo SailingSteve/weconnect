@@ -3,7 +3,6 @@ import { isCordova } from '../common/utils/isCordovaOrWebApp'; // eslint-disable
 import AppObservableStore from '../stores/AppObservableStore'; // eslint-disable-line import/no-cycle
 import arrayContains from '../common/utils/arrayContains';
 
-// TODO: Convert to a functional component, so it can use getContext()
 export default {
   clearEmailAddressStatus () {
     Dispatcher.dispatch({ type: 'clearEmailAddressStatus', payload: true });

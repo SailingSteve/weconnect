@@ -4,7 +4,6 @@ import AddPersonDrawerMainContent from '../Person/AddPersonDrawerMainContent';
 import DrawerTemplateA from './DrawerTemplateA';
 
 
-// eslint-disable-next-line no-unused-vars
 const AddPersonDrawer = () => {
   renderLog('AddPersonDrawer');  // Set LOG_RENDER_EVENTS to log all renders
 

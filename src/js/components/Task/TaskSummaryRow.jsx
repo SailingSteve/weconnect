@@ -2,32 +2,22 @@ import { Info, Launch } from '@mui/icons-material';
 import { Checkbox, FormControlLabel } from '@mui/material'; // FormLabel, Radio, RadioGroup,
 import Tooltip from '@mui/material/Tooltip';
 import { withStyles } from '@mui/styles';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
 import React, { Suspense, useRef } from 'react';
 import styled from 'styled-components';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import { renderLog } from '../../common/utils/logging';
 import makeRequestParams from '../../react-query/makeRequestParams';
-import weConnectQueryFn from '../../react-query/WeConnectQuery';
+import { useSaveTaskMutation } from '../../react-query/mutations';
 
 
 const OpenExternalWebSite = React.lazy(() => import(/* webpackChunkName: 'OpenExternalWebSite' */ '../../common/components/Widgets/OpenExternalWebSite'));
 
 const TaskSummaryRow = ({ classes, hideIfCompleted, personId, rowNumberForDisplay, taskDefinition, task }) => {
   renderLog('TaskSummaryRow');  // Set LOG_RENDER_EVENTS to log all renders
+  const { mutate } = useSaveTaskMutation();
 
   const doneCheckboxFldRef = useRef('');
-  const queryClient = useQueryClient();
-
-  const saveTaskMutation = useMutation({
-    mutationFn: (requestParams) => weConnectQueryFn('task-save', requestParams),
-    onSuccess: () => {
-      // console.log('--------- saveTaskMutation mutated ---------');
-      queryClient.invalidateQueries('task-status-list-retrieve').then(() => {});
-    },
-
-  });
 
   const updateTaskFieldInstant = (event) => {
     console.log('updateTaskFieldInstant event:', event);
@@ -40,7 +30,7 @@ const TaskSummaryRow = ({ classes, hideIfCompleted, personId, rowNumberForDispla
     }, {
       statusDone: !event.target.checked,
     });
-    saveTaskMutation.mutate(requestParams);
+    mutate(requestParams);
   };
 
   if (hideIfCompleted && task.statusDone) {

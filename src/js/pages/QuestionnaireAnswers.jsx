@@ -14,7 +14,7 @@ import webAppConfig from '../config';
 
 // eslint-disable-next-line no-unused-vars
 const QuestionnaireAnswers = ({ classes, match }) => {
-  renderLog('QuestionnaireAnswers');  // Set LOG_RENDER_EVENTS to log all renders
+  renderLog('QuestionnaireAnswers');
   const [questionnaireId] = useState(parseInt(useParams().questionnaireId));
   const [personId] = useState(parseInt(useParams().personId));
   const [person, setPerson] = useState(undefined);

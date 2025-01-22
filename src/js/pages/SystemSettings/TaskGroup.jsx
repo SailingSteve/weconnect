@@ -1,4 +1,3 @@
-import { Edit } from '@mui/icons-material';
 import { Button } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import PropTypes from 'prop-types';
@@ -8,6 +7,7 @@ import { Link, useLocation, useParams } from 'react-router';
 import styled from 'styled-components';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import { renderLog } from '../../common/utils/logging';
+import { EditStyled } from '../../components/Style/iconStyles';
 import { SpanWithLinkStyle } from '../../components/Style/linkStyles';
 import { PageContentContainer } from '../../components/Style/pageLayoutStyles';
 import webAppConfig from '../../config';
@@ -50,7 +50,6 @@ const TaskGroup = ({ classes, match }) => {
     setAppContextValue('editTaskDefinitionDrawerLabel', 'Add Task');
   };
 
-  // eslint-disable-next-line no-unused-vars
   const editTaskDefinitionClick = (taskDefinition) => {
     setAppContextValue('editTaskDefinitionDrawerOpen', true);
     setAppContextValue('editTaskDefinitionDrawerTaskDefinition', taskDefinition);
@@ -142,13 +141,6 @@ const AddButtonWrapper = styled('div')`
   margin-top: 24px;
 `;
 
-const EditStyled = styled(Edit)`
-  color: ${DesignTokenColors.neutral100};
-  height: 16px;
-  margin-left: 2px;
-  width: 16px;
-`;
-
 const InstructionsWrapper = styled('div')`
   color: ${DesignTokenColors.neutralUI300};
   font-size: 1.2em;
@@ -162,15 +154,5 @@ const TaskDefinitionListWrapper = styled('div')`
   margin-top: 24px;
   padding-bottom: 24px;
 `;
-
-// const RequiredStar = styled('span')`
-//   color: ${DesignTokenColors.alert800};
-//   font-weight: bold;
-// `;
-
-// const TitleWrapper = styled('h1')`
-//   line-height: 1.1;
-//   margin-bottom: 8px;
-// `;
 
 export default withStyles(styles)(TaskGroup);

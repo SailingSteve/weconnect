@@ -8,13 +8,7 @@ import { hasIPhoneNotch } from '../../common/utils/cordovaUtils';
 import { normalizedHrefPage } from '../../common/utils/hrefUtils';
 import { renderLog } from '../../common/utils/logging';
 import { displayTopMenuShadow } from '../../utils/applicationUtils';
-import {
-  TopOfPageHeader,
-  TopRowOneLeftContainer,
-  TopRowOneMiddleContainer,
-  TopRowOneRightContainer,
-  TopRowTwoLeftContainer,
-} from '../Style/pageLayoutStyles';
+import { TopOfPageHeader, TopRowOneLeftContainer, TopRowOneMiddleContainer, TopRowOneRightContainer, TopRowTwoLeftContainer, } from '../Style/pageLayoutStyles';
 import HeaderBarLogo from './HeaderBarLogo';
 // import { handleResize } from '../../common/utils/isMobileScreenSize';
 

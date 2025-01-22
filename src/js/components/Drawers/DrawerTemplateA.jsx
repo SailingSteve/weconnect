@@ -8,12 +8,7 @@ import { hasIPhoneNotch } from '../../common/utils/cordovaUtils';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
 import { cordovaDrawerTopMargin } from '../../utils/cordovaOffsets';
-import {
-  DrawerHeaderAnimateDownInnerContainer,
-  DrawerHeaderAnimateDownOuterContainer,
-  DrawerHeaderWrapper,
-  DrawerTitle,
-} from '../Style/drawerLayoutStyles';
+import { DrawerHeaderAnimateDownInnerContainer, DrawerHeaderAnimateDownOuterContainer, DrawerHeaderWrapper, DrawerTitle, } from '../Style/drawerLayoutStyles';
 
 
 const DrawerTemplateA = ({ classes, drawerId, drawerOpenGlobalVariableName, headerFixedJsx, headerTitleJsx, mainContentJsx }) => {  //  classes, teamId
@@ -86,7 +81,6 @@ const DrawerTemplateA = ({ classes, drawerId, drawerOpenGlobalVariableName, head
           </IconButton>
         </CloseDrawerIconWrapper>
       </DrawerHeaderWrapper>
-      {/* <DrawerHeaderAnimateDownOuterContainer id={`${drawerId}AnimateDownId`} scrolledDown={scrolledDown}> */}
       <DrawerHeaderAnimateDownOuterContainer id={`${drawerId}AnimateDownId`} $scrolledDown={scrolledDown}>
         <DrawerHeaderAnimateDownInnerContainer>
           {headerFixedJsx}

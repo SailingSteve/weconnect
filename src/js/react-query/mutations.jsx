@@ -73,8 +73,19 @@ const usePersonSaveMutation = () => {
   });
 };
 
+const useSaveTaskMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (requestParams) => weConnectQueryFn('task-save', requestParams),
+    onError: (error) => console.log('error in useSaveTaskMutation: ', error),
+    onSuccess: () => queryClient.invalidateQueries('task-status-list-retrieve').then(() => {}),
+  });
+};
+
+
 
 export  { useRemoveTeamMutation, useRemoveTeamMemberMutation, useAddPersonToTeamMutation,
   useQuestionnaireSaveMutation, useTaskDefinitionSaveMutation, useGroupSaveMutation,
-  useQuestionSaveMutation, usePersonSaveMutation };
+  useQuestionSaveMutation, usePersonSaveMutation, useSaveTaskMutation };
 

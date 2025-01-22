@@ -9,7 +9,6 @@ import validator from 'validator';
 import { renderLog } from '../common/utils/logging';
 import { PageContentContainer } from '../components/Style/pageLayoutStyles';
 import webAppConfig from '../config';
-// import historyPush from '../common/utils/historyPush';
 
 /* global $  */
 

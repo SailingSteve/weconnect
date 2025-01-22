@@ -11,7 +11,6 @@ import { SpanWithLinkStyle } from '../Style/linkStyles';
 import AddPersonForm from './AddPersonForm';
 
 
-// eslint-disable-next-line no-unused-vars
 const AddPersonDrawerMainContent = () => {
   renderLog('AddPersonDrawerMainContent');
   const { getAppContextValue } = useConnectAppContext();

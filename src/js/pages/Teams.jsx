@@ -12,8 +12,8 @@ import TeamHeader from '../components/Team/TeamHeader';
 import TeamMemberList from '../components/Team/TeamMemberList';
 import webAppConfig from '../config';
 import { useConnectAppContext } from '../contexts/ConnectAppContext';
-import { useFetchData } from '../react-query/WeConnectQuery';
 import { getTeamList } from '../react-query/TeamsQueryProcessing';
+import { useFetchData } from '../react-query/WeConnectQuery';
 
 
 // eslint-disable-next-line no-unused-vars
@@ -78,7 +78,7 @@ const Teams = ({ classes, match }) => {
           classes={{ root: classes.addTeamButtonRoot }}
           color="primary"
           variant="outlined"
-          onClick={() => addTeamClick()}
+          onClick={addTeamClick}
         >
           Add Team
         </Button>

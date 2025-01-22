@@ -5,8 +5,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
-import { usePersonSaveMutation } from '../../react-query/mutations';
 import makeRequestParams from '../../react-query/makeRequestParams';
+import { usePersonSaveMutation } from '../../react-query/mutations';
 
 const AddPersonForm = ({ classes }) => {  //  classes, teamId
   renderLog('AddPersonForm');

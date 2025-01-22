@@ -1,4 +1,3 @@
-import { Edit } from '@mui/icons-material';
 import { Button, CircularProgress } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import PropTypes from 'prop-types';
@@ -8,6 +7,7 @@ import { Link, useLocation } from 'react-router';
 import styled from 'styled-components';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import { renderLog } from '../../common/utils/logging';
+import { EditStyled } from '../../components/Style/iconStyles';
 import { SpanWithLinkStyle } from '../../components/Style/linkStyles';
 import { PageContentContainer } from '../../components/Style/pageLayoutStyles';
 import webAppConfig from '../../config';
@@ -153,13 +153,6 @@ const styles = (theme) => ({
 
 const AddButtonWrapper = styled('div')`
   margin-top: 24px;
-`;
-
-const EditStyled = styled(Edit)`
-  color: ${DesignTokenColors.neutral100};
-  height: 16px;
-  margin-left: 2px;
-  width: 16px;
 `;
 
 const InstructionsWrapper = styled('div')`
