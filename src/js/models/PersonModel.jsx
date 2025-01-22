@@ -33,7 +33,7 @@ export const useGetFullNamePreferred = (personId) => {
   return fullName;
 };
 
-// Needed to avoid Dependency cycle problem
+// Needed to avoid Dependency cycle problem, and to get this string from within maps
 export const getFullNamePreferredPerson = (person) => {
   let fullName = '';
   if (person.id >= 0) {
@@ -60,7 +60,7 @@ export const usePersonSave = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (params) => weConnectQueryFn('person-save', params, METHOD.GET),
-    networkMode: 'always', // Send queries to the server even if the cache has the data
+    // networkMode: 'always', // <- This is not a solution, it just covers up some problem in our code, while disabling the biggest benefit of ReactQueries. Send queries to the server even if the cache has the data
     onError: (error) => {
       console.log('onError in usePersonSave: ', error);
       queryClient.refetchQueries({ queryKey: ['person-list-retrieve'], refetchType: 'active', exact: true, force: true })

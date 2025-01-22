@@ -7,18 +7,18 @@ import { renderLog } from '../../common/utils/logging';
 import webAppConfig from '../../config';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
 import makeRequestParams from '../../react-query/makeRequestParams';
-// import { usePersonSaveMutation } from '../../react-query/mutations';
-import { useGetPersonById, usePersonSave } from '../../models/PersonModel';
+import { usePersonSaveMutation } from '../../react-query/mutations';
+// import { useGetPersonById, usePersonSave } from '../../models/PersonModel';
 
 const EditPersonForm = ({ classes }) => {
   renderLog('EditPersonForm');
   const { getAppContextValue } = useConnectAppContext();
-  // const { mutate } = usePersonSaveMutation();
-  const { mutate: personSave } = usePersonSave();
+  const { mutate } = usePersonSaveMutation();
+  // const { mutate: personSave } = usePersonSave();
 
   const [saveButtonActive, setSaveButtonActive] = useState(false);
-  // const [initialPerson] = useState(getAppContextValue('personDrawersPerson'));
-  const [initialPerson] = useState(useGetPersonById(getAppContextValue('personDrawersPersonId')));
+  const [initialPerson] = useState(getAppContextValue('personDrawersPerson'));
+  // const [initialPerson] = useState(useGetPersonById(getAppContextValue('personDrawersPersonId')));
   const [activePerson, setActivePerson] = useState({ ...initialPerson });
 
   const emailPersonal = useRef('');
@@ -54,8 +54,8 @@ const EditPersonForm = ({ classes }) => {
       personId: activePerson.id,
     };
 
-    // mutate(makeRequestParams(plainParams, data));
-    personSave(makeRequestParams(plainParams, data));
+    mutate(makeRequestParams(plainParams, data));
+    // personSave(makeRequestParams(plainParams, data));
     setSaveButtonActive(false);
   };
 
@@ -78,7 +78,7 @@ const EditPersonForm = ({ classes }) => {
           defaultValue={activePerson.firstNamePreferred || ''}
           id="firstNamePreferredToBeSaved"
           inputRef={firstNamePreferred}
-          label="Preferred Name (if different from legal)"
+          label="Preferred FIRST Name (if different from legal)"
           margin="dense"
           name="firstNamePreferred"
           onChange={() => setSaveButtonActive(true)}

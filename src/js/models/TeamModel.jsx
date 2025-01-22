@@ -8,6 +8,8 @@ export const useGetTeamById = (teamId) => {
   const { apiDataCache } = useConnectAppContext();
   const { allTeamsCache } = apiDataCache;
   // console.log('useGetTeamById teamId:', teamId, ', allTeamsCache:', allTeamsCache);
+  // console.log('||||||| useGetTeamById teamId:', teamId, ', allTeamsCache[2].teamName:', allTeamsCache && allTeamsCache && allTeamsCache[2].teamName);
+
   if (allTeamsCache) {
     return allTeamsCache[teamId] || {};
   } else {
@@ -15,7 +17,7 @@ export const useGetTeamById = (teamId) => {
   }
 };
 
-export const GetTeamMembersListByTeamId = (teamId, apiDataCache) => {
+export const getTeamMembersListByTeamId = (teamId, apiDataCache) => {
   const { allPeopleCache, allTeamMembersCache } = apiDataCache;
   if (!allTeamMembersCache || !allTeamMembersCache[teamId]) {
     return [];
@@ -43,6 +45,7 @@ export function TeamListRetrieveDataCapture (
   apiDataCache = {},
   dispatch,
 ) {
+  // console.log('||||||| TeamListRetrieveDataCapture should be called after useFetchData([\'team-list-retrieve\'], {})')
   const { data, isSuccess } = incomingRetrieveResults;
   const allTeamMembersCache = apiDataCache.allTeamMembersCache || {};
   const allTeamsCache = apiDataCache.allTeamsCache || {};
@@ -107,6 +110,7 @@ export function TeamListRetrieveDataCapture (
         }
       }
       if (newTeamMemberDataReceived) {
+        // console.log('newTeamMemberDataReceived, dispatching allTeamMembersCache');
         dispatch({ type: 'updateByKeyValue', key: 'allTeamMembersCache', value: allTeamMembersCacheNew });
         changeResults.allTeamMembersCache = allTeamMembersCacheNew;
         changeResults.allTeamMembersCacheChanged = true;
@@ -121,11 +125,12 @@ export function TeamListRetrieveDataCapture (
   return changeResults;
 }
 
-export const useRemoveTeamMemberMutation = () => {
+// 2/6/24 Doesn't work and previously used the same function name as the working one in mutations.js
+export const useRemoveTeamMemberMutationDiverged = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (params) => weConnectQueryFn('remove-person-from-team', params),
-    networkMode: 'always', // Send queries to the server even if the cache has the data
+    // networkMode: 'always', // <-- This is not a solution, it just covers up some problem in our code, while disabling the biggest benefit of ReactQueries.  Send queries to the server even if the cache has the data
     onError: (error) => {
       console.log('onError in useRemoveTeamMemberMutation: ', error);
       queryClient.refetchQueries({ queryKey: ['team-list-retrieve'], refetchType: 'active', exact: true, force: true })

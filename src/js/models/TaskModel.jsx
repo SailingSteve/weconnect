@@ -6,6 +6,7 @@ import isEqual from 'lodash-es/isEqual';
 
 // This is called after making this fetchData request:
 // const taskStatusListRetrieveResults = useFetchData(['task-status-list-retrieve'], { personIdList: personIdsList });
+// eslint-disable-next-line import/prefer-default-export
 export function TaskStatusListRetrieveDataCapture (
   incomingRetrieveResults = {},
   apiDataCache = {},

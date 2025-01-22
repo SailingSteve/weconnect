@@ -22,6 +22,7 @@ const TeamHome = ({ classes }) => {
 
   const params  = useParams();
   const [team, setTeam] = useState(useGetTeamById(convertToInteger(params.teamId)));
+  const [teamMemberLists, setTeamMemberLists] = useState([]);
   const [teamId] = useState(convertToInteger(params.teamId));
 
   // const updateTeam = (tList) => {
@@ -35,6 +36,7 @@ const TeamHome = ({ classes }) => {
   useEffect(() => {
     // console.log('useFetchData team-list-retrieve in TeamHome useEffect:', teamListRetrieveResults);
     if (teamListRetrieveResults) {
+      setTeamMemberLists(teamListRetrieveResults.data);
       // console.log('In useEffect apiDataCache:', apiDataCache);
       // const changeResults =
       TeamListRetrieveDataCapture(teamListRetrieveResults, apiDataCache, dispatch);
@@ -65,6 +67,8 @@ const TeamHome = ({ classes }) => {
     setAppContextValue('addPersonDrawerOpen', true);
     setAppContextValue('addPersonDrawerTeam', team);
     setAppContextValue('teamId', team.id);
+    const teamWithEmbeddedMemberList = (teamMemberLists && teamMemberLists.teamList.filter((list) => list.id === team.id)[0]) || [];
+    setAppContextValue('addPersonDrawerTeamMemberList', teamWithEmbeddedMemberList && teamWithEmbeddedMemberList.teamMemberList);
   };
 
   return (
@@ -97,7 +101,8 @@ const TeamHome = ({ classes }) => {
               // showHeaderLabels={(teamMemberList && teamMemberList.length > 0)}
               showIcons={false}
             />
-            <TeamMemberList teamId={teamId} />
+            {/* PLEASE DO NOT REMOVE PASSED team */}
+            <TeamMemberList teamId={teamId} team={team} />
           </>
         )}
         <Button
@@ -105,6 +110,7 @@ const TeamHome = ({ classes }) => {
           color="primary"
           variant="outlined"
           onClick={addTeamMemberClick}
+          sx={{ marginTop: '30px' }}
         >
           Add Team Member
         </Button>

@@ -1,18 +1,18 @@
 // eslint-disable-next-line  arrow-body-style
-export const getTeamList = (teamListData) => {
-  // const teamListRaw = teamListData.teamList;
-
-  // Copied from TeamStore, this code does nothing
-  // const teamList = [];
-  // let teamFiltered;
-  // let teamRaw;
-  // for (let i = 0; i < teamListRaw.length; i++) {
-  //   teamRaw = teamListRaw[i];
-  //   teamFiltered = teamRaw;
-  //   teamList.push(teamFiltered);
-  // }
-  return teamListData.teamList;
-};
+// export const getTeamList = (teamListData) => {
+//   // const teamListRaw = teamListData.teamList;
+//
+//   // Copied from TeamStore, this code does nothing
+//   // const teamList = [];
+//   // let teamFiltered;
+//   // let teamRaw;
+//   // for (let i = 0; i < teamListRaw.length; i++) {
+//   //   teamRaw = teamListRaw[i];
+//   //   teamFiltered = teamRaw;
+//   //   teamList.push(teamFiltered);
+//   // }
+//   return teamListData.teamList;
+// };
 
 export const getTeamPersonsList = (teamListData, teamId) => {
   console.log('TeamsQueryProcessing, getTeamPersonsList teamId:', teamId);

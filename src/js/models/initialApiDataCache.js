@@ -1,6 +1,7 @@
 // Moved to a separate file that does not include ConnectAppContext.jsx to avoid a "Dependency cycle"
 const initialApiDataCache = () => {
   // These are the "AppContextValues" (i.e., global state variables) used in the PersonModel
+  console.log('initialApiDataCache called');  // This is worth logging, to see if we are reinitializing the apiDataCache unintentionally
   const initialGlobalPersonVariables = {
     allPeopleCache: {}, // This is a dictionary key: personId, value: person dict
     mostRecentPersonIdSaved: -1,

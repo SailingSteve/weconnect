@@ -12,6 +12,7 @@ const ConnectDispatch = createContext(null);
 
 function apiDataCacheReducer (apiDataCache, action) {
   let revisedApiDataCache = { ...apiDataCache };
+  // console.log('^^^^^^^^ apiDataReducer called with key: ', action.key);
   switch (action.type) {
     case 'updateByKeyValue': {
       revisedApiDataCache = { ...revisedApiDataCache, [action.key]: action.value };
@@ -55,7 +56,7 @@ export const ConnectAppContextProvider = ({ children }) => {
   // This is not currently the right place to pass these values, but I'm saving these here for the next 30 days until we work out the correct place.
   // {
   //   cacheTime: 0,
-  //   networkMode: 'no-cache',
+  //   networkMode: 'no-cache', <-- This is not a solution, it just covers up some problem in our code, while disabling the biggest benefit of ReactQueries.
   //   refetchOnMount: true,
   //   refetchOnWindowFocus: true,
   //   refetchInterval: 0,
@@ -93,7 +94,6 @@ export const ConnectAppContextProvider = ({ children }) => {
     }
   }, [dataAuth, isSuccessAuth]);
 
-
   return (
     <ConnectAppContext.Provider value={{ apiDataCache, getAppContextData, setAppContextValue, getAppContextValue, setAppContextValuesInBulk }}>
       <ConnectDispatch.Provider value={dispatch}>
@@ -114,33 +114,3 @@ export function useConnectAppContext () {
 export function useConnectDispatch () {
   return useContext(ConnectDispatch);
 }
-
-
-
-
-
-
-
-// Replaces AppObservableStore.js
-// export const ConnectAppContext = createContext({ value: undefined, loadValue: () => console.log('Default function') });
-//
-//
-// // https://stackoverflow.com/questions/57819211/how-to-set-a-value-with-usecontext
-// // eslint-disable-next-line react/prop-types
-// export const WeProvider = ({ children }) => {
-//   const [value, setAppContextValue] = useState(undefined);
-//
-//   return (
-//     <ConnectAppContext.Provider
-//       value={{
-//         value,
-//         loadAppContextValue: (currentValue) => {
-//           setAppContextValue(currentValue);
-//         },
-//       }}
-//     >
-//       {children}
-//     </ConnectAppContext.Provider>
-//   );
-// };
-//

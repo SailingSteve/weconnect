@@ -14,7 +14,7 @@ const AddTeamDrawer = () => {
       drawerId="addTeamDrawer"
       drawerOpenGlobalVariableName="addTeamDrawerOpen"
       mainContentJsx={<AddTeamDrawerMainContent />}
-      headerTitleJsx={getAppContextValue('AddTeamDrawerLabel')}
+      headerTitleJsx={<>{getAppContextValue('AddTeamDrawerLabel')}</>}
       headerFixedJsx={<></>}
     />
   );

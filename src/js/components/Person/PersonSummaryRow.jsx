@@ -5,16 +5,16 @@ import styled from 'styled-components';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
-import { useGetFullNamePreferred } from '../../models/PersonModel';
-import { useRemoveTeamMemberMutation } from '../../models/TeamModel';
-// import useGetFullNamePreferredReactQuery from '../../react-query/useGetFullNamePreferredReactQuery';
-// import { useRemoveTeamMemberMutation } from '../../react-query/mutations';
+import { useRemoveTeamMemberMutation } from '../../react-query/mutations';
 import { DeleteStyled, EditStyled } from '../Style/iconStyles';
+// import { useRemoveTeamMemberMutationDiverged } from '../../models/TeamModel';
 
 
 const PersonSummaryRow = ({ person, rowNumberForDisplay, teamId }) => {
   renderLog('PersonSummaryRow');  // Set LOG_RENDER_EVENTS to log all renders
-  // const [person, setPerson] = useState(useGetPersonById(personId));
+  // console.log('PersonSummaryRow location: ', person && person.location);
+
+  // const [person, setPerson] = useState(useGetPersonById(personId));  2/5/2025 does not work
   const { setAppContextValue } = useConnectAppContext();
   const { mutate } = useRemoveTeamMemberMutation();
 
@@ -26,14 +26,14 @@ const PersonSummaryRow = ({ person, rowNumberForDisplay, teamId }) => {
   const editPersonClick = (hasEditRights = true) => {
     if (hasEditRights) {
       setAppContextValue('editPersonDrawerOpen', true);
-      // setAppContextValue('personDrawersPerson', person);
+      setAppContextValue('personDrawersPerson', person);
       setAppContextValue('personDrawersPersonId', person.personId);
     }
   };
 
   const personProfileClick = () => {
     setAppContextValue('personProfileDrawerOpen', true);
-    // setAppContextValue('personDrawersPerson', person);
+    setAppContextValue('personDrawersPerson', person);
     setAppContextValue('personDrawersPersonId', person.personId);
   };
 
@@ -65,7 +65,8 @@ const PersonSummaryRow = ({ person, rowNumberForDisplay, teamId }) => {
         }}
         width={200}
       >
-        {useGetFullNamePreferred(person.personId)}
+        {`${person.firstName} ${person.lastName}`}
+        {/* useGetFullNamePreferred(person.personId) 2/6/25 currently if you save a first name preferred, it shows up here, but will not be searchable on add team member If you */}
       </PersonCell>
       <PersonCell id={`location-personId-${person.personId}`} $smallFont width={300}>
         {person.location}
