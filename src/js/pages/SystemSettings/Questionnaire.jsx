@@ -62,7 +62,7 @@ const Questionnaire = ({ classes, match }) => {
     setAppContextValue('editQuestionnaireDrawerOpen', true);
   };
 
-  if (isFetchingQList || questionnaire === undefined ) {
+  if (isFetchingQList || questionnaire === undefined) {
     return (
       <div style={{ padding: '150px 30px 30px 50%' }}>
         <CircularProgress />
@@ -108,7 +108,7 @@ const Questionnaire = ({ classes, match }) => {
         <QuestionListWrapper>
           {questionList.map((question) => (
             <OneQuestionnaireWrapper key={`questionnaire-${question.id}`}>
-              {console.log('questionList.map((questionnaire)', questionList)}
+              {console.log('questionList.map((questionnaire)', question)}
               Question: {question.questionText}
               {' '}
               {question.requireAnswer && (

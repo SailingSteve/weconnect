@@ -50,14 +50,14 @@ const PersonSummaryRow = ({ person, rowNumberForDisplay, teamId }) => {
           textDecoration: 'underline',
           color: DesignTokenColors.primary500,
         }}
-        width={150}
+        width={200}
       >
         {person.firstName} {person.lastName}
       </PersonCell>
-      <PersonCell id={`location-personId-${person.personId}`} $smallFont width={125}>
+      <PersonCell id={`location-personId-${person.personId}`} $smallFont width={300}>
         {person.location}
       </PersonCell>
-      <PersonCell id={`jobTitle-personId-${person.personId}`} $smallestFont width={190}>
+      <PersonCell id={`jobTitle-personId-${person.personId}`} $smallestFont width={225}>
         {person.jobTitle}
       </PersonCell>
       {hasEditRights ? (

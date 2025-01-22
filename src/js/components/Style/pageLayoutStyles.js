@@ -1,19 +1,6 @@
 import styled from 'styled-components';
 import standardBoxShadow from '../../common/components/Style/standardBoxShadow';
-import {
-  hasDynamicIsland,
-  isAndroidSizeMD,
-  isAndroidSizeWide,
-  isAndroidSizeXL,
-  isIOSAppOnMac,
-  isIPad,
-  isIPad11in,
-  isIPadMini,
-  isIPhone14Pro,
-  isIPhone4p7in,
-  isIPhone5p5inEarly,
-  isIPhone5p5inMini,
-} from '../../common/utils/cordovaUtils';
+import { hasDynamicIsland, isAndroidSizeMD, isAndroidSizeWide, isAndroidSizeXL, isIOSAppOnMac, isIPad, isIPad11in, isIPadMini, isIPhone14Pro, isIPhone4p7in, isIPhone5p5inEarly, isIPhone5p5inMini } from '../../common/utils/cordovaUtils';
 import { normalizedHrefPage } from '../../common/utils/hrefUtils';
 import { isAndroid, isCordova, isWebApp } from '../../common/utils/isCordovaOrWebApp';
 import isMobileScreenSize, { isTablet } from '../../common/utils/isMobileScreenSize';
@@ -27,7 +14,7 @@ export const IOSNotchedSpacer = styled('div')`
     return                        '36px';
   }};
   top: 0;
-  position: fixed;Ï
+  position: fixed;
   background: white;
   width: 100%;
   opacity: 1;

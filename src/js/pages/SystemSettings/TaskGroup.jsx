@@ -18,11 +18,11 @@ import { useFetchData } from '../../react-query/WeConnectQuery';
 // eslint-disable-next-line no-unused-vars
 const TaskGroup = ({ classes, match }) => {
   renderLog('TaskGroup');
-  const { setAppContextValue, getAppContextValue } = useConnectAppContext();
+  const { setAppContextValue } = useConnectAppContext();
 
   const location = useLocation();
   const [taskGroupId] = useState(parseInt(useParams().taskGroupId));
-  const [taskGroupFromContext] = useState(getAppContextValue('editTaskGroupDrawerTaskGroup'));
+  // const [taskGroupFromContext] = useState(getAppContextValue('editTaskGroupDrawerTaskGroup'));
   const [taskGroupName] = useState(location.state.taskGroupName);
   const [taskGroup, setTaskGroup] = useState(undefined);
 

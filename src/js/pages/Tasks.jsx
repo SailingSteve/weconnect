@@ -23,13 +23,13 @@ const Tasks = ({ classes, match }) => {
   const [taskDefinitionList, setTaskDefinitionList] = useState(undefined);
   const [allStaffList, setAllStaffList] = useState([]);
   const [isFetching, setIsFetching] = useState([false]);
-  let personIdsList;
+  const [personIdsList, setPersonIdsList] = useState();
 
   // Roughly equivalent to PersonStore.getAllCachedPeopleList(); and TaskActions.taskStatusListRetrieve();
   const { data: dataPerson, isSuccess: isSuccessPerson, isFetching: isFetchingPerson } = useFetchData(['person-list-retrieve'], {});
   useEffect(() => {
     if (dataPerson) {
-      personIdsList = dataPerson.personList.map((dataPersonObj) => dataPersonObj.id);
+      setPersonIdsList(dataPerson.personList.map((dataPersonObj) => dataPersonObj.id));
       setAllStaffList(dataPerson.personList);
     }
   }, [dataPerson, isSuccessPerson]);

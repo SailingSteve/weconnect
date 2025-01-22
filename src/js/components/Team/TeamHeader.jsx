@@ -20,7 +20,7 @@ const TeamHeader = ({ classes, showHeaderLabels, showIcons, team }) => {
 
   const removeTeamClick = () => {
     console.log('removeTeamMutation team: ', teamLocal.id);
-    mutate({teamId: teamLocal.id});
+    mutate({ teamId: teamLocal.id });
   };
 
   const editTeamClick = () => {
@@ -33,14 +33,17 @@ const TeamHeader = ({ classes, showHeaderLabels, showIcons, team }) => {
   return (
     <OneTeamHeader>
       {/* Width (below) of this TeamHeaderCell comes from the combined widths of the first x columns in TeamMemberList */}
-      <TeamHeaderCell $largeFont $titleCell width={15 + 150 + 125}>
+      <TeamHeaderCell $largeFont $titleCell width={215}>
         {teamLocal && (
           <Link to={`/team-home/${teamLocal.id}`}>
             {teamLocal.teamName}
           </Link>
         )}
       </TeamHeaderCell>
-      <TeamHeaderCell width={190}>
+      <TeamHeaderCell width={300}>
+        {showHeaderLabels ? 'Location' : ''}
+      </TeamHeaderCell>
+      <TeamHeaderCell width={225}>
         {showHeaderLabels ? 'Title / Volunteering Love' : ''}
       </TeamHeaderCell>
       {/* Edit icon */}

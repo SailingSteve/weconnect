@@ -29,9 +29,9 @@ const CopyQuestionnaireLink = () => {
     <CopyQuestionnaireLinkWrapper>
       <CopyToClipboard text={linkToBeShared} onCopy={copyLink}>
         <div>
-          <div style={{ paddingBottom: '20px' }}>
-            Hi {person.firstName}!
-          </div>
+          {/* <div style={{ paddingBottom: '20px' }}> */}
+          {/*  Hi {person.firstName}! */}
+          {/* </div> */}
           {linkCopied ? (
             <div>Link copied!</div>
           ) : (

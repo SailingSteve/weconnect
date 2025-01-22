@@ -22,7 +22,7 @@ const QuestionnaireResponsesList = ({ personId }) => {
   // Although we are sending a list, there will only be one person id, if there were more, just append them with commas
   const requestParams = `personIdList[]=${person.id}`;
 
-  const { dataQRS, isSuccessQRS, isFetchingQRS } = useFetchData(['questionnaire-responses-list-retrieve'], requestParams);
+  const { data: dataQRS, isSuccess: isSuccessQRS, isFetching: isFetchingQRS } = useFetchData(['questionnaire-responses-list-retrieve'], requestParams);
   if (isFetchingQRS) {
     console.log('isFetching  ------------ \'questionnaire-responses-list-retrieve\'');
   }
@@ -35,7 +35,6 @@ const QuestionnaireResponsesList = ({ personId }) => {
       // It seems like an answered questionnaire question should be a questionAnswerList, but questionnaire and question seem tyo be used inconsistently
       // So this is hard to figure out without having some "answers" data
 
-      // const questionnaireListTemp = dataQRS.questionAnswerList;
       // const questionnaireListTempModified = [];
       // for (let i = 0; i < questionnaireListTemp.length; i++) {
       //   const questionnaire = questionnaireListTemp[i];
@@ -49,46 +48,50 @@ const QuestionnaireResponsesList = ({ personId }) => {
       // }
       // setQuestionnaireList(questionnaireListTempModified);
 
-      setQuestionnaireList(dataQRS.questionAnswerList);
+      setQuestionnaireList(dataQRS.questionnaireList);
     }
-  }, [dataQRS]);
+  }, [dataQRS, isFetchingQRS, person]);
 
   return (
     <div>
       {questionnaireList.length > 0 && (
-        <QuestionnaireListWrapper>
-          Questionnaire Responses
-          {questionnaireList.map((questionnaire) => (
-            <OneQuestionnaireWrapper key={`questionnaire-${questionnaire.id}`}>
-              <QuestionText>
-                {questionnaire.questionnaireName}
-              </QuestionText>
-              <CopyQuestionnaireLink personId={personId} questionnaireId={questionnaire.id} />
-              <Suspense fallback={<></>}>
-                <OpenExternalWebSite
-                  linkIdAttribute="view answers"
-                  url={`${webAppConfig.PROTOCOL}${webAppConfig.HOSTNAME}/answers/${questionnaire.id}/${personId}`}
-                  target="_blank"
-                  body={(
-                    <Tooltip title="View answers">
-                      <div>
-                        view
-                        <LaunchStyled />
-                      </div>
-                    </Tooltip>
-                  )}
-                />
-              </Suspense>
-              {questionnaire.dateQuestionnaireCompleted && (
-                <WhenCompleted>
-                  Completed on
-                  {' '}
-                  {questionnaire.dateQuestionnaireCompleted.toLocaleString('en-US', {})}
-                </WhenCompleted>
-              )}
-            </OneQuestionnaireWrapper>
-          ))}
-        </QuestionnaireListWrapper>
+        <>
+          <QuestionnaireResponses>
+            Questionnaire Responses
+          </QuestionnaireResponses>
+          <QuestionnaireListWrapper>
+            {questionnaireList.map((questionnaire) => (
+              <OneQuestionnaireWrapper key={`questionnaire-${questionnaire.id}`}>
+                <QuestionText>
+                  {questionnaire.questionnaireName}
+                </QuestionText>
+                <CopyQuestionnaireLink personId={personId} questionnaireId={questionnaire.id} />
+                <Suspense fallback={<></>}>
+                  <OpenExternalWebSite
+                    linkIdAttribute="view answers"
+                    url={`${webAppConfig.PROTOCOL}${webAppConfig.HOSTNAME}/answers/${questionnaire.id}/${personId}`}
+                    target="_blank"
+                    body={(
+                      <Tooltip title="View answers">
+                        <div>
+                          view
+                          <LaunchStyled />
+                        </div>
+                      </Tooltip>
+                    )}
+                  />
+                </Suspense>
+                {questionnaire.dateQuestionnaireCompleted && (
+                  <WhenCompleted>
+                    Completed on
+                    {' '}
+                    {questionnaire.dateQuestionnaireCompleted.toLocaleString('en-US', {})}
+                  </WhenCompleted>
+                )}
+              </OneQuestionnaireWrapper>
+            ))}
+          </QuestionnaireListWrapper>
+        </>
       )}
     </div>
   );
@@ -104,14 +107,17 @@ const LaunchStyled = styled(Launch)`
   width: 14px;
 `;
 
+const QuestionnaireResponses = styled('div')`
+  font-weight: 550;
+  margin-top: 20px;
+`;
 const WhenCompleted = styled('div')`
   color: ${DesignTokenColors.neutralUI300};
   font-size: .9em;
 `;
 
 const OneQuestionnaireWrapper = styled('div')`
-  font-weight: 550;
-  margin-top: 6px;
+  font-weight: 450;
 `;
 
 const QuestionText = styled('div')`
@@ -119,6 +125,7 @@ const QuestionText = styled('div')`
 
 const QuestionnaireListWrapper = styled('div')`
   margin-top: 30px;
+  margin-left: 10px;
 `;
 
 export default QuestionnaireResponsesList;
