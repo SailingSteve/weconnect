@@ -87,11 +87,9 @@ const AddPersonDrawerMainContent = () => {
       teamName,
     };
     mutate(makeRequestParams(plainParams, {}));
-    if (mutate.isSuccess) {
-      // This removes the recently "added" staff, from the list of staff who can be added, the staffToDisplayList
-      const updatedStaffToDisplayList = staffToDisplayList.filter((staff) => staff.id !== person.id);
-      setStaffToDisplayList(updatedStaffToDisplayList);
-    }
+    // This removes the recently "added" staff, from the list of staff who can be added, the staffToDisplayList
+    const updatedStaffToDisplayList = staffToDisplayList.filter((staff) => staff.id !== person.id);
+    setStaffToDisplayList(updatedStaffToDisplayList);
   };
 
   return (
