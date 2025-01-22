@@ -1,5 +1,14 @@
 import { ContentCopy } from '@mui/icons-material';
-import { Button, Checkbox, FormControl, FormControlLabel, TextField } from '@mui/material'; // FormLabel, Radio, RadioGroup,
+import {
+  Button,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Radio,
+  RadioGroup,
+  TextField,
+} from '@mui/material'; // FormLabel, Radio, RadioGroup,
 import { withStyles } from '@mui/styles';
 import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
@@ -8,8 +17,8 @@ import styled from 'styled-components';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
-import { useQuestionSaveMutation } from '../../react-query/mutations';
 import makeRequestParams from '../../react-query/makeRequestParams';
+import { useQuestionSaveMutation } from '../../react-query/mutations';
 import { SpanWithLinkStyle } from '../Style/linkStyles';
 
 const PERSON_FIELDS_ACCEPTED = [
@@ -36,8 +45,6 @@ const EditQuestionForm = ({ classes }) => {
 
   const [question] = useState(getAppContextValue('selectedQuestion'));
   const [questionnaire] = useState(getAppContextValue('selectedQuestionnaire'));
-  const [errorString, setErrorString] = useState('');
-  const [answerTypeValue, setAnswerTypeValue] = useState('');
   const [fieldMappingRuleValue, setFieldMappingRuleValue] = useState('');
   const [questionInstructionsValue, setQuestionInstructionsValue] = useState('');
   const [questionTextValue, setQuestionTextValue] = useState('');
@@ -48,24 +55,25 @@ const EditQuestionForm = ({ classes }) => {
   const [fieldMappingRuleCopied, setFieldMappingRuleCopied] = useState('');
   const [saveButtonActive, setSaveButtonActive] = useState(false);
   const [showFieldMappingOptions, setShowFieldMappingOptions] = useState(false);
+  const [radioValue, setRadioValue] = useState();
 
-  const answerTypeFldRef = useRef('');
   const fieldMappingRuleFldRef = useRef('');
   const questionInstructionsFldRef = useRef('');
   const questionTextFldRef = useRef('');
   const requireAnswerFldRef = useRef(false);
   const statusActiveFldRef = useRef(true);
+  const formatRadioFldRef = useRef(true);
 
   useEffect(() => {
     if (question) {
-      setAnswerTypeValue(question.answerType);
+      setRadioValue(question.answerType);
       setFieldMappingRuleValue(question.fieldMappingRule);
       setQuestionInstructionsValue(question.questionInstructions);
       setQuestionTextValue(question.questionText);
       setRequireAnswerValue(question.requireAnswer);
       setStatusActiveValue(question.statusActive);
     } else {
-      setAnswerTypeValue('');
+      setRadioValue('STRING');
       setFieldMappingRuleValue('');
       setQuestionInstructionsValue('');
       setQuestionTextValue('');
@@ -91,26 +99,20 @@ const EditQuestionForm = ({ classes }) => {
   };
 
   const saveQuestion = () => {
-    const types = ['INTEGER', 'BOOLEAN', 'STRING'];
-    if (!types.includes(answerTypeFldRef.current.value.trim())) {
-      setErrorString('type must be one of [INTEGER, BOOLEAN, STRING]');
-      setSaveButtonActive(true);
-    } else {
-      const requestParams = makeRequestParams({
-        questionId: question ? question.id : '-1',
-        questionnaireId: questionnaire.id,
-      }, {
-        answerType: answerTypeFldRef.current.value,
-        // fieldMappingRule: fieldMappingRuleFldRef.current.checked,
-        questionInstructions: questionInstructionsFldRef.current.value,
-        questionText: questionTextFldRef.current.value,
-        requireAnswer: (requireAnswerFldRef.current.value === 'on'),
-        statusActive: (statusActiveFldRef.current.value === 'on'),
-      });
-      mutate(requestParams);
-      console.log('saveQuestionnaire requestParams:', requestParams);
-      setSaveButtonActive(false);
-    }
+    const requestParams = makeRequestParams({
+      questionId: question ? question.id : '-1',
+      questionnaireId: questionnaire ? questionnaire.id : 'Need to navigate from earlier page where q is put in AppContext',   // hack
+    }, {
+      answerType: radioValue,
+      // fieldMappingRule: fieldMappingRuleFldRef.current.checked,
+      questionInstructions: questionInstructionsFldRef.current.value,
+      questionText: questionTextFldRef.current.value,
+      requireAnswer: (requireAnswerFldRef.current.value === 'on'),
+      statusActive: (statusActiveFldRef.current.value === 'on'),
+    });
+    mutate(requestParams);
+    console.log('saveQuestionnaire requestParams:', requestParams);
+    setSaveButtonActive(false);
   };
 
   const updateSaveButton = () => {
@@ -123,9 +125,12 @@ const EditQuestionForm = ({ classes }) => {
     }
   };
 
+  const handleRadioChange = (event) => {
+    setRadioValue(event.target.value);
+  };
+
   return (
     <EditQuestionFormWrapper>
-      {errorString}
       <FormControl classes={{ root: classes.formControl }}>
         <TextField
           autoFocus
@@ -154,18 +159,22 @@ const EditQuestionForm = ({ classes }) => {
           rows={4}
           variant="outlined"
         />
-        {/* If this is a one of 3 choices field, it probably should be a pull down menu chooser */}
-        <TextField
-          defaultValue={answerTypeValue}
-          id="answerTypeToBeSaved"
-          inputRef={answerTypeFldRef}
-          label="Type of Answer"
-          margin="dense"
-          name="answerType"
-          onChange={() => updateSaveButton()}
-          placeholder="BOOLEAN / INTEGER / STRING"
-          variant="outlined"
-        />
+        <FormControl>
+          <FormLabel id="demo-radio-buttons-group-label">Data format of answer</FormLabel>
+          <RadioGroup
+            aria-labelledby="demo-radio-buttons-group-label"
+            defaultValue="STRING"
+            inputRef={formatRadioFldRef}
+            name="radio-buttons-group"
+            onChange={handleRadioChange}
+            row
+            sx={{ paddingBottom: '20px' }}
+          >
+            <FormControlLabel value="STRING" control={<Radio />} label="String" />
+            <FormControlLabel value="BOOLEAN" control={<Radio />} label="Boolean" />
+            <FormControlLabel value="INTEGER" control={<Radio />} label="Integer" />
+          </RadioGroup>
+        </FormControl>
         <CheckboxLabel
           classes={{ label: classes.checkboxLabel }}
           control={(

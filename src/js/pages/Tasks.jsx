@@ -11,7 +11,7 @@ import { SpanWithLinkStyle } from '../components/Style/linkStyles';
 import { PageContentContainer } from '../components/Style/pageLayoutStyles';
 import TaskListForPerson from '../components/Task/TaskListForPerson';
 import webAppConfig from '../config';
-import useFetchData from '../react-query/fetchData';
+import { useFetchData } from '../react-query/WeConnectQuery';
 
 
 // eslint-disable-next-line no-unused-vars

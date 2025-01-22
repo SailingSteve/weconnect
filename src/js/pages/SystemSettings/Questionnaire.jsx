@@ -12,7 +12,7 @@ import { SpanWithLinkStyle } from '../../components/Style/linkStyles';
 import { PageContentContainer } from '../../components/Style/pageLayoutStyles';
 import webAppConfig from '../../config';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
-import useFetchData from '../../react-query/fetchData';
+import { useFetchData } from '../../react-query/WeConnectQuery';
 
 
 // eslint-disable-next-line no-unused-vars

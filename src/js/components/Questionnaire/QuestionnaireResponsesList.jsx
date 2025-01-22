@@ -7,7 +7,7 @@ import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import { renderLog } from '../../common/utils/logging';
 import webAppConfig from '../../config';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
-import useFetchData from '../../react-query/fetchData';
+import { useFetchData } from '../../react-query/WeConnectQuery';
 import CopyQuestionnaireLink from './CopyQuestionnaireLink';
 
 const OpenExternalWebSite = React.lazy(() => import(/* webpackChunkName: 'OpenExternalWebSite' */ '../../common/components/Widgets/OpenExternalWebSite'));

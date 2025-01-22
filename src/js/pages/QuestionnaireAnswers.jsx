@@ -5,11 +5,11 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router';
 import styled from 'styled-components';
+import { useFetchData } from '../react-query/WeConnectQuery';
 import DesignTokenColors from '../common/components/Style/DesignTokenColors';
 import { renderLog } from '../common/utils/logging';
 import { PageContentContainer } from '../components/Style/pageLayoutStyles';
 import webAppConfig from '../config';
-import useFetchData from '../react-query/fetchData';
 
 
 // eslint-disable-next-line no-unused-vars

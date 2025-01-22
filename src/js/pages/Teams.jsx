@@ -12,7 +12,7 @@ import TeamHeader from '../components/Team/TeamHeader';
 import TeamMemberList from '../components/Team/TeamMemberList';
 import webAppConfig from '../config';
 import { useConnectAppContext } from '../contexts/ConnectAppContext';
-import useFetchData from '../react-query/fetchData';
+import { useFetchData } from '../react-query/WeConnectQuery';
 import { getTeamList } from '../react-query/TeamsQueryProcessing';
 
 
