@@ -16,7 +16,7 @@ import { useFetchData } from '../react-query/WeConnectQuery';
 
 const TeamHome = ({ classes }) => {
   renderLog('TeamHome');
-  const { setAppContextValue, getAppContextValue } = useConnectAppContext();
+  const { setAppContextValue } = useConnectAppContext();
 
   const params  = useParams();
   const [team, setTeam] = useState({});
