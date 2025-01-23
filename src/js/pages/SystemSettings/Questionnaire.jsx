@@ -1,117 +1,103 @@
-import { Edit } from '@mui/icons-material';
-import { Button } from '@mui/material';
-import React from 'react';
-import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
-import styled from 'styled-components';
-import PropTypes from 'prop-types';
+import { Button, CircularProgress } from '@mui/material';
 import { withStyles } from '@mui/styles';
-import AppObservableStore, { messageService } from '../../stores/AppObservableStore';
-import QuestionnaireActions from '../../actions/QuestionnaireActions';
-import QuestionnaireStore from '../../stores/QuestionnaireStore';
+import PropTypes from 'prop-types';
+import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { Link, useLocation } from 'react-router';
+import styled from 'styled-components';
+import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
+import { renderLog } from '../../common/utils/logging';
+import { EditStyled } from '../../components/Style/iconStyles';
 import { SpanWithLinkStyle } from '../../components/Style/linkStyles';
 import { PageContentContainer } from '../../components/Style/pageLayoutStyles';
-import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import webAppConfig from '../../config';
-import apiCalming from '../../common/utils/apiCalming';
-import { renderLog } from '../../common/utils/logging';
-import convertToInteger from '../../common/utils/convertToInteger';
+import { useConnectAppContext } from '../../contexts/ConnectAppContext';
+import { useFetchData } from '../../react-query/WeConnectQuery';
 
 
+// eslint-disable-next-line no-unused-vars
 const Questionnaire = ({ classes, match }) => {
-  renderLog('Questionnaire');  // Set LOG_RENDER_EVENTS to log all renders
-  const [questionList, setQuestionList] = React.useState([]);
-  const [questionnaire, setQuestionnaire] = React.useState({});
-  const [questionnaireCount, setQuestionnaireCount] = React.useState(0);
+  renderLog('Questionnaire');
+  const { setAppContextValue, getAppContextValue } = useConnectAppContext();
+  const location = useLocation();
 
-  const onAppObservableStoreChange = () => {
-  };
+  const [questionList, setQuestionList] = useState([]);
+  const [questionnaire, setQuestionnaire] = useState(getAppContextValue('selectedQuestionnaire'));
 
-  const onQuestionnaireStoreChange = () => {
-    const { params } = match;
-    const questionnaireIdTemp = convertToInteger(params.questionnaireId);
-    const questionnaireTemp = QuestionnaireStore.getQuestionnaireById(questionnaireIdTemp);
-    setQuestionnaire(questionnaireTemp);
-    const questionListTemp = QuestionnaireStore.getQuestionListByQuestionnaireId(questionnaireIdTemp);
-    // console.log('Questionnaire QuestionnaireStore.getQuestionList:', questionListTemp);
-    setQuestionList(questionListTemp);
-    setQuestionnaireCount(questionListTemp.length);
-  };
+  const { data: dataQList, isSuccess: isSuccessQList, isFetching: isFetchingQList } = useFetchData(['questionnaire-list-retrieve'], {});
+  useEffect(() => {
+    console.log('useFetchData in Questionnaire useEffect:', dataQList, isSuccessQList, isFetchingQList);
+    if (dataQList !== undefined && isFetchingQList === false) {
+      console.log('useFetchData in Questionnaire useEffect data is good:', dataQList, isSuccessQList, isFetchingQList);
+      console.log('Successfully retrieved questionnaire-list-retrieve...');
+      const qNumber = location.pathname.substring(location.pathname.lastIndexOf('/') + 1);
+      const oneQ = dataQList.questionnaireList.find((questionn) => questionn.id === parseInt(qNumber));
+      setQuestionnaire(oneQ);
+    }
+  }, [dataQList, isSuccessQList]);
+
+  const { data: dataQuestionList, isSuccess: isSuccessQuestionList, isFetching: isFetchingQuestionList } =
+    useFetchData(['question-list-retrieve'], { questionnaireId: questionnaire ? questionnaire.questionnaireId : '-1' });
+  useEffect(() => {
+    console.log('useFetchData question-list-retrieve in Questionnaire useEffect:', dataQuestionList, isSuccessQuestionList, isFetchingQuestionList);
+    if (dataQuestionList !== undefined && isFetchingQuestionList === false) {
+      console.log('useFetchData question-list-retrieve in Questionnaire useEffect data is good:', dataQuestionList, isSuccessQuestionList, isFetchingQuestionList);
+      const questionListTemp = dataQuestionList.questionList;
+      console.log('Successfully retrieved question-list-retrieve... questionListTemp', questionListTemp);
+      setQuestionList(questionListTemp);
+    }
+  }, [dataQuestionList]);
 
   const addQuestionClick = () => {
-    const { params } = match;
-    const questionnaireIdTemp = convertToInteger(params.questionnaireId);
-    AppObservableStore.setGlobalVariableState('editQuestionDrawerOpen', true);
-    AppObservableStore.setGlobalVariableState('editQuestionDrawerQuestionId', -1);
-    AppObservableStore.setGlobalVariableState('editQuestionDrawerQuestionnaireId', questionnaireIdTemp);
+    setAppContextValue('editQuestionDrawerOpen', true);
+    setAppContextValue('selectedQuestion', undefined);
   };
 
-  const editQuestionClick = (questionId) => {
-    const { params } = match;
-    const questionnaireIdTemp = convertToInteger(params.questionnaireId);
-    AppObservableStore.setGlobalVariableState('editQuestionDrawerOpen', true);
-    AppObservableStore.setGlobalVariableState('editQuestionDrawerQuestionId', questionId);
-    AppObservableStore.setGlobalVariableState('editQuestionDrawerQuestionnaireId', questionnaireIdTemp);
+  const editQuestionClick = (question) => {
+    setAppContextValue('editQuestionDrawerOpen', true);
+    setAppContextValue('selectedQuestion', question);
   };
 
   const editQuestionnaireClick = () => {
-    const { params } = match;
-    const questionnaireIdTemp = convertToInteger(params.questionnaireId);
-    AppObservableStore.setGlobalVariableState('editQuestionnaireDrawerOpen', true);
-    AppObservableStore.setGlobalVariableState('editQuestionnaireDrawerQuestionnaireId', questionnaireIdTemp);
+    setAppContextValue('editQuestionnaireDrawerOpen', true);
   };
 
-  React.useEffect(() => {
-    const { params } = match;
-    const questionnaireIdTemp = convertToInteger(params.questionnaireId);
-
-    const appStateSubscription = messageService.getMessage().subscribe(() => onAppObservableStoreChange());
-    onAppObservableStoreChange();
-    const questionnaireStoreListener = QuestionnaireStore.addListener(onQuestionnaireStoreChange);
-    onQuestionnaireStoreChange();
-
-    if (questionnaireIdTemp >= 0) {
-      if (apiCalming('questionnaireListRetrieve', 1000)) {
-        QuestionnaireActions.questionnaireListRetrieve();
-      }
-      if (apiCalming(`questionListRetrieve-${questionnaireIdTemp}`, 1000)) {
-        QuestionnaireActions.questionListRetrieve(questionnaireIdTemp);
-      }
-    }
-
-    return () => {
-      appStateSubscription.unsubscribe();
-      questionnaireStoreListener.remove();
-    };
-  }, []);
-
-  const { params } = match;
-  const questionnaireIdTemp = convertToInteger(params.questionnaireId);
+  if (isFetchingQList || questionnaire === undefined) {
+    return (
+      <div style={{ padding: '150px 30px 30px 50%' }}>
+        <CircularProgress />
+      </div>
+    );
+  }
 
   return (
-    <div>
+    <>
       <Helmet>
         <title>
           Questionnaire Details -
           {' '}
           {webAppConfig.NAME_FOR_BROWSER_TAB_TITLE}
         </title>
-        <link rel="canonical" href={`${webAppConfig.WECONNECT_URL_FOR_SEO}/questionnaire-question-list/${questionnaireIdTemp}`} />
+        {/* <link rel="canonical" href={`${webAppConfig.WECONNECT_URL_FOR_SEO}/questionnaire-question-list/${questionnaireIdTemp}`} /> */}
       </Helmet>
       <PageContentContainer>
-        <div>
-          <Link to="/system-settings">Questionnaires</Link>
+        <QuestionnaireTitleWrapper>
+          <Link to="/system-settings" style={{ height: '40px', fontSize: 'large' }} className="u-cursor--pointer u-link-color">
+            Questionnaires
+          </Link>
           {' '}
           &gt;
           {' '}
-          {questionnaire.questionnaireName}
+          <span style={{ padding: '0 20px 0 10px' }}>{questionnaire.questionnaireName}</span>
           <SpanWithLinkStyle onClick={editQuestionnaireClick}>
             <EditStyled />
           </SpanWithLinkStyle>
-        </div>
+        </QuestionnaireTitleWrapper>
         {questionnaire.questionnaireTitle && (
           <TitleWrapper>
-            {questionnaire.questionnaireTitle}
+            Questionnaire Name: {questionnaire.questionnaireName}
+            <br />
+            Questionnaire Title: {questionnaire.questionnaireTitle}
           </TitleWrapper>
         )}
         {questionnaire.questionnaireInstructions && (
@@ -122,12 +108,13 @@ const Questionnaire = ({ classes, match }) => {
         <QuestionListWrapper>
           {questionList.map((question) => (
             <OneQuestionnaireWrapper key={`questionnaire-${question.id}`}>
-              {question.questionText}
+              {console.log('questionList.map((questionnaire)', question)}
+              Question: {question.questionText}
               {' '}
               {question.requireAnswer && (
                 <RequiredStar> *</RequiredStar>
               )}
-              <SpanWithLinkStyle onClick={() => editQuestionClick(question.id)}>
+              <SpanWithLinkStyle onClick={() => editQuestionClick(question)}>
                 <EditStyled />
               </SpanWithLinkStyle>
             </OneQuestionnaireWrapper>
@@ -144,12 +131,12 @@ const Questionnaire = ({ classes, match }) => {
           </Button>
         </AddButtonWrapper>
       </PageContentContainer>
-    </div>
+    </>
   );
 };
 Questionnaire.propTypes = {
   classes: PropTypes.object.isRequired,
-  match: PropTypes.object.isRequired,
+  match: PropTypes.object,
 };
 
 const styles = (theme) => ({
@@ -168,16 +155,14 @@ const AddButtonWrapper = styled('div')`
   margin-top: 24px;
 `;
 
-const EditStyled = styled(Edit)`
-  color: ${DesignTokenColors.neutral100};
-  height: 16px;
-  margin-left: 2px;
-  width: 16px;
-`;
-
 const InstructionsWrapper = styled('div')`
   color: ${DesignTokenColors.neutralUI300};
   font-size: 1.2em;
+`;
+
+const QuestionnaireTitleWrapper = styled('div')`
+  height: 100px;
+  align-content: center;
 `;
 
 const OneQuestionnaireWrapper = styled('div')`

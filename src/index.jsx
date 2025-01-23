@@ -1,12 +1,10 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
-import { CompatRouter } from 'react-router-dom-v5-compat';
 import App from './App';
 import ErrorBoundary from './js/common/components/Widgets/ErrorBoundary';
-import WeVoteRouter from './js/common/components/Widgets/WeVoteRouter';
 import { isAndroid } from './js/common/utils/isCordovaOrWebApp';
-// importStartCordovaToken -- Do not remove this line!
+
 
 // The following line is rewritten to true by the buildSrcCordova.js node script
 const isIndexCordova = false;
@@ -36,17 +34,13 @@ function redirectToStandardizedWeVoteUrl () {
 }
 
 function startReact () {
-  ReactDOM.render(
+  const root = createRoot(document.getElementById('app'));
+  root.render(
     <ErrorBoundary>
-      <WeVoteRouter>
-        <CompatRouter>
-          <HelmetProvider>
-            <App />
-          </HelmetProvider>
-        </CompatRouter>
-      </WeVoteRouter>
+      <HelmetProvider>
+        <App />
+      </HelmetProvider>
     </ErrorBoundary>,
-    document.getElementById('app'),
   );
 
   try {
