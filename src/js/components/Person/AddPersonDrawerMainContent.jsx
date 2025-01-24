@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import { TextField } from '@mui/material';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router';
 import styled from 'styled-components';
-import SearchBar2024 from '../../common/components/Search/SearchBar2024';
 import arrayContains from '../../common/utils/arrayContains';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
-import { useAddPersonToTeamMutation } from '../../react-query/mutations';
 import makeRequestParams from '../../react-query/makeRequestParams';
+import { useAddPersonToTeamMutation } from '../../react-query/mutations';
 import { SpanWithLinkStyle } from '../Style/linkStyles';
 import AddPersonForm from './AddPersonForm';
 
@@ -19,18 +19,19 @@ const AddPersonDrawerMainContent = () => {
   const params  = useParams();
   console.log('AddPersonDrawerMainContent params: ', params);
 
+  const [allStaffList] = useState(getAppContextValue('allStaffList'));
+  const [allStaffLessAdds, setAllStaffLessAdds] = useState(getAppContextValue('allStaffList'));
   const [staffToDisplayList, setStaffToDisplayList] = useState([]);
-  // eslint-disable-next-line no-unused-vars
-  const [searchText, setSearchText] = useState('');
-  const [allStaffList, setAllStaffList] = useState(getAppContextValue('allStaffList'));
+  const [staffListLabelAdd, setStaffListLabelAdd] = useState(true);
   const [thisTeamsCurrentMembersList, setThisTeamsCurrentMembersList] = useState([]);
   const [teamId, setTeamId] = useState(getAppContextValue('teamId'));
   const [teamName, setTeamName] = useState('');
+  const [teamMemberPersonIdList] = useState([]);
+  const [searchResultsList] = useState([]);
+  const [matchingCountText, setMatchingCountText] = useState('');
+  const [addPersonDrawerOpen] = useState(getAppContextValue('addPersonDrawerOpen'));
 
-  // eslint-disable-next-line no-unused-vars
-  const [teamMemberPersonIdList, setTeamMemberPersonIdList] = useState([]);
-  // eslint-disable-next-line no-unused-vars
-  const [searchResultsList, setSearchResultsList] = useState([]);
+  const searchStringRef = useRef('');
 
   let memberList = [];
   const teamListFromContext = getAppContextValue('teamListNested');
@@ -47,34 +48,42 @@ const AddPersonDrawerMainContent = () => {
     // console.log('no teamListFromContext yet!');
   }
 
-  if (staffToDisplayList.length === 0 && allStaffList && allStaffList.length > 0) {
-    const staffToDisplay = [];
-    allStaffList.forEach((oneStaff) => {
-      const isOnTeam = memberList.some((obj) => obj.id === oneStaff.id);
-      if (!isOnTeam) {
-        staffToDisplay.push(oneStaff);
-      }
-    });
-    setStaffToDisplayList(staffToDisplay);
-  }
+  const setTheAllStaffToDisplayList = () => {
+    console.log('setTheAllStaffList in AddPersonDrawerMainContent');
+    // Start with the passed in allStaffList, create the staffToDisplayList, by removing any staff already on the team
+    if (allStaffList && allStaffList.length > 0) {
+      const staffToDisplay = [];
+      allStaffList.forEach((oneStaff) => {
+        const isOnTeam = thisTeamsCurrentMembersList.some((obj) => obj.id === oneStaff.id);
+        if (!isOnTeam) {
+          staffToDisplay.push(oneStaff);
+        }
+      });
+      setStaffToDisplayList(staffToDisplay);
+    }
+  };
 
-  // TODO: 1/6/25: revive search
-  // const searchFunction = (incomingSearchText) => {
-  // let searchingJustStarted = false;
-  // if (searchText.length === 0 && incomingSearchText.length > 0) {
-  //   searchingJustStarted = true;
-  // }
-  // const isSearching = (incomingSearchText && incomingSearchText.length > 0);
-  //   const teamIdTemp = getAppContextValue('addPersonDrawerTeamId');
-  //   if (apiCalming(`addPersonToTeamSearch-${teamIdTemp}-${incomingSearchText}`, 60000)) { // Only once per 60 seconds
-  //     PersonActions.personListRetrieve(incomingSearchText);
-  //   }
-  //   setSearchText(incomingSearchText);
-  // };
+  useEffect(() => {
+    setAllStaffLessAdds(allStaffList);
+    setTheAllStaffToDisplayList();
+  }, [addPersonDrawerOpen]);
 
-  const clearFunction = () => {
-    setAllStaffList([]);
-    setSearchText('');
+  const searchFunction = () => {
+    // TODO:  This currently only searches for matches in the staff member's last name
+    const currentValue = searchStringRef.current.value;
+    if (currentValue.length === 0) {
+      setMatchingCountText('');
+      setTheAllStaffToDisplayList();
+      setStaffListLabelAdd(true);
+    } else {
+      const isMatch = (element) => element.lastName.toLowerCase().includes(currentValue.toLowerCase());
+      const matchingElements = staffToDisplayList ? staffToDisplayList.filter((element) => isMatch(element)) : {};
+      setStaffToDisplayList(matchingElements);
+      const matchingCount = matchingElements.length === 0 ? '' : `${matchingElements.length} matches out of ${allStaffList.length} staff members`;
+      setMatchingCountText(matchingCount);
+      setStaffListLabelAdd(false);
+      console.log(matchingElements);
+    }
   };
 
   const addClicked = (person) => {
@@ -86,21 +95,30 @@ const AddPersonDrawerMainContent = () => {
       teamName,
     };
     mutate(makeRequestParams(plainParams, {}));
-    // This removes the recently "added" staff, from the list of staff who can be added, the staffToDisplayList
-    const updatedStaffToDisplayList = staffToDisplayList.filter((staff) => staff.id !== person.id);
-    setStaffToDisplayList(updatedStaffToDisplayList);
+    // Remove this staff from the All Staff less Adds list (since they were added to the team)
+    const updatedAllStaffLessAdds = allStaffLessAdds.filter((staff) => staff.id !== person.id);
+    setAllStaffLessAdds(updatedAllStaffLessAdds);
+    if (staffToDisplayList && staffToDisplayList.length > 0) {
+      // If we are currently showing filtered, remove this staff member from the filtered Staff To Display List
+      const updatedStaffToDisplayList = staffToDisplayList.filter((staff) => staff.id !== person.id);
+      setStaffToDisplayList(updatedStaffToDisplayList);
+    }
   };
 
   return (
     <AddPersonDrawerMainContentWrapper>
       <SearchBarWrapper>
-        <SearchBar2024
+        <TextField
+          id="search_input"
+          label="Search for team members"
+          inputRef={searchStringRef}
+          name="searchByName"
+          onChange={searchFunction}
           placeholder="Search by name"
-          // searchFunction={searchFunction}
-          searchFunction={() => console.log('searchFunction')}
-          clearFunction={clearFunction}
-          searchUpdateDelayTime={750}
+          defaultValue=""
+          sx={{ minWidth: '250px' }}
         />
+        <MatchingPerson>{matchingCountText}</MatchingPerson>
       </SearchBarWrapper>
       {(searchResultsList && searchResultsList.length > 0) && (
         <PersonSearchResultsWrapper>
@@ -123,7 +141,7 @@ const AddPersonDrawerMainContent = () => {
         </PersonSearchResultsWrapper>
       )}
       <PersonDirectoryWrapper>
-        <PersonListTitle>All Staff:</PersonListTitle>
+        <PersonListTitle>{staffListLabelAdd ? 'Can be added to team' : 'Filtered list of people to add to team'}</PersonListTitle>
         <PersonList>
           {staffToDisplayList.map((person) => (
             <PersonItem key={`personResult-${person.id}`}>
@@ -153,6 +171,10 @@ const AddPersonDrawerMainContentWrapper = styled('div')`
 const AddPersonWrapper = styled('div')`
   margin-top: 32px;
 `;
+const MatchingPerson = styled('div')`
+  margin: 10px 0 0 10px;
+  font-style: italic;
+`;
 
 const PersonDirectoryWrapper = styled('div')`
   margin-top: 16px;
@@ -165,6 +187,7 @@ const PersonList = styled('div')`
 `;
 
 const PersonListTitle = styled('div')`
+  font-weight: 250;
 `;
 
 const PersonSearchResultsWrapper = styled('div')`
