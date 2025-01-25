@@ -109,7 +109,7 @@ const EditQuestionForm = ({ classes }) => {
   const updateSaveButton = () => {
     if (questionTextFldRef.current.value && questionTextFldRef.current.value.length &&
       questionInstructionsFldRef.current.value && questionInstructionsFldRef.current.value.length &&
-      questionInstructionsFldRef.current.value && questionInstructionsFldRef.current.value.length)  {
+      questionInstructionsFldRef.current.value && questionInstructionsFldRef.current.value.length) {
       if (!saveButtonActive) {
         setSaveButtonActive(true);
       }
@@ -121,7 +121,6 @@ const EditQuestionForm = ({ classes }) => {
     if (!saveButtonActive) {
       setSaveButtonActive(true);
     }
-
   };
 
   return (
