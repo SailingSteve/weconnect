@@ -22,35 +22,17 @@ const QuestionnaireResponsesList = ({ personId }) => {
   // Although we are sending a list, there will only be one person id, if there were more, just append them with commas
   const requestParams = `personIdList[]=${person.id}`;
 
-  const { data: dataQRS, isSuccess: isSuccessQRS, isFetching: isFetchingQRS } = useFetchData(['questionnaire-responses-list-retrieve'], requestParams);
-  if (isFetchingQRS) {
+  const { data: dataQRL, isSuccess: isSuccessQRL, isFetching: isFetchingQRL } = useFetchData(['questionnaire-responses-list-retrieve'], requestParams);
+  if (isFetchingQRL) {
     console.log('isFetching  ------------ \'questionnaire-responses-list-retrieve\'');
   }
   useEffect(() => {
-    if (dataQRS !== undefined && isFetchingQRS === false && person) {
-      console.log('useFetchData in QuestionnaireResponsesList useEffect dataQRS is good:', dataQRS, isSuccessQRS, isFetchingQRS);
+    if (dataQRL !== undefined && isFetchingQRL === false && person) {
+      console.log('useFetchData in QuestionnaireResponsesList useEffect dataQRL is good:', dataQRL, isSuccessQRL, isFetchingQRL);
       console.log('Successfully retrieved QuestionnaireResponsesList...');
-
-      // TODO: 1/20/25 is this questionList or questionnaireList?
-      // It seems like an answered questionnaire question should be a questionAnswerList, but questionnaire and question seem tyo be used inconsistently
-      // So this is hard to figure out without having some "answers" data
-
-      // const questionnaireListTempModified = [];
-      // for (let i = 0; i < questionnaireListTemp.length; i++) {
-      //   const questionnaire = questionnaireListTemp[i];
-      //   if (dateQuestionnairesCompletedDictTemp[questionnaire.questionnaireId]) {
-      //     questionnaire.dateQuestionnaireCompleted = new Date(dateQuestionnairesCompletedDictTemp[questionnaire.questionnaireId]);
-      //   } else {
-      //     questionnaire.dateQuestionnaireCompleted = null;
-      //   }
-      //   // console.log('QuestionnaireList questionnaire:', questionnaire);
-      //   questionnaireListTempModified[i] = questionnaire;
-      // }
-      // setQuestionnaireList(questionnaireListTempModified);
-
-      setQuestionnaireList(dataQRS.questionnaireList);
+      setQuestionnaireList(dataQRL.questionnaireList);
     }
-  }, [dataQRS, isFetchingQRS, person]);
+  }, [dataQRL, isFetchingQRL, person]);
 
   return (
     <div>

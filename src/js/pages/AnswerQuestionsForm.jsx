@@ -1,88 +1,120 @@
 import { Button, FormControl, TextField } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useParams } from 'react-router';
 import styled from 'styled-components';
-import QuestionnaireActions from '../actions/QuestionnaireActions';
 import DesignTokenColors from '../common/components/Style/DesignTokenColors';
-import convertToInteger from '../common/utils/convertToInteger';
 import { renderLog } from '../common/utils/logging';
 import { PageContentContainer } from '../components/Style/pageLayoutStyles';
 import webAppConfig from '../config';
+import makeRequestParams from '../react-query/makeRequestParams';
+import { useQuestionnaireAnswersSaveMutation } from '../react-query/mutations';
+import { useFetchData } from '../react-query/WeConnectQuery';
 
 
+// eslint-disable-next-line no-unused-vars
 const AnswerQuestionsForm = ({ classes, match }) => {
   renderLog('AnswerQuestionsForm');  // Set LOG_RENDER_EVENTS to log all renders
-  const [questionList] = useState([]);
-  const [questionnaire] = useState({});
-  // const [questionnaireCount, setQuestionnaireCount] = useState(0);
-  // const [questionnaireId, setQuestionnaireId] = useState(-1);
+  const { mutate } = useQuestionnaireAnswersSaveMutation();
+  const params  = useParams();
+
+  const [questionnaireId] = useState(params.questionnaireId);
+  const [personId] = useState(params.personId);
+  const [questionList, setQuestionList] = useState(undefined);
+  const [questionnaireList, setQuestionnaireList] = useState(undefined);
+  const [questionnaire, setQuestionnaire] = useState(undefined);
+  const [questionAnswerList, setQuestionAnswerList] = useState(undefined);
   const [saveButtonActive, setSaveButtonActive] = useState(false);
   const [inputValues, setInputValues] = useState({});
+  const [errorMessage, setErrorMessage] = useState(undefined);
 
-  //
-  // const onQuestionnaireStoreChange = () => {
-  //   const { params } = match;
-  //   const questionnaireIdTemp = convertToInteger(params.questionnaireId);
-  //   const questionnaireTemp = QuestionnaireStore.getQuestionnaireById(questionnaireIdTemp);
-  //   setQuestionnaire(questionnaireTemp);
-  //   const questionListTemp = QuestionnaireStore.getQuestionListByQuestionnaireId(questionnaireIdTemp);
-  //   // console.log('AnswerQuestionsForm QuestionnaireStore.getQuestionList:', questionListTemp);
-  //   setQuestionList(questionListTemp);
-  //   setQuestionnaireCount(questionListTemp.length);
-  // };
+  const requestParams = `personIdList[]=${personId}&questionnaireId=${questionnaireId}`;
+  const { data: dataQRL, isSuccess: isSuccessQRL, isFetching: isFetchingQRL } = useFetchData(['questionnaire-responses-list-retrieve'], requestParams);
+  if (isFetchingQRL) {
+    console.log('isFetching  ------------ \'questionnaire-responses-list-retrieve\'');
+  }
 
-  const updateQuestionAnswer = (event) => {
-    // The input name must match the person field being updated
-    if (event.target.name) {
-      const newValue = event.target.value || '';
-      // console.log('updateQuestionAnswer:', event.target.name, ', newValue:', newValue);
-      setInputValues({ ...inputValues, [event.target.name]: newValue });
-      setSaveButtonActive(true);
-    } else {
-      console.error('updateQuestionAnswer Invalid event:', event);
+  useEffect(() => {
+    if (dataQRL !== undefined && isFetchingQRL === false && personId) {
+      // console.log('useFetchData in AnswerQuestionsForm useEffect dataQRL is good:', dataQRL, isSuccessQRL, isFetchingQRL);
+      // console.log('Successfully retrieved QuestionnaireResponsesList...');
+      setQuestionnaireList(dataQRL.questionnaireList);
+      if (questionnaireList && questionnaireList.length) {
+        setQuestionnaire(questionnaireList[questionnaireId]);
+      }
+      setQuestionAnswerList(dataQRL.questionAnswerList);
+      setQuestionList(dataQRL.questionList);
     }
+  }, [dataQRL, isFetchingQRL, isSuccessQRL, personId]);
+
+  const updateQuestionAnswer = (questionId) => {
+    // eslint-disable-next-line no-restricted-globals
+    const newValue = event.target.value;
+    setInputValues({ ...inputValues, [questionId]: newValue });
+    setSaveButtonActive(true);
   };
 
   const saveAnswers = () => {
-    const { params } = match;
-    const personIdTemp = convertToInteger(params.personId);
-    const questionnaireIdTemp = convertToInteger(params.questionnaireId);
+    let foundError = false;
+    Object.keys(inputValues).forEach((key) => {
+      const cleanKey = parseInt(key.match(/\d+/g));
+      const question = questionList.find((q) => q.questionId === cleanKey);
+      if (question.answerType === 'BOOLEAN') {
+        const boolAnswers = ['t', 'f', 'true', 'false', '1', '0'];
+        if (boolAnswers.includes(inputValues[key])) {
+          setErrorMessage(`"${question.questionText}" requires a boolean answer ('true' or 't' or 'false' or 'f')`);
+          setSaveButtonActive(false);
+          foundError = true;
+        }
+      } else if (question.answerType === 'INTEGER') {
+        // eslint-disable-next-line no-restricted-globals
+        if (isNaN(inputValues[key])) {
+          setErrorMessage(`"${question.questionText}" requires a numeric answer`);
+          setSaveButtonActive(false);
+          foundError = true;
+        }
+      }
+    });
+    if (!foundError) {
+      setErrorMessage(undefined);
+    }
 
-    console.log('saveAnswers inputValues:', inputValues);
-    const data = { ...inputValues };
+    const requestParams2 = makeRequestParams({
+      questionnaireId,
+      personId,
+      ...inputValues,
+    }, {});
+
+    mutate(requestParams2);
     // console.log('saveAnswers data:', data);
-    QuestionnaireActions.questionnaireAnswerListSave(questionnaireIdTemp, personIdTemp, data);
     setSaveButtonActive(false);
   };
 
-  // React.useEffect(() => {
-  //   const { params } = match;
-  //   const questionnaireIdTemp = convertToInteger(params.questionnaireId);
-  //
-  //   // const appStateSubscription = messageService.getMessage().subscribe(() => onAppObservableStoreChange());
-  //   // onAppObservableStoreChange();
-  //   // const questionnaireStoreListener = QuestionnaireStore.addListener(onQuestionnaireStoreChange);
-  //   // onQuestionnaireStoreChange();
-  //
-  //   if (questionnaireIdTemp >= 0) {
-  //     if (apiCalming('questionnaireListRetrieve', 10000)) {
-  //       QuestionnaireActions.questionnaireListRetrieve();
-  //     }
-  //     if (apiCalming(`questionListRetrieve-${questionnaireIdTemp}`, 10000)) {
-  //       QuestionnaireActions.questionListRetrieve(questionnaireIdTemp);
-  //     }
-  //   }
-  //
-  //   return () => {
-  //     // appStateSubscription.unsubscribe();
-  //     // questionnaireStoreListener.remove();
-  //   };
-  // }, []);
-
-  // const { params } = match;
-  // const questionnaireIdTemp = convertToInteger(params.questionnaireId);
+  const getInitialAnswer = (questionId) => {
+    if (!questionAnswerList || questionAnswerList.length === 0) {
+      console.log(questionId, 'n/a');
+      return '';
+    }
+    const answer = questionAnswerList.filter((answerIteration) => answerIteration.questionId === questionId);
+    let initVal = '';
+    if (answer.length) {
+      switch (answer[0].answerType) {
+        case 'BOOLEAN':
+          initVal = answer.length ? answer[0].answerBoolean : '';
+          break;
+        case 'INTEGER':
+          initVal = answer.length ? answer[0].answerInteger : '';
+          break;
+        default:
+        case 'STRING':
+          initVal = answer.length ? answer[0].answerString : '';
+          break;
+      }
+    }
+    return initVal;
+  };
 
   return (
     <div>
@@ -95,18 +127,14 @@ const AnswerQuestionsForm = ({ classes, match }) => {
         <meta name="robots" content="noindex" data-react-helmet="true" />
       </Helmet>
       <PageContentContainer>
-        {questionnaire.questionnaireTitle && (
-          <TitleWrapper>
-            {questionnaire.questionnaireTitle}
-          </TitleWrapper>
-        )}
-        {questionnaire.questionnaireInstructions && (
-          <InstructionsWrapper>
-            {questionnaire.questionnaireInstructions}
-          </InstructionsWrapper>
-        )}
+        <TitleWrapper>
+          {questionnaire && questionnaire.questionnaireTitle}
+        </TitleWrapper>
+        <InstructionsWrapper>
+          {questionnaire && questionnaire.questionnaireInstructions}
+        </InstructionsWrapper>
         <FormControl classes={{ root: classes.formControl }}>
-          {questionList.map((question) => (
+          {questionList && questionList.map((question) => (
             <OneQuestionWrapper key={`questionnaire-${question.id}`}>
               <QuestionText>
                 {question.questionText}
@@ -120,18 +148,18 @@ const AnswerQuestionsForm = ({ classes, match }) => {
               <QuestionFormWrapper>
                 <TextField
                   classes={(question.answerType === 'INTEGER') ? {} : { root: classes.formControl }}
+                  defaultValue={getInitialAnswer(question.id)}
                   id={`questionAnswerToBeSaved-${question.id}`}
-                  // label={`${question.id}`}
-                  name={`questionAnswer-${question.id}`}
+                  label={`${question.answerType}`}
                   margin="dense"
+                  name={`questionAnswer-${question.id}`}
+                  onChange={() => updateQuestionAnswer(`questionAnswer-${question.id}`)}
                   variant="outlined"
-                  placeholder={question.questionPlaceholder || ''}
-                  value={inputValues[`questionAnswer-${question.id}`] || ''}
-                  onChange={updateQuestionAnswer}
                 />
               </QuestionFormWrapper>
             </OneQuestionWrapper>
           ))}
+          <ErrorLine>{errorMessage}</ErrorLine>
           <SaveButtonWrapper>
             <Button
               classes={{ root: classes.saveAnswersButton }}
@@ -196,6 +224,12 @@ const RequiredStar = styled('span')`
 
 const SaveButtonWrapper = styled('div')`
   margin-top: 24px;
+`;
+
+const ErrorLine = styled('div')`
+  margin-top: 24px;
+  font-weight: 500;
+  color: red;
 `;
 
 const TitleWrapper = styled('h1')`

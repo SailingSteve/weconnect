@@ -37,6 +37,15 @@ const useQuestionSaveMutation = () => {
   });
 };
 
+const useQuestionnaireAnswersSaveMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (params) => weConnectQueryFn('answer-list-save', params),
+    onError: (error) => console.log('error in useQuestionnaireAnswersSaveMutation: ', error),
+    onSuccess: () => queryClient.invalidateQueries('questionnaire-list-retrieve'),
+  });
+};
+
 const useQuestionnaireSaveMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -87,5 +96,5 @@ const useSaveTaskMutation = () => {
 
 export  { useRemoveTeamMutation, useRemoveTeamMemberMutation, useAddPersonToTeamMutation,
   useQuestionnaireSaveMutation, useTaskDefinitionSaveMutation, useGroupSaveMutation,
-  useQuestionSaveMutation, usePersonSaveMutation, useSaveTaskMutation };
+  useQuestionSaveMutation, usePersonSaveMutation, useSaveTaskMutation, useQuestionnaireAnswersSaveMutation };
 

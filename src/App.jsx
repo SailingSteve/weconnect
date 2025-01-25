@@ -10,6 +10,7 @@ import { normalizedHref } from './js/common/utils/hrefUtils';
 import initializejQuery from './js/common/utils/initializejQuery';
 import { renderLog } from './js/common/utils/logging';
 import Drawers from './js/components/Drawers/Drawers';
+import webAppConfig from './js/config';
 import ConnectAppContext from './js/contexts/ConnectAppContext';
 import Login from './js/pages/Login';
 
@@ -34,6 +35,7 @@ const Teams = React.lazy(() => import(/* webpackChunkName: 'Teams' */ './js/page
 function App () {
   renderLog('App');
   const [hideHeader] = useState(false);
+  const [showDevtools] = useState(webAppConfig.ENABLE_REACT_QUERY_TOOLS !== undefined ? webAppConfig.ENABLE_REACT_QUERY_TOOLS : true);
 
 
   // Inject this once for the app, for all react-query queries
@@ -88,7 +90,9 @@ function App () {
                     <Route path="*" element={<PageNotFound />} />
                   </Routes>
                   {/* Hack 1/14/25 <Footer /> */}
-                  <ReactQueryDevtools />
+                  {showDevtools && (
+                    <ReactQueryDevtools />
+                  )}
                 </WeVoteBody>
               </BrowserRouter>
             </ThemeProvider>
