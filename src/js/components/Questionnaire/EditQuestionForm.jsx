@@ -118,6 +118,9 @@ const EditQuestionForm = ({ classes }) => {
 
   const handleRadioChange = (event) => {
     setRadioValue(event.target.value);
+    if (!saveButtonActive) {
+      setSaveButtonActive(true);
+    }
   };
 
   return (
