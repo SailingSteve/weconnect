@@ -25,7 +25,7 @@ const SystemSettings = ({ classes }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { data: dataQList, isFetching: isFetchingQList } = useFetchData(['questionnaire-list-retrieve'], {});
+  const { data: dataQList, isFetching: isFetchingQList, isSuccess: isSuccessQList } = useFetchData(['questionnaire-list-retrieve'], {});
   if (isFetchingQList) {
     console.log('isFetching questionnaire-list-retrieve ------------');
   }
@@ -34,9 +34,9 @@ const SystemSettings = ({ classes }) => {
       const questionnaireListTemp = dataQList.questionnaireList;
       setQuestionnaireList(questionnaireListTemp);
     }
-  }, [dataQList]);
+  }, [dataQList, isSuccessQList]);
 
-  const { data: dataGroupList, isFetching: isFetchingGroupList } = useFetchData(['task-group-list-retrieve'], {});
+  const { data: dataGroupList, isFetching: isFetchingGroupList, isSuccess: isSuccessGroupList } = useFetchData(['task-group-list-retrieve'], {});
   if (isFetchingGroupList) {
     console.log('isFetching task-group-retrieve ------------');
   }
@@ -45,7 +45,7 @@ const SystemSettings = ({ classes }) => {
       const taskListTemp = dataGroupList.taskGroupList;
       setTaskGroupList(taskListTemp);
     }
-  }, [dataGroupList]);
+  }, [dataGroupList, isSuccessGroupList]);
 
   const addQuestionnaireClick = () => {
     setAppContextValue('editQuestionnaireDrawerOpen', true);
