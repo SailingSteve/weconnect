@@ -9,10 +9,13 @@ const PersonSummaryHeader = () => {
   return (
     <OnePersonHeader>
       {/* Width (below) of this PersonHeaderCell comes from the combined widths of the first x columns in PersonMemberList */}
-      <PersonHeaderCell $largeFont $titleCell width={150 + 125}>
+      <PersonHeaderCell $largeFont $titleCell width={200}>  {/* Name */}
         &nbsp;
       </PersonHeaderCell>
-      <PersonHeaderCell width={190}>
+      <PersonHeaderCell $largeFont $titleCell width={300}>
+        Location
+      </PersonHeaderCell>
+      <PersonHeaderCell width={225}>
         Title / Volunteering Love
       </PersonHeaderCell>
       {/* Edit icon */}
