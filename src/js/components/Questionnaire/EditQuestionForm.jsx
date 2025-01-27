@@ -46,7 +46,7 @@ const EditQuestionForm = ({ classes }) => {
   const [fieldMappingRuleCopied, setFieldMappingRuleCopied] = useState('');
   const [saveButtonActive, setSaveButtonActive] = useState(false);
   const [showFieldMappingOptions, setShowFieldMappingOptions] = useState(false);
-  const [radioValue, setRadioValue] = useState();
+  const [radioValue, setRadioValue] = useState('STRING');
 
   const fieldMappingRuleFldRef = useRef('');
   const questionInstructionsFldRef = useRef('');
@@ -157,8 +157,8 @@ const EditQuestionForm = ({ classes }) => {
           <FormLabel id="demo-radio-buttons-group-label">Data format of answer</FormLabel>
           <RadioGroup
             aria-labelledby="demo-radio-buttons-group-label"
-            defaultValue="STRING"
             inputRef={formatRadioFldRef}
+            value={radioValue}
             name="radio-buttons-group"
             onChange={handleRadioChange}
             row

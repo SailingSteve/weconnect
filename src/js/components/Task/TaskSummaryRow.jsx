@@ -46,7 +46,7 @@ const TaskSummaryRow = ({ classes, hideIfCompleted, personId, rowNumberForDispla
           </GraySpan>
         </TaskCell>
       )}
-      <TaskCell id={`taskName-${task.taskDefinitionId}`} width={300}>
+      <TaskCell id={`taskName-${task.taskDefinitionId}`} width={500}>
         {taskDef.taskDescription ? (
           <Tooltip arrow id={`taskDescription-${task.taskDefinitionId}`} title={taskDef.taskDescription}>
             <span>{taskDef.taskName}</span>
