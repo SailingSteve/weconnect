@@ -20,14 +20,12 @@ const AddPersonDrawerMainContent = () => {
   console.log('AddPersonDrawerMainContent params: ', params);
 
   const [allStaffList] = useState(getAppContextValue('allStaffList'));
-  const [allStaffLessAdds, setAllStaffLessAdds] = useState(getAppContextValue('allStaffList'));
-  const [staffToDisplayList, setStaffToDisplayList] = useState([]);
-  const [staffListLabelAdd, setStaffListLabelAdd] = useState(true);
+  const [remainingStaffToAdd, setRemainingStaffToAdd] = useState(getAppContextValue('allStaffList'));
+  const [searchResultsList, setSearchResultsList] = useState(undefined);
   const [thisTeamsCurrentMembersList, setThisTeamsCurrentMembersList] = useState([]);
   const [teamId, setTeamId] = useState(getAppContextValue('teamId'));
   const [teamName, setTeamName] = useState('');
   const [teamMemberPersonIdList] = useState([]);
-  const [searchResultsList] = useState([]);
   const [matchingCountText, setMatchingCountText] = useState('');
   const [addPersonDrawerOpen] = useState(getAppContextValue('addPersonDrawerOpen'));
 
@@ -48,9 +46,9 @@ const AddPersonDrawerMainContent = () => {
     // console.log('no teamListFromContext yet!');
   }
 
-  const setTheAllStaffToDisplayList = () => {
-    console.log('setTheAllStaffList in AddPersonDrawerMainContent');
-    // Start with the passed in allStaffList, create the staffToDisplayList, by removing any staff already on the team
+  const initializeRemainingStaffToAddList = () => {
+    console.log('initializeTheRemainingStaffToAddListList in AddPersonDrawerMainContent');
+    // Start with the passed in allStaffList, create the remainingStaffToAddList, by removing any staff already on the team
     if (allStaffList && allStaffList.length > 0) {
       const staffToDisplay = [];
       allStaffList.forEach((oneStaff) => {
@@ -59,30 +57,37 @@ const AddPersonDrawerMainContent = () => {
           staffToDisplay.push(oneStaff);
         }
       });
-      setStaffToDisplayList(staffToDisplay);
+      setRemainingStaffToAdd(staffToDisplay);
     }
   };
 
   useEffect(() => {
-    setAllStaffLessAdds(allStaffList);
-    setTheAllStaffToDisplayList();
+    setRemainingStaffToAdd(allStaffList);  // handles navigate to issues
+    initializeRemainingStaffToAddList();
   }, [addPersonDrawerOpen]);
 
-  const searchFunction = () => {
-    // TODO:  This currently only searches for matches in the staff member's last name
+  const setMatchingCounter = (matchingElements) => {
+    const matchingCount = matchingElements.length === 0 ? '' : `${matchingElements.length} matches out of ${remainingStaffToAdd.length} staff members`;
+    setMatchingCountText(matchingCount);
+  };
+
+
+  const searchFunction = () => {   // Now searches first and last name
     const currentValue = searchStringRef.current.value;
     if (currentValue.length === 0) {
       setMatchingCountText('');
-      setTheAllStaffToDisplayList();
-      setStaffListLabelAdd(true);
+      setSearchResultsList(undefined);
     } else {
-      const isMatch = (element) => element.lastName.toLowerCase().includes(currentValue.toLowerCase());
-      const matchingElements = staffToDisplayList ? staffToDisplayList.filter((element) => isMatch(element)) : {};
-      setStaffToDisplayList(matchingElements);
-      const matchingCount = matchingElements.length === 0 ? '' : `${matchingElements.length} matches out of ${allStaffList.length} staff members`;
-      setMatchingCountText(matchingCount);
-      setStaffListLabelAdd(false);
-      console.log(matchingElements);
+      const isMatch = (element) => (element.lastName.toLowerCase().includes(currentValue.toLowerCase()) ||
+          element.firstName.toLowerCase().includes(currentValue.toLowerCase()));
+      const matchingElements = remainingStaffToAdd ? remainingStaffToAdd.filter((element) => isMatch(element)) : {};
+      if (matchingElements && matchingElements.length) {
+        setSearchResultsList(matchingElements);
+        setMatchingCounter(matchingElements);
+        console.log(matchingElements);
+      } else {
+        setMatchingCountText('');
+      }
     }
   };
 
@@ -96,15 +101,17 @@ const AddPersonDrawerMainContent = () => {
     };
     mutate(makeRequestParams(plainParams, {}));
     // Remove this staff from the All Staff less Adds list (since they were added to the team)
-    const updatedAllStaffLessAdds = allStaffLessAdds.filter((staff) => staff.id !== person.id);
-    setAllStaffLessAdds(updatedAllStaffLessAdds);
-    if (staffToDisplayList && staffToDisplayList.length > 0) {
-      // If we are currently showing filtered, remove this staff member from the filtered Staff To Display List
-      const updatedStaffToDisplayList = staffToDisplayList.filter((staff) => staff.id !== person.id);
-      setStaffToDisplayList(updatedStaffToDisplayList);
+    const updatedRemainingStaffToAdd = remainingStaffToAdd.filter((staff) => staff.id !== person.id);
+    setRemainingStaffToAdd(updatedRemainingStaffToAdd);
+    if (searchResultsList && searchResultsList.length) {
+      // also remove them from the searchResultsList if it exists
+      const updatedSearchResultsList = searchResultsList.filter((staff) => staff.id !== person.id);
+      setSearchResultsList(updatedSearchResultsList);
+      setMatchingCounter(updatedSearchResultsList);
     }
   };
 
+  const displayList = searchResultsList || remainingStaffToAdd || [];
   return (
     <AddPersonDrawerMainContentWrapper>
       <SearchBarWrapper>
@@ -120,11 +127,11 @@ const AddPersonDrawerMainContent = () => {
         />
         <MatchingPerson>{matchingCountText}</MatchingPerson>
       </SearchBarWrapper>
-      {(searchResultsList && searchResultsList.length > 0) && (
+      {(displayList && displayList.length > 0) && (
         <PersonSearchResultsWrapper>
-          <PersonListTitle>Search Results:</PersonListTitle>
+          <PersonListTitle>{ searchResultsList ? 'Filtered list of people to add to team: ' : 'Can be added to team: '}</PersonListTitle>
           <PersonList>
-            {searchResultsList.map((person) => (
+            {displayList.map((person) => (
               <PersonItem key={`personResult-${person.id}`}>
                 {person.firstName}
                 {' '}
@@ -140,24 +147,7 @@ const AddPersonDrawerMainContent = () => {
           </PersonList>
         </PersonSearchResultsWrapper>
       )}
-      <PersonDirectoryWrapper>
-        <PersonListTitle>{staffListLabelAdd ? 'Can be added to team' : 'Filtered list of people to add to team'}</PersonListTitle>
-        <PersonList>
-          {staffToDisplayList.map((person) => (
-            <PersonItem key={`personResult-${person.id}`}>
-              {person.firstName}
-              {' '}
-              {person.lastName}
-              {!arrayContains(person.id, teamMemberPersonIdList) && (
-                <>
-                  {' '}
-                  <SpanWithLinkStyle onClick={() => addClicked(person)}>add</SpanWithLinkStyle>
-                </>
-              )}
-            </PersonItem>
-          ))}
-        </PersonList>
-      </PersonDirectoryWrapper>
+
       <AddPersonWrapper>
         <AddPersonForm />
       </AddPersonWrapper>
@@ -176,9 +166,9 @@ const MatchingPerson = styled('div')`
   font-style: italic;
 `;
 
-const PersonDirectoryWrapper = styled('div')`
-  margin-top: 16px;
-`;
+// const PersonDirectoryWrapper = styled('div')`
+//   margin-top: 16px;
+// `;
 
 const PersonItem = styled('div')`
 `;

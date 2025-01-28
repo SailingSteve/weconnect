@@ -37,7 +37,7 @@ const TeamHome = ({ classes }) => {
       setAppContextValue('teamListNested', tList);
       updateTeam(tList);
     }
-  }, [isAddPersonDrawerOpen, data]);
+  }, [isAddPersonDrawerOpen, data, isSuccess]);
 
   const { data: dataP, isSuccess: isSuccessP, isFetching: isFetchingP, isStale: isStaleP } = useFetchData(['person-list-retrieve'], {});
   useEffect(() => {
