@@ -5,11 +5,12 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router';
 import styled from 'styled-components';
-import { useFetchData } from '../react-query/WeConnectQuery';
 import DesignTokenColors from '../common/components/Style/DesignTokenColors';
 import { renderLog } from '../common/utils/logging';
 import { PageContentContainer } from '../components/Style/pageLayoutStyles';
 import webAppConfig from '../config';
+import useGetFullNamePreferred from '../react-query/useGetFullNamePreferred';
+import { useFetchData } from '../react-query/WeConnectQuery';
 
 
 // eslint-disable-next-line no-unused-vars
@@ -78,7 +79,7 @@ const QuestionnaireAnswers = ({ classes, match }) => {
         <AnsweredBy>
           Answered by:
           {' '}
-          <AnsweredBySpan>{person ? `${person.firstName} ${person.lastName}` : 'tbd'}</AnsweredBySpan>
+          <AnsweredBySpan>{useGetFullNamePreferred(person)}</AnsweredBySpan>
         </AnsweredBy>
         <FormControl classes={{ root: classes.formControl }}>
           {questionList && questionList.map((question) => (

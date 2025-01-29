@@ -39,16 +39,6 @@ const TeamHome = ({ classes }) => {
     }
   }, [isAddPersonDrawerOpen, data, isSuccess]);
 
-  const { data: dataP, isSuccess: isSuccessP, isFetching: isFetchingP, isStale: isStaleP } = useFetchData(['person-list-retrieve'], {});
-  useEffect(() => {
-    console.log('useFetchData in TeamHome (person-list-retrieve) useEffect:', dataP, isSuccessP, isFetchingP, isStaleP);
-    if (isSuccessP) {
-      // console.log('useFetchData in TeamHome (person-list-retrieve)useEffect data good:', dataP, isSuccessP, isFetchingP, isStaleP);
-      setAppContextValue('allStaffList', dataP ? dataP.personList : []);
-      // console.log('allStaffList --- dataP.personList:', dataP ? dataP.personList : []);
-    }
-  }, [dataP, isSuccessP, isFetchingP]);
-
   const addTeamMemberClick = () => {
     // console.log('TeamHome addTeamMemberClick, teamId:', teamId);
     setAppContextValue('addPersonDrawerOpen', true);
