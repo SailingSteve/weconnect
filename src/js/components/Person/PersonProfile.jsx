@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
+import useGetFullNamePreferred from '../../react-query/useGetFullNamePreferred';
 import CopyQuestionnaireLink from '../Questionnaire/CopyQuestionnaireLink';
 
 
@@ -18,7 +19,7 @@ const PersonProfile = () => {
   return (
     <PersonProfileWrapper>
       <FullName>
-        {`${person.firstName} ${person.lastName}`}
+        {useGetFullNamePreferred(person)}
       </FullName>
       {/* <PersonDetails /> This was commented out as of January 28th, 2025 */}
       <CopyQuestionnaireLink />

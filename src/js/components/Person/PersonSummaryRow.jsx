@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
+import useGetFullNamePreferred from '../../react-query/useGetFullNamePreferred';
 import { useRemoveTeamMemberMutation } from '../../react-query/mutations';
 import { DeleteStyled, EditStyled } from '../Style/iconStyles';
 
@@ -52,7 +53,7 @@ const PersonSummaryRow = ({ person, rowNumberForDisplay, teamId }) => {
         }}
         width={200}
       >
-        {person.firstName} {person.lastName}
+        {useGetFullNamePreferred(person)}
       </PersonCell>
       <PersonCell id={`location-personId-${person.personId}`} $smallFont width={300}>
         {person.location}

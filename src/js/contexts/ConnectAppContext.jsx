@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-// import { messageService } from '../stores/AppObservableStore';
+import { useFetchData } from '../react-query/WeConnectQuery';
 
 // Replaces AppObservableStore.js
 // Create the context
@@ -28,6 +28,16 @@ export const ConnectAppContextProvider = ({ children }) => {
       setData((prevStore) => ({ ...prevStore, [keysIn[i]]: values[i] }));
     }
   };
+
+  const { data: dataP, isSuccess: isSuccessP, isFetching: isFetchingP, isStale: isStaleP } = useFetchData(['person-list-retrieve'], {});
+  useEffect(() => {
+    console.log('useFetchData in TeamHome (person-list-retrieve) useEffect:', dataP, isSuccessP, isFetchingP, isStaleP);
+    if (isSuccessP) {
+      // console.log('useFetchData in TeamHome (person-list-retrieve)useEffect data good:', dataP, isSuccessP, isFetchingP, isStaleP);
+      setAppContextValue('allStaffList', dataP ? dataP.personList : []);
+      console.log('allStaffList fetched in ConnectAppContext');
+    }
+  }, [dataP, isSuccessP, isFetchingP]);
 
   return (
     <ConnectAppContext.Provider value={{ getAppContextData, setAppContextValue, getAppContextValue, setAppContextValuesInBulk }}>
