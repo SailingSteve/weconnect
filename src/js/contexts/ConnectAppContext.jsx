@@ -59,14 +59,16 @@ export const ConnectAppContextProvider = ({ children }) => {
   };
 
   // const { data: dataP, isSuccess: isSuccessP, isFetching: isFetchingP, isStale: isStaleP } = useFetchData(['person-list-retrieve'], {});
-  const personListRetrieveResults = useFetchData(['person-list-retrieve'], {
-    cacheTime: 0,
-    networkMode: 'no-cache',
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
-    refetchInterval: 0,
-    staleTime: 0,
-  });
+  const personListRetrieveResults = useFetchData(['person-list-retrieve'], {});
+  // This is not currently the right place to pass these values, but I'm saving these here for the next 30 days until we work out the correct place.
+  // {
+  //   cacheTime: 0,
+  //   networkMode: 'no-cache',
+  //   refetchOnMount: true,
+  //   refetchOnWindowFocus: true,
+  //   refetchInterval: 0,
+  //   staleTime: 0,
+  // }
   const { data: dataP, isSuccess: isSuccessP, isFetching: isFetchingP, isStale: isStaleP } = personListRetrieveResults;
   useEffect(() => {
     // console.log('useFetchData person-list-retrieve in Teams useEffect:', personListRetrieveResults);
