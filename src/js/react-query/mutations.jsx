@@ -10,6 +10,7 @@ const useRemoveTeamMutation = () => {
   });
 };
 
+// Moved to TeamModel.jsx
 const useRemoveTeamMemberMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -72,6 +73,7 @@ const useGroupSaveMutation = () => {
   });
 };
 
+// Moved to /models/PersonModel.jsx
 const usePersonSaveMutation = () => {
   const queryClient = useQueryClient();
 
@@ -94,7 +96,7 @@ const useSaveTaskMutation = () => {
 
 
 
-export  { useRemoveTeamMutation, useRemoveTeamMemberMutation, useAddPersonToTeamMutation,
+export { useRemoveTeamMutation, useRemoveTeamMemberMutation, useAddPersonToTeamMutation,
   useQuestionnaireSaveMutation, useTaskDefinitionSaveMutation, useGroupSaveMutation,
   useQuestionSaveMutation, usePersonSaveMutation, useSaveTaskMutation, useQuestionnaireAnswersSaveMutation };
 

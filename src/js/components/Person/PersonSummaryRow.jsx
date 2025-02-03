@@ -5,33 +5,45 @@ import styled from 'styled-components';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
-import useGetFullNamePreferred from '../../react-query/useGetFullNamePreferred';
-import { useRemoveTeamMemberMutation } from '../../react-query/mutations';
+import { useGetFullNamePreferred } from '../../models/PersonModel';
+import { useRemoveTeamMemberMutation } from '../../models/TeamModel';
+// import useGetFullNamePreferredReactQuery from '../../react-query/useGetFullNamePreferredReactQuery';
+// import { useRemoveTeamMemberMutation } from '../../react-query/mutations';
 import { DeleteStyled, EditStyled } from '../Style/iconStyles';
 
 
 const PersonSummaryRow = ({ person, rowNumberForDisplay, teamId }) => {
   renderLog('PersonSummaryRow');  // Set LOG_RENDER_EVENTS to log all renders
+  // const [person, setPerson] = useState(useGetPersonById(personId));
   const { setAppContextValue } = useConnectAppContext();
   const { mutate } = useRemoveTeamMemberMutation();
 
   const removeTeamMemberClick = () => {
-    const personId = person.id;
-    const params = { personId, teamId };
+    const params = { personId: person.personId, teamId };
     mutate(params);
   };
 
   const editPersonClick = (hasEditRights = true) => {
     if (hasEditRights) {
       setAppContextValue('editPersonDrawerOpen', true);
-      setAppContextValue('personDrawersPerson', person);
+      // setAppContextValue('personDrawersPerson', person);
+      setAppContextValue('personDrawersPersonId', person.personId);
     }
   };
 
   const personProfileClick = () => {
     setAppContextValue('personProfileDrawerOpen', true);
-    setAppContextValue('personDrawersPerson', person);
+    // setAppContextValue('personDrawersPerson', person);
+    setAppContextValue('personDrawersPersonId', person.personId);
   };
+
+  // useEffect(() => {
+  //   console.log('PersonSummaryRow person: ', person, ' useEffect apiDataCache:', apiDataCache);
+  //   const { allPeopleCache } = apiDataCache;
+  //   if (allPeopleCache) {
+  //     setPerson(allPeopleCache[personId] || {});
+  //   }
+  // }, [apiDataCache]);
 
   const hasEditRights = true;
   return (
@@ -53,7 +65,7 @@ const PersonSummaryRow = ({ person, rowNumberForDisplay, teamId }) => {
         }}
         width={200}
       >
-        {useGetFullNamePreferred(person)}
+        {useGetFullNamePreferred(person.personId)}
       </PersonCell>
       <PersonCell id={`location-personId-${person.personId}`} $smallFont width={300}>
         {person.location}

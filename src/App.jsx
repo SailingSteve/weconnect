@@ -42,6 +42,7 @@ function App () {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
+        networkMode: 'always', // Send queries to the server even if the cache has the data
         refetchOnWindowFocus: false,
         refetchOnMount: true,
         staleTime: 1000 * 60 * 5, // 5 minutes
@@ -50,9 +51,9 @@ function App () {
   });
 
   useEffect(() => {
-    console.log('--------- initializejQuery() ---------');
+    // console.log('--------- initializejQuery() ---------');
     initializejQuery(() => {
-      console.log('--------- jQuery has been initialized ---------');
+      // console.log('--------- jQuery has been initialized ---------');
     });
     return () => {
       // Anything in here is fired on component unmount, equiv to componentDidUnmount()
@@ -61,7 +62,7 @@ function App () {
 
 
   const isAuth = localStorage.getItem('isAuthenticated');
-  console.log('======================================== isAuthenticated: "  ', isAuth, ' =============================');
+  // console.log('======================================== isAuthenticated: "  ', isAuth, ' =============================');
 
   return (
     <>
@@ -79,7 +80,7 @@ function App () {
                       <Route path="/faq" element={<FAQ />} />
                     </Route>
                     <Route path="/login" element={<Login />} />
-                    <Route path="/q/:questionnaireId/:personId" element={<AnswerQuestionsForm />} />
+                    {/* <Route path="/q/:questionnaireId/:personId" element={<AnswerQuestionsForm />} /> */}
                     <Route path="/questionnaire/:questionnaireId" element={<QuestionnaireQuestionList />} />
                     <Route path="/system-settings" element={<SystemSettings />} />
                     <Route path="/tasks" element={<Tasks />} />

@@ -4,7 +4,7 @@ import AddPersonDrawer from './AddPersonDrawer';
 import AddTeamDrawer from './AddTeamDrawer';
 import EditPersonDrawer from './EditPersonDrawer';
 import EditQuestionDrawer from './EditQuestionDrawer';
-import EditQuestionnaireDrawer from './EditQuestionnaireDrawer';
+// import EditQuestionnaireDrawer from './EditQuestionnaireDrawer';
 import EditTaskDefinitionDrawer from './EditTaskDefinitionDrawer';
 import EditTaskGroupDrawer from './EditTaskGroupDrawer';
 import PersonProfileDrawer from './PersonProfileDrawer';
@@ -20,7 +20,7 @@ const Drawers = () => {
       <AddTeamDrawer />
       <EditPersonDrawer />
       <EditQuestionDrawer />
-      <EditQuestionnaireDrawer />
+      {/* TODO: Still causing infinite loop: <EditQuestionnaireDrawer /> */}
       <EditTaskDefinitionDrawer />
       <EditTaskGroupDrawer />
     </>

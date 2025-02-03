@@ -18,7 +18,7 @@ const DrawerTemplateA = ({ classes, drawerId, drawerOpenGlobalVariableName, head
   const [scrolledDown, setScrolledDown] = useState(false);
   const drawerOpen = getAppContextValue(drawerOpenGlobalVariableName);
 
-  console.log('DrawerTemplateA drawerOpen: ', drawerOpenGlobalVariableName, drawerOpen);
+  // console.log('DrawerTemplateA drawerOpen: ', drawerOpenGlobalVariableName, drawerOpen);
 
   const handleScrolledDownDrawer = (evt) => {
     const { scrollTop } = evt.target;
@@ -31,9 +31,9 @@ const DrawerTemplateA = ({ classes, drawerId, drawerOpenGlobalVariableName, head
   };
 
   useEffect(() => {
-    console.log('DrawerTemplateA: Context value changed: ',
-      drawerId, drawerOpenGlobalVariableName, getAppContextValue(drawerOpenGlobalVariableName));
-    setScrolledDown(getAppContextValue('scrolledDownDrawer'));
+    // console.log('DrawerTemplateA: Context value changed: ',
+    //   drawerId, drawerOpenGlobalVariableName, getAppContextValue(drawerOpenGlobalVariableName));
+    // TEMP DALE: setScrolledDown(getAppContextValue('scrolledDownDrawer'));
   }, [getAppContextData]);
 
   React.useEffect(() => {
@@ -42,7 +42,7 @@ const DrawerTemplateA = ({ classes, drawerId, drawerOpenGlobalVariableName, head
       if (drawer) {
         drawer.addEventListener('scroll', handleScrolledDownDrawer);
       } else {
-        console.log('Drawer element NOT found make timeout longer.');
+        // console.log('Drawer element NOT found make timeout longer.');
       }
     }, 100);
 

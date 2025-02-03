@@ -5,9 +5,9 @@ import arrayContains from '../common/utils/arrayContains';
 class QuestionnaireStore extends ReduceStore {
   getInitialState () {
     return {
-      allCachedQuestionnairesDict: {}, // This is a dictionary key: questionnaireId, value: questionnaire dict
-      allCachedQuestionsDict: {}, // This is a dictionary key: questionId, value: question dict
-      allCachedAnswersDict: {}, // This is a dictionary key: personId, value: another dictionary key: questionId, value: answer dict
+      allQuestionnairesCache: {}, // This is a dictionary key: questionnaireId, value: questionnaire dict
+      allQuestionsCache: {}, // This is a dictionary key: questionId, value: question dict
+      allAnswersCache: {}, // This is a dictionary key: personId, value: another dictionary key: questionId, value: answer dict
       dateQuestionnaireCompletedDict: {}, // This is a dictionary key: personId, value: another dictionary key: questionnaireId, value: dateQuestionnaireCompleted
       mostRecentQuestionIdSaved: -1,
       mostRecentQuestionSaved: {
@@ -28,16 +28,16 @@ class QuestionnaireStore extends ReduceStore {
 
   getAllCachedAnswersDictByPersonId (personId) {
     // This lets us know when the person answered the questionnaire
-    const { allCachedAnswersDict } = this.getState();
-    if (allCachedAnswersDict[personId]) {
-      return allCachedAnswersDict[personId];
+    const { allAnswersCache } = this.getState();
+    if (allAnswersCache[personId]) {
+      return allAnswersCache[personId];
     }
     return {};
   }
 
   getAllCachedQuestionnairesList () {
-    const { allCachedQuestionnairesDict } = this.getState();
-    const questionnaireListRaw = Object.values(allCachedQuestionnairesDict);
+    const { allQuestionnairesCache } = this.getState();
+    const questionnaireListRaw = Object.values(allQuestionnairesCache);
 
     const questionnaireList = [];
     let questionnaireFiltered;
@@ -84,8 +84,8 @@ class QuestionnaireStore extends ReduceStore {
   }
 
   getQuestionListByQuestionnaireId (questionnaireId) {
-    const { allCachedQuestionsDict } = this.getState();
-    const questionListRaw = Object.values(allCachedQuestionsDict);
+    const { allQuestionsCache } = this.getState();
+    const questionListRaw = Object.values(allQuestionsCache);
     const questionListForQuestionnaire = [];
     for (let i = 0; i < questionListRaw.length; i++) {
       if (questionListRaw[i].questionnaireId === questionnaireId) {
@@ -97,20 +97,20 @@ class QuestionnaireStore extends ReduceStore {
   }
 
   getQuestionById (questionId) {
-    const { allCachedQuestionsDict } = this.getState();
-    // console.log('QuestionnaireStore getQuestionById:', questionId, ', allCachedQuestionsDict:', allCachedQuestionsDict);
-    return allCachedQuestionsDict[questionId] || {};
+    const { allQuestionsCache } = this.getState();
+    // console.log('QuestionnaireStore getQuestionById:', questionId, ', allQuestionsCache:', allQuestionsCache);
+    return allQuestionsCache[questionId] || {};
   }
 
   getQuestionnaireById (questionnaireId) {
-    const { allCachedQuestionnairesDict } = this.getState();
-    // console.log('QuestionnaireStore getQuestionnaireById:', questionnaireId, ', allCachedQuestionnairesDict:', allCachedQuestionnairesDict);
-    return allCachedQuestionnairesDict[questionnaireId] || {};
+    const { allQuestionnairesCache } = this.getState();
+    // console.log('QuestionnaireStore getQuestionnaireById:', questionnaireId, ', allQuestionnairesCache:', allQuestionnairesCache);
+    return allQuestionnairesCache[questionnaireId] || {};
   }
 
   getQuestionnaireListByPersonId (personId) {
     const { questionnairesAnsweredListByPersonId } = this.getState();
-    // console.log('QuestionnaireStore getQuestionnaireById:', questionnaireId, ', allCachedQuestionnairesDict:', allCachedQuestionnairesDict);
+    // console.log('QuestionnaireStore getQuestionnaireById:', questionnaireId, ', allQuestionnairesCache:', allQuestionnairesCache);
     const questionnairesAnsweredIdList =  questionnairesAnsweredListByPersonId[personId] || [];
     const questionnairesAnsweredListForPerson = [];
     for (let i = 0; i < questionnairesAnsweredIdList.length; i++) {
@@ -126,7 +126,7 @@ class QuestionnaireStore extends ReduceStore {
 
   reduce (state, action) {
     const {
-      allCachedAnswersDict, allCachedQuestionsDict, allCachedQuestionnairesDict,
+      allAnswersCache, allQuestionsCache, allQuestionnairesCache,
       dateQuestionnaireCompletedDict,
       questionnairesAnsweredByPersonList, questionnairesAnsweredListByPersonId, questionsAnsweredPersonIdList,
     } = state;
@@ -157,13 +157,13 @@ class QuestionnaireStore extends ReduceStore {
           action.res.questionList.forEach((question) => {
             // console.log('QuestionnaireStore question-list-retrieve adding question:', question);
             if (question && (question.id >= 0)) {
-              allCachedQuestionsDict[question.id] = question;
+              allQuestionsCache[question.id] = question;
             }
           });
-          // console.log('allCachedQuestionsDict:', allCachedQuestionsDict);
+          // console.log('allQuestionsCache:', allQuestionsCache);
           revisedState = {
             ...revisedState,
-            allCachedQuestionsDict,
+            allQuestionsCache,
           };
         }
         // console.log('QuestionnaireStore revisedState:', revisedState);
@@ -184,10 +184,10 @@ class QuestionnaireStore extends ReduceStore {
         if (questionId >= 0) {
           if (action.res.questionCreated || action.res.questionUpdated) {
             // console.log('QuestionnaireStore question-save questionId:', questionId);
-            allCachedQuestionsDict[questionId] = action.res;
+            allQuestionsCache[questionId] = action.res;
             revisedState = {
               ...revisedState,
-              allCachedQuestionsDict,
+              allQuestionsCache,
               mostRecentQuestionIdSaved: questionId,
             };
           } else {
@@ -212,10 +212,10 @@ class QuestionnaireStore extends ReduceStore {
             // console.log('QuestionnaireStore questionnaire-responses-list-retrieve adding answer:', answer);
             if (answer && (answer.personId >= 0)) {
               if (answer.questionId >= 0) {
-                if (!allCachedAnswersDict[answer.personId]) {
-                  allCachedAnswersDict[answer.personId] = {};
+                if (!allAnswersCache[answer.personId]) {
+                  allAnswersCache[answer.personId] = {};
                 }
-                allCachedAnswersDict[answer.personId][answer.questionId] = answer;
+                allAnswersCache[answer.personId][answer.questionId] = answer;
                 //
                 // Add personId to questionnairesAnsweredByPersonList
                 if (!Array.isArray(questionnairesAnsweredByPersonList[answer.questionnaireId])) {
@@ -259,10 +259,10 @@ class QuestionnaireStore extends ReduceStore {
               }
             }
           });
-          // console.log('allCachedAnswersDict:', allCachedAnswersDict);
+          // console.log('allAnswersCache:', allAnswersCache);
           revisedState = {
             ...revisedState,
-            allCachedAnswersDict,
+            allAnswersCache,
             questionnairesAnsweredByPersonList,
             questionnairesAnsweredListByPersonId,
             questionsAnsweredPersonIdList,
@@ -272,13 +272,13 @@ class QuestionnaireStore extends ReduceStore {
           action.res.questionList.forEach((question) => {
             // console.log('QuestionnaireStore questionnaire-responses-list-retrieve adding question:', question);
             if (question && (question.id >= 0)) {
-              allCachedQuestionsDict[question.id] = question;
+              allQuestionsCache[question.id] = question;
             }
           });
-          // console.log('allCachedQuestionsDict:', allCachedQuestionsDict);
+          // console.log('allQuestionsCache:', allQuestionsCache);
           revisedState = {
             ...revisedState,
-            allCachedQuestionsDict,
+            allQuestionsCache,
           };
         }
         // console.log('QuestionnaireStore questionnaire-responses-list-retrieve questionnaireList:', action.res.questionnaireList);
@@ -286,13 +286,13 @@ class QuestionnaireStore extends ReduceStore {
           action.res.questionnaireList.forEach((questionnaire) => {
             // console.log('QuestionnaireStore questionnaire-responses-list-retrieve adding questionnaire:', questionnaire);
             if (questionnaire && (questionnaire.id >= 0)) {
-              allCachedQuestionnairesDict[questionnaire.id] = questionnaire;
+              allQuestionnairesCache[questionnaire.id] = questionnaire;
             }
           });
-          // console.log('allCachedQuestionnairesDict:', allCachedQuestionnairesDict);
+          // console.log('allQuestionnairesCache:', allQuestionnairesCache);
           revisedState = {
             ...revisedState,
-            allCachedQuestionnairesDict,
+            allQuestionnairesCache,
           };
         }
         // console.log('QuestionnaireStore revisedState:', revisedState);
@@ -318,13 +318,13 @@ class QuestionnaireStore extends ReduceStore {
           action.res.questionnaireList.forEach((questionnaire) => {
             // console.log('QuestionnaireStore questionnaire-list-retrieve adding questionnaire:', questionnaire);
             if (questionnaire && (questionnaire.id >= 0)) {
-              allCachedQuestionnairesDict[questionnaire.id] = questionnaire;
+              allQuestionnairesCache[questionnaire.id] = questionnaire;
             }
           });
-          // console.log('allCachedQuestionnairesDict:', allCachedQuestionnairesDict);
+          // console.log('allQuestionnairesCache:', allQuestionnairesCache);
           revisedState = {
             ...revisedState,
-            allCachedQuestionnairesDict,
+            allQuestionnairesCache,
           };
         }
         // console.log('QuestionnaireStore revisedState:', revisedState);
@@ -344,10 +344,10 @@ class QuestionnaireStore extends ReduceStore {
 
         if (questionnaireId >= 0) {
           // console.log('QuestionnaireStore questionnaire-save questionnaireId:', questionnaireId);
-          allCachedQuestionnairesDict[questionnaireId] = action.res;
+          allQuestionnairesCache[questionnaireId] = action.res;
           revisedState = {
             ...revisedState,
-            allCachedQuestionnairesDict,
+            allQuestionnairesCache,
             mostRecentQuestionnaireIdSaved: questionnaireId,
           };
         } else {

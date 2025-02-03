@@ -9,6 +9,7 @@ import makeRequestParams from '../../react-query/makeRequestParams';
 import { useAddPersonToTeamMutation } from '../../react-query/mutations';
 import { SpanWithLinkStyle } from '../Style/linkStyles';
 import AddPersonForm from './AddPersonForm';
+// import { GetTeamListArray } from '../../models/TeamModel';
 
 
 const AddPersonDrawerMainContent = () => {
@@ -16,8 +17,8 @@ const AddPersonDrawerMainContent = () => {
   const { getAppContextValue } = useConnectAppContext();
   const { mutate } = useAddPersonToTeamMutation();
 
-  const params  = useParams();
-  console.log('AddPersonDrawerMainContent params: ', params);
+  // const params  = useParams();
+  // console.log('AddPersonDrawerMainContent params: ', params);
 
   const [allStaffList] = useState(getAppContextValue('allStaffList'));
   const [remainingStaffToAdd, setRemainingStaffToAdd] = useState(getAppContextValue('allStaffList'));
@@ -32,19 +33,20 @@ const AddPersonDrawerMainContent = () => {
   const searchStringRef = useRef('');
 
   let memberList = [];
-  const teamListFromContext = getAppContextValue('teamListNested');
-  if (teamListFromContext  && thisTeamsCurrentMembersList.length === 0 && teamName === '') {
-    const oneTeam = teamListFromContext.find((team) => team.id === parseInt(teamId));
-    setTeamName(oneTeam.teamName);
-    setTeamId(oneTeam.id);
-
-    if (oneTeam && oneTeam.teamMemberList.length > 0) {
-      memberList = oneTeam.teamMemberList;
-      setThisTeamsCurrentMembersList(memberList);
-    }
-  } else {
-    // console.log('no teamListFromContext yet!');
-  }
+  // const teamListFromContext = getAppContextValue('teamListNested');
+  // const teamListFromContext = GetTeamListArray();
+  // if (teamListFromContext  && thisTeamsCurrentMembersList.length === 0 && teamName === '') {
+  //   const oneTeam = teamListFromContext.find((team) => team.id === parseInt(teamId));
+  //   setTeamName(oneTeam.teamName);
+  //   setTeamId(oneTeam.id);
+  //
+  //   if (oneTeam && oneTeam.teamMemberList.length > 0) {
+  //     memberList = oneTeam.teamMemberList;
+  //     setThisTeamsCurrentMembersList(memberList);
+  //   }
+  // } else {
+  //   // console.log('no teamListFromContext yet!');
+  // }
 
   const initializeRemainingStaffToAddList = () => {
     console.log('initializeTheRemainingStaffToAddListList in AddPersonDrawerMainContent');
@@ -84,7 +86,7 @@ const AddPersonDrawerMainContent = () => {
       if (matchingElements && matchingElements.length) {
         setSearchResultsList(matchingElements);
         setMatchingCounter(matchingElements);
-        console.log(matchingElements);
+        // console.log(matchingElements);
       } else {
         setMatchingCountText('');
       }

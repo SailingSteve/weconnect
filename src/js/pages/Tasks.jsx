@@ -1,4 +1,3 @@
-import { CircularProgress } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
@@ -11,44 +10,72 @@ import { SpanWithLinkStyle } from '../components/Style/linkStyles';
 import { PageContentContainer } from '../components/Style/pageLayoutStyles';
 import TaskListForPerson from '../components/Task/TaskListForPerson';
 import webAppConfig from '../config';
+import { useConnectAppContext, useConnectDispatch } from '../contexts/ConnectAppContext';
+import { TaskStatusListRetrieveDataCapture } from '../models/TaskModel';
+import { TeamListRetrieveDataCapture } from '../models/TeamModel';
 import { useFetchData } from '../react-query/WeConnectQuery';
 
 
 // eslint-disable-next-line no-unused-vars
 const Tasks = ({ classes, match }) => {
   renderLog('Tasks');  // Set LOG_RENDER_EVENTS to log all renders
+  const { apiDataCache } = useConnectAppContext();
+  const { allPeopleCache, allTaskDefinitionsCache, allTasksCache } = apiDataCache;
+  const dispatch = useConnectDispatch();
 
   const [showCompletedTasks, setShowCompletedTasks] = useState(false);
-  const [taskList, setTaskList] = useState(undefined);
-  const [taskDefinitionList, setTaskDefinitionList] = useState(undefined);
-  const [allStaffList, setAllStaffList] = useState([]);
-  const [isFetching, setIsFetching] = useState([false]);
-  const [personIdsList, setPersonIdsList] = useState();
+  const [taskListByPersonId, setTaskListByPersonId] = useState({});
+  const [taskDefinitionList, setTaskDefinitionList] = useState([]);
+  const [selectedPersonList, setSelectedPersonList] = useState([]);
+  const [personIdsList, setPersonIdsList] = useState([]);
 
-  // Roughly equivalent to PersonStore.getAllCachedPeopleList(); and TaskActions.taskStatusListRetrieve();
-  const { data: dataPerson, isSuccess: isSuccessPerson, isFetching: isFetchingPerson } = useFetchData(['person-list-retrieve'], {});
+  const taskStatusListRetrieveResults = useFetchData(['task-status-list-retrieve'], { personIdList: personIdsList });
   useEffect(() => {
-    if (dataPerson) {
-      setPersonIdsList(dataPerson.personList.map((dataPersonObj) => dataPersonObj.id));
-      setAllStaffList(dataPerson.personList);
+    if (taskStatusListRetrieveResults) {
+      // const changeResults =
+      TaskStatusListRetrieveDataCapture(taskStatusListRetrieveResults, apiDataCache, dispatch);
+      // console.log('Tasks useEffect changeResults:', changeResults);
     }
-  }, [dataPerson, isSuccessPerson]);
+  }, [personIdsList, taskStatusListRetrieveResults]);
 
-  const { data: dataTask, isSuccess: isSuccessTask, isFetching: isFetchingTask } = useFetchData(['task-status-list-retrieve'], { personIdList: personIdsList });
   useEffect(() => {
-    console.log('useFetchData in Tasks (person-list-retrieve) useEffect:', isSuccessPerson, isFetchingPerson, dataPerson);
-    console.log('useFetchData in Tasks (task-status-list-retrieve) useEffect:', isSuccessTask, isFetchingTask, dataTask);
-    setIsFetching(isFetchingTask || isFetchingPerson);
-    if (isSuccessPerson && isSuccessTask) {
-      setTaskDefinitionList(dataTask.taskDefinitionList);
-      setTaskList(dataTask.taskList);
+    // console.log('Tasks useEffect allTaskDefinitionsCache:', allTaskDefinitionsCache);
+    if (allTaskDefinitionsCache) {
+      setTaskDefinitionList(Object.values(allTaskDefinitionsCache));
     }
-  }, [personIdsList, dataTask, isSuccessPerson, isSuccessTask]);
+  }, [allTaskDefinitionsCache]);
 
-  if (taskDefinitionList) {
-    const test = taskDefinitionList.filter((taskDefEntry) => taskDefEntry.personId === 1);
-    console.log(test);
-  }
+  const teamListRetrieveResults = useFetchData(['team-list-retrieve'], {});
+  useEffect(() => {
+    // console.log('useFetchData team-list-retrieve in Teams useEffect:', teamListRetrieveResults);
+    if (teamListRetrieveResults) {
+      // console.log('In useEffect apiDataCache:', apiDataCache);
+      // const changeResults =
+      TeamListRetrieveDataCapture(teamListRetrieveResults, apiDataCache, dispatch);
+      // console.log('Teams useEffect changeResults:', changeResults);
+    }
+  }, [teamListRetrieveResults]);
+
+  useEffect(() => {
+    // console.log('Tasks useEffect allPeopleCache:', allPeopleCache);
+    if (allPeopleCache) {
+      const allCachedPeopleList = Object.values(allPeopleCache);
+      setPersonIdsList(allCachedPeopleList.map((person) => person.personId));
+      setSelectedPersonList(allCachedPeopleList);
+    }
+  }, [allPeopleCache]);
+
+  useEffect(() => {
+    const taskListByPersonIdTemp = {};
+    if (allTasksCache) {
+      Object.entries(allTasksCache).forEach(([personIdTemp, taskDictByDefinitionId]) => {
+        taskListByPersonIdTemp[personIdTemp] = Object.values(taskDictByDefinitionId);
+      });
+    }
+    setTaskListByPersonId(taskListByPersonIdTemp);
+    // console.log('=== taskListByPersonIdTemp:', taskListByPersonIdTemp);
+  }, [allTasksCache]);
+
   const teamId = 0;  // hack 1/15/25
   return (
     <div>
@@ -58,7 +85,7 @@ const Tasks = ({ classes, match }) => {
           {' '}
           {webAppConfig.NAME_FOR_BROWSER_TAB_TITLE}
         </title>
-        {/*  Executing a link to a full url restarts the session, <Link rel="canonical" href={`${webAppConfig.WECONNECT_URL_FOR_SEO}/team-home`} /> */}
+        {/* Executing a link to a full url restarts the session, <Link rel="canonical" href={`${webAppConfig.WECONNECT_URL_FOR_SEO}/tasks`} /> */}
         {/* Latest Helmet wont take a link or Link, <Link to="/team-home">Home</Link> */}
         {/* browser.js:38 Uncaught Invariant Violation: Only elements types base, body, head, html, link, meta, noscript, script, style, title, Symbol(react.fragment) are allowed. Helmet does not support rendering <[object Object]> elements. Refer to our API for more information. */}
       </Helmet>
@@ -72,19 +99,14 @@ const Tasks = ({ classes, match }) => {
           )}
         </div>
         <PersonSummaryHeader />
-        {isFetching && (
-          <div style={{ padding: '50px 30px 30px 320px' }}>
-            <CircularProgress />
-          </div>
-        )}
-        {taskList && allStaffList.map((person) => (
+        {taskListByPersonId && selectedPersonList.map((person) => (
           <OneTeamWrapper key={`team-${person.personId}`}>
             <PersonSummaryRow person={person} teamId={teamId} />
             <TaskListForPerson
               personId={person.personId}
               showCompletedTasks={showCompletedTasks}
               taskDefinitionList={taskDefinitionList}
-              taskListForPersonId={taskList.filter((taskEntry) => taskEntry.personId === person.personId)}
+              taskListForPersonId={taskListByPersonId[person.personId] || []}
             />
           </OneTeamWrapper>
         ))}

@@ -11,35 +11,40 @@ import { PageContentContainer } from '../components/Style/pageLayoutStyles';
 import TeamHeader from '../components/Team/TeamHeader';
 import TeamMemberList from '../components/Team/TeamMemberList';
 import webAppConfig from '../config';
-import { useConnectAppContext } from '../contexts/ConnectAppContext';
-import { getTeamList } from '../react-query/TeamsQueryProcessing';
+import { useConnectAppContext, useConnectDispatch } from '../contexts/ConnectAppContext';
+import { TeamListRetrieveDataCapture } from '../models/TeamModel';
 import { useFetchData } from '../react-query/WeConnectQuery';
 
 
 // eslint-disable-next-line no-unused-vars
 const Teams = ({ classes, match }) => {
   renderLog('Teams');
-  const { setAppContextValue, getAppContextValue } = useConnectAppContext();
+  const { apiDataCache, setAppContextValue, getAppContextValue } = useConnectAppContext();
+  const { allPeopleCache, allTeamsCache } = apiDataCache;
+  const dispatch = useConnectDispatch();
 
-  const [showAllTeamMembers, setShowAllTeamMembers] = useState(false);
+  const [showAllTeamMembers, setShowAllTeamMembers] = useState(true);
   const [teamList, setTeamList] = useState([]);
 
-  const { data, isSuccess, isFetching, isStale } = useFetchData(['team-list-retrieve'], {});
-  console.log('useFetchData in Teams:', data, isSuccess, isFetching, isStale);
-  if (isFetching) {
-    console.log('isFetching  ------------');
-  }
+  const teamListRetrieveResults = useFetchData(['team-list-retrieve'], {});
   useEffect(() => {
-    console.log('useFetchData in Teams useEffect:', data, isSuccess, isFetching, isStale);
-    if (data !== undefined && isFetching === false && isStale === false) {
-      console.log('useFetchData in Teams useEffect data is good:', data, isSuccess, isFetching, isStale);
-      console.log('Successfully retrieved teams...');
-      const teamListTemp = getTeamList(data);
-      setShowAllTeamMembers(true);
-      setTeamList(teamListTemp);
-      setAppContextValue('teamListNested', teamListTemp);
+    // console.log('useFetchData team-list-retrieve in Teams useEffect:', teamListRetrieveResults);
+    if (teamListRetrieveResults) {
+      // console.log('In useEffect apiDataCache:', apiDataCache);
+      // TODO Consider making this useTeamListRetrieveDataCapture so we don't have to pass in the apiDataCache or dispatch
+      // const changeResults =
+      TeamListRetrieveDataCapture(teamListRetrieveResults, apiDataCache, dispatch);
+      // console.log('Teams useEffect changeResults:', changeResults);
     }
-  }, [data]);
+  }, [teamListRetrieveResults]);
+
+  useEffect(() => {
+    // console.log('In useEffect apiDataCache:', apiDataCache);
+    if (allTeamsCache) {
+      const teamListSimple = Object.values(allTeamsCache);
+      setTeamList(teamListSimple);
+    }
+  }, [allPeopleCache, allTeamsCache]);
 
   const addTeamClick = () => {
     setAppContextValue('addTeamDrawerOpen', true);
@@ -48,8 +53,8 @@ const Teams = ({ classes, match }) => {
 
   const personProfile = getAppContextValue('personProfileDrawerOpen');
   if (personProfile === undefined) {
-    setAppContextValue('personProfileDrawerOpen', false);
-    setAppContextValue('addTeamDrawerOpen', false);
+    // setAppContextValue('personProfileDrawerOpen', false);
+    // setAppContextValue('addTeamDrawerOpen', false);
   }
 
   return (
@@ -74,6 +79,19 @@ const Teams = ({ classes, match }) => {
             <SpanWithLinkStyle onClick={() => setShowAllTeamMembers(true)}>show people</SpanWithLinkStyle>
           )}
         </div>
+        {teamList.map((team, index) => (
+          <OneTeamWrapper key={`team-${team.id}`}>
+            <TeamHeader
+              team={team}
+              showHeaderLabels={(index === 0) && showAllTeamMembers}
+              // showHeaderLabels={(index === 0) && showAllTeamMembers && (team.teamMemberList && team.teamMemberList.length > 0)}
+              showIcons
+            />
+            {showAllTeamMembers && (
+              <TeamMemberList teamId={team.id} />
+            )}
+          </OneTeamWrapper>
+        ))}
         <Button
           classes={{ root: classes.addTeamButtonRoot }}
           color="primary"
@@ -82,14 +100,6 @@ const Teams = ({ classes, match }) => {
         >
           Add Team
         </Button>
-        {teamList.map((team, index) => (
-          <OneTeamWrapper key={`team-${team.id}`}>
-            <TeamHeader team={team} showHeaderLabels={(index === 0) && showAllTeamMembers && (team.teamMemberList && team.teamMemberList.length > 0)} showIcons />
-            {showAllTeamMembers && (
-              <TeamMemberList teamId={team.id} teamList={teamList} />
-            )}
-          </OneTeamWrapper>
-        ))}
         <div style={{ padding: '100px 0 25px 0', fontWeight: '700' }}>
           <Link to="/login">
             Sign in

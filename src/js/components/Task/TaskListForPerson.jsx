@@ -7,27 +7,30 @@ import TaskSummaryRow from './TaskSummaryRow';
 
 const TaskListForPerson = ({ personId, showCompletedTasks, taskDefinitionList, taskListForPersonId }) => {
   renderLog('TaskListForPerson');  // Set LOG_RENDER_EVENTS to log all renders
-
+  let taskDefinition = {};
   return (
     <TaskListWrapper>
-      {taskListForPersonId.map((task, index) => (
-        <TaskSummaryRow
-          hideIfCompleted={!showCompletedTasks}
-          key={`taskSummaryRow-${task.personId}-${task.taskDefinitionId}`}
-          personId={personId}
-          taskDefinition={taskDefinitionList.filter((taskDefEntry) => taskDefEntry.taskDefinitionId === task.taskDefinitionId)}
-          task={task}
-          rowNumberForDisplay={index + 1}
-        />
-      ))}
+      {taskListForPersonId.map((task, index) => {
+        taskDefinition = taskDefinitionList.find((taskDef) => taskDef.taskDefinitionId === task.taskDefinitionId) || {};
+        return (
+          <TaskSummaryRow
+            hideIfCompleted={!showCompletedTasks}
+            key={`taskSummaryRow-${task.personId}-${task.taskDefinitionId}`}
+            personId={personId}
+            taskDefinition={taskDefinition}
+            task={task}
+            rowNumberForDisplay={index + 1}
+          />
+        );
+      })}
     </TaskListWrapper>
   );
 };
 TaskListForPerson.propTypes = {
   personId: PropTypes.number.isRequired,
   showCompletedTasks: PropTypes.bool,
-  taskDefinitionList: PropTypes.object,
-  taskListForPersonId: PropTypes.object,
+  taskDefinitionList: PropTypes.array,
+  taskListForPersonId: PropTypes.array,
 };
 
 const TaskListWrapper = styled('div')`

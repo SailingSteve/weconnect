@@ -36,7 +36,7 @@ const TaskSummaryRow = ({ classes, hideIfCompleted, personId, rowNumberForDispla
   if (hideIfCompleted && task.statusDone) {
     return null;
   }
-  const taskDef = taskDefinition[0];
+  // console.log('TaskSummaryRow taskDefinition:', taskDefinition);
   return (
     <OneTaskWrapper key={`teamMember-${task.taskDefinitionId}`}>
       {rowNumberForDisplay && (
@@ -46,13 +46,13 @@ const TaskSummaryRow = ({ classes, hideIfCompleted, personId, rowNumberForDispla
           </GraySpan>
         </TaskCell>
       )}
-      <TaskCell id={`taskName-${task.taskDefinitionId}`} width={500}>
-        {taskDef.taskDescription ? (
-          <Tooltip arrow id={`taskDescription-${task.taskDefinitionId}`} title={taskDef.taskDescription}>
-            <span>{taskDef.taskName}</span>
+      <TaskCell id={`taskName-${task.taskDefinitionId}`} width={300}>
+        {taskDefinition.taskDescription ? (
+          <Tooltip arrow id={`taskDescription-${task.taskDefinitionId}`} title={taskDefinition.taskDescription}>
+            <span>{taskDefinition.taskName}</span>
           </Tooltip>
         ) : (
-          <span>{taskDef.taskName}</span>
+          <span>{taskDefinition.taskName}</span>
         )}
       </TaskCell>
       <TaskCell id={`statusDoneCell-${task.taskDefinitionId}`} width={75}>
@@ -87,27 +87,27 @@ const TaskSummaryRow = ({ classes, hideIfCompleted, personId, rowNumberForDispla
         )}
       </TaskCell>
       <TaskCell id={`taskInstructions-${task.taskDefinitionId}`} width={24}>
-        {(taskDef.taskInstructions) && (
+        {(taskDefinition.taskInstructions) && (
           <Tooltip
             arrow
             enterTouchDelay={0} // show with click in mobile
             id={`taskDescription-${task.taskDefinitionId}`}
             leaveTouchDelay={3000}
-            title={taskDef.taskInstructions}
+            title={taskDefinition.taskInstructions}
           >
             <InfoStyled />
           </Tooltip>
         )}
       </TaskCell>
       <TaskCell id={`taskActionUrlDiv-${task.taskDefinitionId}`} width={24}>
-        {(taskDef.taskActionUrl) && (
+        {(taskDefinition.taskActionUrl) && (
           <Suspense fallback={<></>}>
             <OpenExternalWebSite
               linkIdAttribute={`taskActionUrl-${task.taskDefinitionId}`}
-              url={taskDef.taskActionUrl}
+              url={taskDefinition.taskActionUrl}
               target="_blank"
               body={(
-                <Tooltip arrow id={`taskActionUrlTooltip-${task.taskDefinitionId}`} title={taskDef.taskActionUrl}>
+                <Tooltip arrow id={`taskActionUrlTooltip-${task.taskDefinitionId}`} title={taskDefinition.taskActionUrl}>
                   <LaunchStyled />
                 </Tooltip>
               )}

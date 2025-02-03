@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useConnectAppContext } from '../contexts/ConnectAppContext';
 
 // When the function name starts with 'use' React treats it as a custom hook, and it can then access Context variables
-const useGetFullNamePreferred = (person) => {
+const useGetFullNamePreferredReactQuery = (person) => {
   const { getAppContextValue } = useConnectAppContext();
   const [allStaffList] = useState(getAppContextValue('allStaffList'));
   const [personId] = Object.values(person);  // This is silly, but this is a proof of concept
@@ -24,4 +24,4 @@ const useGetFullNamePreferred = (person) => {
   return fullName;
 };
 
-export default useGetFullNamePreferred;
+export default useGetFullNamePreferredReactQuery;

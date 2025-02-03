@@ -4,10 +4,10 @@ import Dispatcher from '../common/dispatcher/Dispatcher';
 class TaskStore extends ReduceStore {
   getInitialState () {
     return {
-      allCachedTaskGroupsDict: {}, // This is a dictionary key: taskGroupId, value: TaskGroup dict
-      allCachedTaskDefinitionsDict: {}, // This is a dictionary key: taskDefinitionId, value: TaskDefinition dict
-      allCachedTaskDependenciesDict: {}, // This is a dictionary key: taskDependencyId, value: TaskDependency dict
-      allCachedTasksDict: {}, // This is a dictionary key: personId, value: another dictionary key: taskDefinitionId, value: Task dict
+      allTaskGroupsCache: {}, // This is a dictionary key: taskGroupId, value: TaskGroup dict
+      allTaskDefinitionsCache: {}, // This is a dictionary key: taskDefinitionId, value: TaskDefinition dict
+      allTaskDependenciesCache: {}, // This is a dictionary key: taskDependencyId, value: TaskDependency dict
+      allTasksCache: {}, // This is a dictionary key: personId, value: another dictionary key: taskDefinitionId, value: Task dict
       mostRecentTaskDefinitionIdSaved: -1,
       mostRecentTaskDefinitionSaved: {
         taskDefinitionId: -1,
@@ -25,8 +25,8 @@ class TaskStore extends ReduceStore {
   }
 
   getAllCachedTaskDefinitionsList () {
-    const { allCachedTaskDefinitionsDict } = this.getState();
-    const taskDefinitionListRaw = Object.values(allCachedTaskDefinitionsDict);
+    const { allTaskDefinitionsCache } = this.getState();
+    const taskDefinitionListRaw = Object.values(allTaskDefinitionsCache);
 
     const taskDefinitionList = [];
     let taskDefinitionFiltered;
@@ -41,8 +41,8 @@ class TaskStore extends ReduceStore {
   }
 
   getAllCachedTaskGroupList () {
-    const { allCachedTaskGroupsDict } = this.getState();
-    const taskGroupListRaw = Object.values(allCachedTaskGroupsDict);
+    const { allTaskGroupsCache } = this.getState();
+    const taskGroupListRaw = Object.values(allTaskGroupsCache);
 
     const taskGroupList = [];
     let taskGroupFiltered;
@@ -70,14 +70,14 @@ class TaskStore extends ReduceStore {
   }
 
   getTask (personId, taskDefinitionId) {
-    const { allCachedTasksDict } = this.getState();
-    // console.log('TaskStore getTaskListDictByPersonId:', personId, ', allCachedTasksDict:', allCachedTasksDict);
-    return allCachedTasksDict[personId][taskDefinitionId] || {};
+    const { allTasksCache } = this.getState();
+    // console.log('TaskStore getTaskListDictByPersonId:', personId, ', allTasksCache:', allTasksCache);
+    return allTasksCache[personId][taskDefinitionId] || {};
   }
 
   getTaskDefinitionListByTaskGroupId (taskGroupId) {
-    const { allCachedTaskDefinitionsDict } = this.getState();
-    const taskDefinitionListRaw = Object.values(allCachedTaskDefinitionsDict);
+    const { allTaskDefinitionsCache } = this.getState();
+    const taskDefinitionListRaw = Object.values(allTaskDefinitionsCache);
     const taskDefinitionListForTaskDefinition = [];
     for (let i = 0; i < taskDefinitionListRaw.length; i++) {
       if (taskDefinitionListRaw[i].taskGroupId === taskGroupId) {
@@ -89,9 +89,9 @@ class TaskStore extends ReduceStore {
   }
 
   getTaskGroupById (taskGroupId) {
-    const { allCachedTaskGroupsDict } = this.getState();
-    // console.log('TaskStore getTaskGroupById:', taskGroupId, ', allCachedTaskGroupsDict:', allCachedTaskGroupsDict);
-    return allCachedTaskGroupsDict[taskGroupId] || {};
+    const { allTaskGroupsCache } = this.getState();
+    // console.log('TaskStore getTaskGroupById:', taskGroupId, ', allTaskGroupsCache:', allTaskGroupsCache);
+    return allTaskGroupsCache[taskGroupId] || {};
   }
 
   getTaskGroupIdByTaskDefinitionId (taskDefinitionId) {
@@ -100,15 +100,15 @@ class TaskStore extends ReduceStore {
   }
 
   getTaskDefinitionById (taskDefinitionId) {
-    const { allCachedTaskDefinitionsDict } = this.getState();
-    // console.log('TaskStore getTaskDefinitionById:', taskDefinitionId, ', allCachedTaskDefinitionsDict:', allCachedTaskDefinitionsDict);
-    return allCachedTaskDefinitionsDict[taskDefinitionId] || {};
+    const { allTaskDefinitionsCache } = this.getState();
+    // console.log('TaskStore getTaskDefinitionById:', taskDefinitionId, ', allTaskDefinitionsCache:', allTaskDefinitionsCache);
+    return allTaskDefinitionsCache[taskDefinitionId] || {};
   }
 
   getTaskListDictByPersonId (personId) {
-    const { allCachedTasksDict } = this.getState();
-    // console.log('TaskStore getTaskListDictByPersonId:', personId, ', allCachedTasksDict:', allCachedTasksDict);
-    return allCachedTasksDict[personId] || {};
+    const { allTasksCache } = this.getState();
+    // console.log('TaskStore getTaskListDictByPersonId:', personId, ', allTasksCache:', allTasksCache);
+    return allTasksCache[personId] || {};
   }
 
   getTaskListForPerson (personId) {
@@ -125,7 +125,7 @@ class TaskStore extends ReduceStore {
 
   reduce (state, action) {
     const {
-      allCachedTaskGroupsDict, allCachedTaskDefinitionsDict, allCachedTasksDict,
+      allTaskGroupsCache, allTaskDefinitionsCache, allTasksCache,
     } = state;
     let missingRequiredVariable = false;
     let personId = -1;
@@ -155,13 +155,13 @@ class TaskStore extends ReduceStore {
           action.res.taskDefinitionList.forEach((taskDefinition) => {
             // console.log('TaskStore task-definition-list-retrieve adding taskDefinition:', taskDefinition);
             if (taskDefinition && (taskDefinition.id >= 0)) {
-              allCachedTaskDefinitionsDict[taskDefinition.id] = taskDefinition;
+              allTaskDefinitionsCache[taskDefinition.id] = taskDefinition;
             }
           });
-          // console.log('allCachedTaskDefinitionsDict:', allCachedTaskDefinitionsDict);
+          // console.log('allTaskDefinitionsCache:', allTaskDefinitionsCache);
           revisedState = {
             ...revisedState,
-            allCachedTaskDefinitionsDict,
+            allTaskDefinitionsCache,
           };
         }
         // console.log('TaskStore revisedState:', revisedState);
@@ -182,10 +182,10 @@ class TaskStore extends ReduceStore {
         if (taskDefinitionId >= 0) {
           if (action.res.taskDefinitionCreated || action.res.taskDefinitionUpdated) {
             // console.log('TaskStore taskDefinition-save taskDefinitionId:', taskDefinitionId);
-            allCachedTaskDefinitionsDict[taskDefinitionId] = action.res;
+            allTaskDefinitionsCache[taskDefinitionId] = action.res;
             revisedState = {
               ...revisedState,
-              allCachedTaskDefinitionsDict,
+              allTaskDefinitionsCache,
               mostRecentTaskDefinitionIdSaved: taskDefinitionId,
             };
           } else {
@@ -216,13 +216,13 @@ class TaskStore extends ReduceStore {
           action.res.taskGroupList.forEach((taskGroup) => {
             // console.log('TaskStore task-group-list-retrieve adding taskGroup:', taskGroup);
             if (taskGroup && (taskGroup.id >= 0)) {
-              allCachedTaskGroupsDict[taskGroup.id] = taskGroup;
+              allTaskGroupsCache[taskGroup.id] = taskGroup;
             }
           });
-          // console.log('allCachedTaskGroupsDict:', allCachedTaskGroupsDict);
+          // console.log('allTaskGroupsCache:', allTaskGroupsCache);
           revisedState = {
             ...revisedState,
-            allCachedTaskGroupsDict,
+            allTaskGroupsCache,
           };
         }
         // console.log('TaskStore revisedState:', revisedState);
@@ -242,10 +242,10 @@ class TaskStore extends ReduceStore {
 
         if (taskGroupId >= 0) {
           // console.log('TaskStore task-group-save taskGroupId:', taskGroupId);
-          allCachedTaskGroupsDict[taskGroupId] = action.res;
+          allTaskGroupsCache[taskGroupId] = action.res;
           revisedState = {
             ...revisedState,
-            allCachedTaskGroupsDict,
+            allTaskGroupsCache,
             mostRecentTaskGroupIdSaved: taskGroupId,
           };
         } else {
@@ -275,10 +275,10 @@ class TaskStore extends ReduceStore {
 
         if (!missingRequiredVariable) {
           // console.log('TaskStore task-save personId:', personId, ', taskDefinitionId:', taskDefinitionId);
-          allCachedTasksDict[personId][taskDefinitionId] = action.res;
+          allTasksCache[personId][taskDefinitionId] = action.res;
           revisedState = {
             ...revisedState,
-            allCachedTasksDict,
+            allTasksCache,
           };
         } else {
           console.log('TaskStore task-save MISSING_REQUIRED_VARIABLE personId:', personId, ', taskDefinitionId:', taskDefinitionId);
@@ -296,37 +296,37 @@ class TaskStore extends ReduceStore {
           action.res.taskDefinitionList.forEach((taskDefinition) => {
             // console.log('TaskStore task-definition-list-retrieve adding taskDefinition:', taskDefinition);
             if (taskDefinition && (taskDefinition.id >= 0)) {
-              allCachedTaskDefinitionsDict[taskDefinition.id] = taskDefinition;
+              allTaskDefinitionsCache[taskDefinition.id] = taskDefinition;
             }
           });
-          // console.log('allCachedTaskDefinitionsDict:', allCachedTaskDefinitionsDict);
+          // console.log('allTaskDefinitionsCache:', allTaskDefinitionsCache);
           revisedState = {
             ...revisedState,
-            allCachedTaskDefinitionsDict,
+            allTaskDefinitionsCache,
           };
         }
         if (action.res.taskGroupList) {
           action.res.taskGroupList.forEach((taskGroup) => {
             // console.log('TaskStore task-group-list-retrieve adding taskGroup:', taskGroup);
             if (taskGroup && (taskGroup.id >= 0)) {
-              allCachedTaskGroupsDict[taskGroup.id] = taskGroup;
+              allTaskGroupsCache[taskGroup.id] = taskGroup;
             }
           });
-          // console.log('allCachedTaskGroupsDict:', allCachedTaskGroupsDict);
+          // console.log('allTaskGroupsCache:', allTaskGroupsCache);
           revisedState = {
             ...revisedState,
-            allCachedTaskGroupsDict,
+            allTaskGroupsCache,
           };
         }
         if (action.res.taskList) {
           action.res.taskList.forEach((task) => {
             // console.log('TaskStore task-group-list-retrieve adding taskGroup:', taskGroup);
             if (task && (task.personId >= 0)) {
-              if (!allCachedTasksDict[task.personId]) {
-                allCachedTasksDict[task.personId] = {};
+              if (!allTasksCache[task.personId]) {
+                allTasksCache[task.personId] = {};
               }
               if (task && (task.taskDefinitionId >= 0)) {
-                allCachedTasksDict[task.personId][task.taskDefinitionId] = task;
+                allTasksCache[task.personId][task.taskDefinitionId] = task;
               } else {
                 console.log('TaskStore task-group-list-retrieve skipping task with missing personId:', task);
               }
@@ -334,10 +334,10 @@ class TaskStore extends ReduceStore {
               console.log('TaskStore task-group-list-retrieve skipping task with missing taskDefinitionId:', task);
             }
           });
-          // console.log('allCachedTasksDict:', allCachedTasksDict);
+          // console.log('allTasksCache:', allTasksCache);
           revisedState = {
             ...revisedState,
-            allCachedTasksDict,
+            allTasksCache,
           };
         }
         // console.log('TaskStore revisedState:', revisedState);
