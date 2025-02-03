@@ -51,9 +51,9 @@ function App () {
   });
 
   useEffect(() => {
-    // console.log('--------- initializejQuery() ---------');
+    console.log('--------- App.jsx loading ---------');
     initializejQuery(() => {
-      // console.log('--------- jQuery has been initialized ---------');
+      console.log('--------- jQuery has been initialized ---------');
     });
     return () => {
       // Anything in here is fired on component unmount, equiv to componentDidUnmount()
@@ -62,7 +62,9 @@ function App () {
 
 
   const isAuth = localStorage.getItem('isAuthenticated');
-  // console.log('======================================== isAuthenticated: "  ', isAuth, ' =============================');
+  if (isAuth) {
+    console.log('======================================== isAuthenticated: "  ', isAuth, ' =============================');
+  }
 
   return (
     <>
