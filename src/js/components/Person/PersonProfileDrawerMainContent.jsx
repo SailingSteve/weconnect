@@ -11,7 +11,7 @@ const PersonProfileDrawerMainContent = () => {
   return (
     <PersonProfileDrawerMainContentWrapper>
       <PersonProfile />
-      <QuestionnaireResponsesList />
+      {/* <QuestionnaireResponsesList /> */}
     </PersonProfileDrawerMainContentWrapper>
   );
 };

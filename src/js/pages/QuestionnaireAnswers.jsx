@@ -9,8 +9,9 @@ import DesignTokenColors from '../common/components/Style/DesignTokenColors';
 import { renderLog } from '../common/utils/logging';
 import { PageContentContainer } from '../components/Style/pageLayoutStyles';
 import webAppConfig from '../config';
-import useGetFullNamePreferred from '../react-query/useGetFullNamePreferred';
+// import useGetFullNamePreferred from '../react-query/useGetFullNamePreferred';
 import { useFetchData } from '../react-query/WeConnectQuery';
+import { useGetFullNamePreferred } from '../models/PersonModel';
 
 
 // eslint-disable-next-line no-unused-vars
@@ -53,8 +54,8 @@ const QuestionnaireAnswers = ({ classes, match }) => {
   /* eslint-disable arrow-body-style */
   // eslint-disable-next-line no-unused-vars
   const getAnswerValue = (questionId) => {
-    // if (allCachedAnswersDict && allCachedAnswersDict[questionId]) {
-    //   const questionAnswer = allCachedAnswersDict[questionId];
+    // if (allAnswersCache && allAnswersCache[questionId]) {
+    //   const questionAnswer = allAnswersCache[questionId];
     //   return getAnswerValueFromAnswerDict(questionAnswer);
     // }
     return '';
@@ -79,7 +80,8 @@ const QuestionnaireAnswers = ({ classes, match }) => {
         <AnsweredBy>
           Answered by:
           {' '}
-          <AnsweredBySpan>{useGetFullNamePreferred(person)}</AnsweredBySpan>
+          {/* <AnsweredBySpan>{useGetFullNamePreferred(person)}</AnsweredBySpan> */}
+          <AnsweredBySpan>{person ? useGetFullNamePreferred(person.personId) : 'tbd'}</AnsweredBySpan>
         </AnsweredBy>
         <FormControl classes={{ root: classes.formControl }}>
           {questionList && questionList.map((question) => (

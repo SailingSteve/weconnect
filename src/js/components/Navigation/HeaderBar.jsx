@@ -31,32 +31,32 @@ const HeaderBar = () => {
   // };
 
   const initializeTabValue = () => {
-    console.log('initializeTabValue normalizedHrefPage():', normalizedHrefPage());
+    // console.log('initializeTabValue normalizedHrefPage():', normalizedHrefPage());
     switch (normalizedHrefPage()) {
       case 'tasks':
         setTabsValue('1');
-        console.log('initializeTabValue  setTabsValue: 1');
+        // console.log('initializeTabValue  setTabsValue: 1');
         break;
       case 'team-home':
       case 'teams':
         setTabsValue('2');
-        console.log('initializeTabValue  setTabsValue: 2');
+        // console.log('initializeTabValue  setTabsValue: 2');
         break;
       case 'questionnaire':
       case 'system-settings':
       case 'task-group':
         setTabsValue('3');
-        console.log('initializeTabValue  setTabsValue: 3');
+        // console.log('initializeTabValue  setTabsValue: 3');
         break;
       default:
         setTabsValue('1');
-        console.log('initializeTabValue  setTabsValue default: 1');
+        // console.log('initializeTabValue  setTabsValue default: 1');
         break;
     }
   };
 
   const handleTabChange = (event, newValue) => {
-    console.log(`handleTabChange newValue: ${newValue}`);
+    // console.log(`handleTabChange newValue: ${newValue}`);
     // setTabsValue(newValue);
     switch (newValue) {
       case '1':
@@ -96,7 +96,7 @@ const HeaderBar = () => {
   //   // console.log('------ HeaderBar, onAppObservableStoreChange received: ', msg);
   //   setScrolledDown(false);
   // };
-  console.log('tabs value ==== ', tabsValue);
+  // console.log('tabs value ==== ', tabsValue);
   return (
     <HeaderBarWrapper
       $hasNotch={hasIPhoneNotch()}

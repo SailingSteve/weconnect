@@ -12,14 +12,15 @@ const EditQuestionDrawer = () => {
   const [headerFixedJsx] = useState(<></>);
 
   useEffect(() => {
-    console.log('EditQuestionDrawer: Context value changed:', true);
+    // console.log('EditQuestionDrawer: Context value changed:', true);
     const question = getAppContextValue('selectedQuestion');
-    if (question && question.id >= 0) {
-      setHeaderTitleJsx(<>Edit Question</>);
-    } else {
-      setHeaderTitleJsx(<>Add Question</>);
-    }
-  }, [getAppContextValue]);
+    // if (question && question.id >= 0) {
+    //   setHeaderTitleJsx(<>Edit Question</>);
+    // } else {
+    //   setHeaderTitleJsx(<>Add Question</>);
+    // }
+  });
+  // }, [getAppContextValue]);  // TODO DALE: commented out for now to avoid infinite loop
 
   return (
     <DrawerTemplateA

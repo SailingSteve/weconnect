@@ -13,10 +13,11 @@ const EditPersonDrawerMainContent = () => {
   const [teamId, setTeamId] = useState(-1);
 
   useEffect(() => {  // Replaces onAppObservableStoreChange and will be called whenever the context value changes
-    console.log('EditPersonDrawerMainContent: Context value changed:', true);
+    // console.log('EditPersonDrawerMainContent: Context value changed:', true);
     const teamIdTemp = getAppContextValue('editPersonDrawerTeamId');
     setTeamId(teamIdTemp);
-  }, [getAppContextValue]);
+  });
+  // }, [getAppContextValue]);  // TODO DALE: commented out for now to avoid infinite loop
 
   return (
     <EditPersonDrawerMainContentWrapper>

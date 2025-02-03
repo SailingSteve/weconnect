@@ -7,15 +7,18 @@ import { renderLog } from '../../common/utils/logging';
 import webAppConfig from '../../config';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
 import makeRequestParams from '../../react-query/makeRequestParams';
-import { usePersonSaveMutation } from '../../react-query/mutations';
+// import { usePersonSaveMutation } from '../../react-query/mutations';
+import { useGetPersonById, usePersonSave } from '../../models/PersonModel';
 
 const EditPersonForm = ({ classes }) => {
   renderLog('EditPersonForm');
   const { getAppContextValue } = useConnectAppContext();
-  const { mutate } = usePersonSaveMutation();
+  // const { mutate } = usePersonSaveMutation();
+  const { mutate: personSave } = usePersonSave();
 
   const [saveButtonActive, setSaveButtonActive] = useState(false);
-  const [initialPerson] = useState(getAppContextValue('personDrawersPerson'));
+  // const [initialPerson] = useState(getAppContextValue('personDrawersPerson'));
+  const [initialPerson] = useState(useGetPersonById(getAppContextValue('personDrawersPersonId')));
   const [activePerson, setActivePerson] = useState({ ...initialPerson });
 
   const emailPersonal = useRef('');
@@ -24,6 +27,7 @@ const EditPersonForm = ({ classes }) => {
   const jobTitle = useRef('');
   const lastName = useRef('');
   const location = useRef('');
+  const stateCode = useRef('');
 
   const savePerson = () => {
     activePerson.emailPersonal = emailPersonal.current.value;
@@ -32,9 +36,10 @@ const EditPersonForm = ({ classes }) => {
     activePerson.jobTitle = jobTitle.current.value;
     activePerson.lastName = lastName.current.value;
     activePerson.location = location.current.value;
+    activePerson.stateCode = stateCode.current.value;
     setActivePerson(activePerson);
 
-    console.log('savePerson data:', JSON.stringify(activePerson));
+    // console.log('savePerson data:', JSON.stringify(activePerson));
 
     const data = {};
     // for (const key in activePerson) {
@@ -49,7 +54,8 @@ const EditPersonForm = ({ classes }) => {
       personId: activePerson.id,
     };
 
-    mutate(makeRequestParams(plainParams, data));
+    // mutate(makeRequestParams(plainParams, data));
+    personSave(makeRequestParams(plainParams, data));
     setSaveButtonActive(false);
   };
 
@@ -58,77 +64,88 @@ const EditPersonForm = ({ classes }) => {
       <FormControl classes={{ root: classes.formControl }}>
         <TextField
           autoFocus
+          defaultValue={activePerson.firstName || ''}
           id="firstNameToBeSaved"
+          inputRef={firstName}
           label="First (Legal) Name"
           margin="dense"
           name="firstName"
-          inputRef={firstName}
           onChange={() => setSaveButtonActive(true)}
           placeholder="First Name (legal name)"
-          defaultValue={activePerson.firstName || ''}
           variant="outlined"
         />
         <TextField
-          id="firstNamePreferredToBeSaved"
-          label="Preferred  Name (if different from legal)"
-          name="firstNamePreferred"
-          inputRef={firstNamePreferred}
-          margin="dense"
-          variant="outlined"
-          placeholder="First Name you want used in meetings"
           defaultValue={activePerson.firstNamePreferred || ''}
-          onChange={() => setSaveButtonActive(true)}
-        />
-        <TextField
-          id="lastNameToBeSaved"
-          label="Last Name"
-          name="lastName"
-          inputRef={lastName}
+          id="firstNamePreferredToBeSaved"
+          inputRef={firstNamePreferred}
+          label="Preferred Name (if different from legal)"
           margin="dense"
-          variant="outlined"
-          placeholder="Last Name"
-          defaultValue={activePerson.lastName || ''}
+          name="firstNamePreferred"
           onChange={() => setSaveButtonActive(true)}
+          placeholder="First Name to use in meetings"
+          variant="outlined"
         />
         <TextField
+          defaultValue={activePerson.lastName || ''}
+          id="lastNameToBeSaved"
+          inputRef={lastName}
+          label="Last Name"
+          margin="dense"
+          name="lastName"
+          onChange={() => setSaveButtonActive(true)}
+          placeholder="Last Name"
+          variant="outlined"
+        />
+        <TextField
+          defaultValue={activePerson.emailPersonal || ''}
           id="emailPersonalToBeSaved"
           label="Email Address, Personal"
           name="emailPersonal"
           inputRef={emailPersonal}
           margin="dense"
           variant="outlined"
+          onChange={() => setSaveButtonActive(true)}
           placeholder="Email Address, Personal"
-          defaultValue={activePerson.emailPersonal || ''}
-         onChange={() => setSaveButtonActive(true)}
         />
         <TextField
-          id="locationToBeSaved"
-          label="Location"
-          name="location"
-          inputRef={location}
-          margin="dense"
-          variant="outlined"
-          placeholder="City, State"
           defaultValue={activePerson.location || ''}
+          id="locationToBeSaved"
+          inputRef={location}
+          label="Location"
+          margin="dense"
+          name="location"
           onChange={() => setSaveButtonActive(true)}
+          placeholder="City, State"
+          variant="outlined"
         />
         <TextField
-          id="jobTitleToBeSaved"
-          label={`Job Title (at ${webAppConfig.ORGANIZATION_NAME})`}
-          name="jobTitle"
-          inputRef={jobTitle}
+          defaultValue={activePerson.stateCode || ''}
+          id="stateCodeToBeSaved"
+          inputRef={stateCode}
+          label="State Code"
           margin="dense"
-          variant="outlined"
-          placeholder={`Job Title here at ${webAppConfig.ORGANIZATION_NAME}`}
-          defaultValue={activePerson.jobTitle || ''}
+          name="stateCode"
           onChange={() => setSaveButtonActive(true)}
+          placeholder="State Code (2 characters)"
+          variant="outlined"
+        />
+        <TextField
+          defaultValue={activePerson.jobTitle || ''}
+          id="jobTitleToBeSaved"
+          inputRef={jobTitle}
+          label={`Job Title (at ${webAppConfig.ORGANIZATION_NAME})`}
+          margin="dense"
+          name="jobTitle"
+          onChange={() => setSaveButtonActive(true)}
+          placeholder={`Job Title here at ${webAppConfig.ORGANIZATION_NAME}`}
+          variant="outlined"
         />
         <Button
           classes={{ root: classes.savePersonButton }}
           color="primary"
           disabled={!saveButtonActive}
-          variant="contained"
           onClick={savePerson}
+          variant="contained"
         >
           Save Person
         </Button>

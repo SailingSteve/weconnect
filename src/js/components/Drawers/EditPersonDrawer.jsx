@@ -9,7 +9,6 @@ const EditPersonDrawer = () => {
   const [headerTitleJsx] = useState(<></>);
   const [headerFixedJsx] = useState(<></>);
 
-
   return (
     <DrawerTemplateA
       drawerId="editPersonDrawer"

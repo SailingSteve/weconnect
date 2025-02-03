@@ -6,7 +6,7 @@ import arrayContains from '../common/utils/arrayContains';
 class PersonStore extends ReduceStore {
   getInitialState () {
     return {
-      allCachedPeopleDict: {}, // This is a dictionary key: personId, value: person dict
+      allPeopleCache: {}, // This is a dictionary key: personId, value: person dict
       mostRecentPersonIdSaved: -1,
       mostRecentPersonSaved: {
         firstName: '',
@@ -18,8 +18,8 @@ class PersonStore extends ReduceStore {
   }
 
   getAllCachedPeopleList () {
-    const { allCachedPeopleDict } = this.getState();
-    const personListRaw = Object.values(allCachedPeopleDict);
+    const { allPeopleCache } = this.getState();
+    const personListRaw = Object.values(allPeopleCache);
 
     const personList = [];
     let personFiltered;
@@ -87,9 +87,9 @@ class PersonStore extends ReduceStore {
   }
 
   getPersonById (personId) {
-    const { allCachedPeopleDict } = this.getState();
-    // console.log('PersonStore getPersonById:', personId, ', allCachedPeopleDict:', allCachedPeopleDict);
-    return allCachedPeopleDict[personId] || {};
+    const { allPeopleCache } = this.getState();
+    // console.log('PersonStore getPersonById:', personId, ', allPeopleCache:', allPeopleCache);
+    return allPeopleCache[personId] || {};
   }
 
   getPersonDeviceId () {
@@ -111,7 +111,7 @@ class PersonStore extends ReduceStore {
   }
 
   reduce (state, action) {
-    const { allCachedPeopleDict } = state;
+    const { allPeopleCache } = state;
     let personTemp = {};
     let personId = -1;
     let revisedState = state;
@@ -137,14 +137,14 @@ class PersonStore extends ReduceStore {
         if (action.res) {
           personTemp = action.res;
           // console.log('PersonStore add-person-to-team:', personTemp);
-          // Only add to allCachedPeopleDict if they aren't already in the dictionary, since the person data that comes back with this API response is partial data
-          if (personTemp && (personTemp.personId >= 0) && !arrayContains(personTemp.personId, allCachedPeopleDict)) {
-            allCachedPeopleDict[personTemp.personId] = personTemp;
+          // Only add to allPeopleCache if they aren't already in the dictionary, since the person data that comes back with this API response is partial data
+          if (personTemp && (personTemp.personId >= 0) && !arrayContains(personTemp.personId, allPeopleCache)) {
+            allPeopleCache[personTemp.personId] = personTemp;
           }
-          // console.log('allCachedPeopleDict:', allCachedPeopleDict);
+          // console.log('allPeopleCache:', allPeopleCache);
           revisedState = {
             ...revisedState,
-            allCachedPeopleDict,
+            allPeopleCache,
           };
         }
         return revisedState;
@@ -169,13 +169,13 @@ class PersonStore extends ReduceStore {
           action.res.personList.forEach((person) => {
             // console.log('PersonStore team-retrieve adding person:', person);
             if (person && (person.id >= 0)) {
-              allCachedPeopleDict[person.id] = person;
+              allPeopleCache[person.id] = person;
             }
           });
-          // console.log('allCachedPeopleDict:', allCachedPeopleDict);
+          // console.log('allPeopleCache:', allPeopleCache);
           revisedState = {
             ...revisedState,
-            allCachedPeopleDict,
+            allPeopleCache,
           };
         }
         // console.log('PersonStore revisedState:', revisedState);
@@ -195,10 +195,10 @@ class PersonStore extends ReduceStore {
 
         if (personId >= 0) {
           // console.log('PersonStore person-save personId:', personId);
-          allCachedPeopleDict[personId] = action.res;
+          allPeopleCache[personId] = action.res;
           revisedState = {
             ...revisedState,
-            allCachedPeopleDict,
+            allPeopleCache,
           };
         } else {
           console.log('PersonStore person-retrieve MISSING personId:', personId);
@@ -219,10 +219,10 @@ class PersonStore extends ReduceStore {
 
         if (personId >= 0) {
           // console.log('PersonStore person-save personId:', personId);
-          allCachedPeopleDict[personId] = action.res;
+          allPeopleCache[personId] = action.res;
           revisedState = {
             ...revisedState,
-            allCachedPeopleDict,
+            allPeopleCache,
             mostRecentPersonIdSaved: personId,
           };
         } else {
@@ -243,8 +243,8 @@ class PersonStore extends ReduceStore {
               teamMemberList = team.teamMemberList || [];
               teamMemberList.forEach((person) => {
                 // console.log('PersonStore team-retrieve adding person:', person);
-                if (person && (person.id >= 0) && !arrayContains(person.id, allCachedPeopleDict)) {
-                  allCachedPeopleDict[person.id] = person;
+                if (person && (person.id >= 0) && !arrayContains(person.id, allPeopleCache)) {
+                  allPeopleCache[person.id] = person;
                 }
               });
             }
@@ -253,7 +253,7 @@ class PersonStore extends ReduceStore {
 
         revisedState = {
           ...revisedState,
-          allCachedPeopleDict,
+          allPeopleCache,
         };
         return revisedState;
 
@@ -270,19 +270,19 @@ class PersonStore extends ReduceStore {
           teamId = -1;
         }
 
-        // console.log('PersonStore ', action.type, ' start allCachedPeopleDict:', allCachedPeopleDict);
+        // console.log('PersonStore ', action.type, ' start allPeopleCache:', allPeopleCache);
         if (teamId >= 0 && action.res.teamMemberList) {
           teamMemberList = action.res.teamMemberList || [];
           teamMemberList.forEach((person) => {
             // console.log('PersonStore team-retrieve adding person:', person);
-            if (person && (person.id >= 0) && !arrayContains(person.id, allCachedPeopleDict)) {
-              allCachedPeopleDict[person.id] = person;
+            if (person && (person.id >= 0) && !arrayContains(person.id, allPeopleCache)) {
+              allPeopleCache[person.id] = person;
             }
           });
-          // console.log('allCachedPeopleDict:', allCachedPeopleDict);
+          // console.log('allPeopleCache:', allPeopleCache);
           revisedState = {
             ...revisedState,
-            allCachedPeopleDict,
+            allPeopleCache,
           };
         }
         return revisedState;

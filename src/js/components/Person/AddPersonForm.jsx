@@ -22,10 +22,11 @@ const AddPersonForm = ({ classes }) => {  //  classes, teamId
   const emailFldRef = useRef('');
 
   useEffect(() => {  // Replaces onAppObservableStoreChange and will be called whenever the context value changes
-    console.log('AddPersonForm: Context value changed:', true);
+    // console.log('AddPersonForm: Context value changed:', true);
     setTeamId(getAppContextValue('addPersonDrawerTeam').id);
     setTeamName(getAppContextValue('addPersonDrawerTeam').teamName);
-  }, [getAppContextValue]);
+  }, []);
+  // }, [getAppContextValue]);  // TODO DALE: commented out for now to avoid infinite loop
 
 
   const saveNewPerson = () => {

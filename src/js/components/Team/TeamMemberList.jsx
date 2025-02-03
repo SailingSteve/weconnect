@@ -1,36 +1,48 @@
 import { withStyles } from '@mui/styles';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
-import { useConnectAppContext } from '../../contexts/ConnectAppContext';
 import PersonSummaryRow from '../Person/PersonSummaryRow';
+import {
+  GetTeamMembersListByTeamId,
+  // useGetTeamMembersListByTeamId,
+} from '../../models/TeamModel';
+import { useConnectAppContext } from '../../contexts/ConnectAppContext';
 
-const TeamMemberList = ({ teamId }) => {
+const TeamMemberList = ({ teamId }) => { // teamMemberList
   renderLog('TeamMemberList');
-  const { getAppContextValue } = useConnectAppContext();
+  const { apiDataCache } = useConnectAppContext();
+  const { allPeopleCache, allTeamsCache } = apiDataCache;
+  // const [teamMemberList, setTeamMemberList] = useState(useGetTeamMembersListByTeamId(teamId));
+  const [teamMemberList, setTeamMemberList] = useState([]);
+  // const teamMemberList = useGetTeamMembersListByTeamId(teamId);
+  // console.log('TeamMemberList teamMemberList:', teamMemberList);
 
-  let teamMemberList = [];
-  const teamListFromContext = getAppContextValue('teamListNested');
-  if (teamListFromContext) {
-    const oneTeam = teamListFromContext.find((staff) => staff.teamId === parseInt(teamId));
-    if (oneTeam && oneTeam.teamMemberList.length > 0) {
-      teamMemberList = oneTeam.teamMemberList;
-    }
-  } else {
-    console.log('no teamListFromContext yet!');
-  }
+  useEffect(() => {
+    // console.log(`TeamMemberList useEffect teamId: ${teamId} apiDataCache:`, apiDataCache);
+    const updatedTeamMemberList = GetTeamMembersListByTeamId(teamId, apiDataCache);
+    // console.log(`TeamMemberList useEffect teamId: ${teamId} updatedTeamMemberList:`, updatedTeamMemberList);
+    setTeamMemberList(updatedTeamMemberList);
+  }, [allPeopleCache, allTeamsCache, teamId]);
 
   return (
     <TeamMembersWrapper>
-      {teamMemberList.map((person, index) => (
-        <PersonSummaryRow
-          key={`teamMember-${teamId}-${person.id}`}
-          person={person}
-          rowNumberForDisplay={index + 1}
-          teamId={teamId}
-        />
-      ))}
+      {teamMemberList.map((person, index) => {
+        // console.log(`TeamMemberList teamId: ${teamId}, person:`, person);
+        if (person) {
+          return (
+            <PersonSummaryRow
+              key={`teamMember-${teamId}-${person.id}`}
+              person={person}
+              rowNumberForDisplay={index + 1}
+              teamId={teamId}
+            />
+          );
+        } else {
+          return null; // Empty row for non-existing members
+        }
+      })}
     </TeamMembersWrapper>
   );
 };

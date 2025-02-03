@@ -15,7 +15,7 @@ const EditQuestionnaireDrawer = () => {
 
   useEffect(() => {
     if (getAppContextValue('editQuestionnaireDrawerOpen')) {
-      console.log('EditQuestionnaireDrawer: Context value changed:', true);
+      // console.log('EditQuestionnaireDrawer: Context value changed:', true);
       const questionnaire = getAppContextValue('selectedQuestionnaire');
       if (questionnaire) {
         setHeaderTitleJsx(<>Edit Questionnaire</>);
@@ -23,7 +23,8 @@ const EditQuestionnaireDrawer = () => {
         setHeaderTitleJsx(<>Add Questionnaire</>);
       }
     }
-  }, [getAppContextValue]);
+  });
+  // }, [getAppContextValue]);  // TODO DALE: commented out for now to avoid infinite loop
 
   return (
     <DrawerTemplateA

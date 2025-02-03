@@ -7,8 +7,8 @@ import convertToInteger from '../common/utils/convertToInteger';
 class TeamStore extends ReduceStore {
   getInitialState () {
     return {
-      allCachedTeamsDict: {}, // This is a dictionary key: teamId, value: team dict
-      allCachedTeamMembersDict: {}, // This is a dictionary key: teamId, value: list of personIds in the team
+      allTeamsCache: {}, // This is a dictionary key: teamId, value: team dict
+      allTeamMembersCache: {}, // This is a dictionary key: teamId, value: list of personIds in the team
       mostRecentTeamIdSaved: -1,
       mostRecentTeamMemberIdSaved: -1,
       mostRecentTeamSaved: {
@@ -27,14 +27,14 @@ class TeamStore extends ReduceStore {
   }
 
   getTeamById (teamId) {
-    const { allCachedTeamsDict } = this.getState();
-    // console.log('TeamStore getTeamById:', teamId, ', allCachedTeamsDict:', allCachedTeamsDict);
-    return allCachedTeamsDict[teamId] || {};
+    const { allTeamsCache } = this.getState();
+    // console.log('TeamStore getTeamById:', teamId, ', allTeamsCache:', allTeamsCache);
+    return allTeamsCache[teamId] || {};
   }
 
   getTeamList () {
-    const { allCachedTeamsDict } = this.getState();
-    const teamListRaw = Object.values(allCachedTeamsDict);
+    const { allTeamsCache } = this.getState();
+    const teamListRaw = Object.values(allTeamsCache);
 
     const teamList = [];
     let teamFiltered;
@@ -49,9 +49,9 @@ class TeamStore extends ReduceStore {
   }
 
   getTeamMemberList (teamId) {
-    const { allCachedTeamMembersDict } = this.getState();
-    // console.log('TeamStore getTeamMemberList teamId:', teamId, ', allCachedTeamMembersDict:', allCachedTeamMembersDict);
-    const personIdList = allCachedTeamMembersDict[teamId] || [];
+    const { allTeamMembersCache } = this.getState();
+    // console.log('TeamStore getTeamMemberList teamId:', teamId, ', allTeamMembersCache:', allTeamMembersCache);
+    const personIdList = allTeamMembersCache[teamId] || [];
     const teamMemberList = [];
     for (let i = 0; i < personIdList.length; i++) {
       const person = PersonStore.getPersonById(personIdList[i]);
@@ -64,8 +64,8 @@ class TeamStore extends ReduceStore {
   }
 
   getTeamMemberPersonIdList (teamId) {
-    const { allCachedTeamMembersDict } = this.getState();
-    return allCachedTeamMembersDict[teamId] || [];
+    const { allTeamMembersCache } = this.getState();
+    return allTeamMembersCache[teamId] || [];
   }
 
   getTeamName (teamId) {
@@ -74,7 +74,7 @@ class TeamStore extends ReduceStore {
   }
 
   reduce (state, action) {
-    const { allCachedTeamMembersDict, allCachedTeamsDict } = state;
+    const { allTeamMembersCache, allTeamsCache } = state;
     let personId = -1;
     let personIdTemp = -1;
     let revisedState = state;
@@ -106,14 +106,14 @@ class TeamStore extends ReduceStore {
         if (personId >= 0 && teamId >= 0) {
           // console.log('TeamStore add-person-to-team personId: ', personId, ', teamId:', teamId);
           // Start with existing teamMemberList
-          teamMemberIdList = allCachedTeamMembersDict[teamId] || [];
+          teamMemberIdList = allTeamMembersCache[teamId] || [];
           // Check if personId is already in teamMemberListAdd personId to teamMemberList
           if (!arrayContains(personId, teamMemberIdList)) {
             teamMemberIdList.push(personId);
-            allCachedTeamMembersDict[teamId] = teamMemberIdList;
+            allTeamMembersCache[teamId] = teamMemberIdList;
             revisedState = {
               ...revisedState,
-              allCachedTeamMembersDict,
+              allTeamMembersCache,
               mostRecentTeamMemberIdSaved: personId,
             };
           }
@@ -145,14 +145,14 @@ class TeamStore extends ReduceStore {
         if (personId >= 0 && teamId >= 0) {
           // console.log('TeamStore remove-person-from-team personId: ', personId, ', teamId:', teamId);
           // Start with existing teamMemberList
-          teamMemberIdList = allCachedTeamMembersDict[teamId] || [];
+          teamMemberIdList = allTeamMembersCache[teamId] || [];
           // If personId is in teamMemberListAdd, remove it
           if (arrayContains(personId, teamMemberIdList)) {
             teamMemberIdList = teamMemberIdList.filter((item) => item !== personId);
-            allCachedTeamMembersDict[teamId] = teamMemberIdList;
+            allTeamMembersCache[teamId] = teamMemberIdList;
             revisedState = {
               ...revisedState,
-              allCachedTeamMembersDict,
+              allTeamMembersCache,
               mostRecentTeamMemberIdSaved: personId,
             };
           }
@@ -170,7 +170,7 @@ class TeamStore extends ReduceStore {
         revisedState = state;
         teamList.forEach((team) => {
           if (team && (team.id >= 0)) {
-            allCachedTeamsDict[team.id] = team;
+            allTeamsCache[team.id] = team;
             if (team.teamMemberList) {
               teamMemberIdList = [];
               teamMemberList = team.teamMemberList || [];
@@ -179,15 +179,15 @@ class TeamStore extends ReduceStore {
                   teamMemberIdList.push(person.id);
                 }
               });
-              allCachedTeamMembersDict[team.id] = teamMemberIdList;
+              allTeamMembersCache[team.id] = teamMemberIdList;
             }
           }
         });
 
         revisedState = {
           ...revisedState,
-          allCachedTeamMembersDict,
-          allCachedTeamsDict,
+          allTeamMembersCache,
+          allTeamsCache,
         };
         return revisedState;
 
@@ -209,7 +209,7 @@ class TeamStore extends ReduceStore {
 
         // console.log('OrganizationStore issueDescriptionsRetrieve issueList:', issueList);
         if (teamId >= 0) {
-          allCachedTeamsDict[teamId] = action.res;
+          allTeamsCache[teamId] = action.res;
           if (action.res.teamMemberList) {
             // If missing teamMemberList do not alter data in the store
             teamMemberList = action.res.teamMemberList || [];
@@ -218,17 +218,17 @@ class TeamStore extends ReduceStore {
                 teamMemberIdList.push(person.id);
               }
             });
-            allCachedTeamMembersDict[teamId] = teamMemberIdList;
+            allTeamMembersCache[teamId] = teamMemberIdList;
             revisedState = {
               ...revisedState,
-              allCachedTeamMembersDict,
+              allTeamMembersCache,
             };
           }
-          // console.log('allCachedTeamMembersDict:', allCachedTeamMembersDict);
+          // console.log('allTeamMembersCache:', allTeamMembersCache);
           // console.log('allCachedOrganizationsDict:', allCachedOrganizationsDict);
           revisedState = {
             ...revisedState,
-            allCachedTeamsDict,
+            allTeamsCache,
           };
         }
         return revisedState;
@@ -247,7 +247,7 @@ class TeamStore extends ReduceStore {
         }
         if (teamId >= 0) {
           // console.log('TeamStore team-save teamId:', teamId);
-          allCachedTeamsDict[teamId] = action.res;
+          allTeamsCache[teamId] = action.res;
           if (action.res.teamMemberList) {
             // If missing teamMemberList do not alter data in the store
             teamMemberList = action.res.teamMemberList || [];
@@ -256,15 +256,15 @@ class TeamStore extends ReduceStore {
                 teamMemberIdList.push(person.id);
               }
             });
-            allCachedTeamMembersDict[teamId] = teamMemberIdList;
+            allTeamMembersCache[teamId] = teamMemberIdList;
             revisedState = {
               ...revisedState,
-              allCachedTeamMembersDict,
+              allTeamMembersCache,
             };
           }
           revisedState = {
             ...revisedState,
-            allCachedTeamsDict,
+            allTeamsCache,
             mostRecentTeamIdSaved: teamId,
           };
         } else {
