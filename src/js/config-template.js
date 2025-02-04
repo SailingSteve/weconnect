@@ -12,29 +12,39 @@ module.exports = {
   WECONNECT_URL_FOR_SEO: 'https://wevoteconnect.org',
 
   ///////////////////////////////////////////////
-  // Keep both configuration blocks below, but only uncomment one of them at a time.
+  // Keep all three configuration blocks below, but only uncomment one of them at a time.
   //// Connecting to local WeConnect "weconnect-server" APIs ////
   STAFF_API_SERVER_ROOT_URL: 'http://localhost:4500/',
   STAFF_API_SERVER_ADMIN_ROOT_URL: 'http://localhost:4500/admin/',
   STAFF_API_SERVER_API_ROOT_URL: 'http://localhost:4500/apis/v1/',
   STAFF_API_SERVER_API_CDN_ROOT_URL: 'http://localhost:4500/apis/v1/',
+  //// weconnect-server local server running SSL/TLS HTTPS
+  // STAFF_API_SERVER_ROOT_URL: 'https://wevotedeveloper.com:4500/',
+  // STAFF_API_SERVER_ADMIN_ROOT_URL: 'https://wevotedeveloper.com:4500/admin/',
+  // STAFF_API_SERVER_API_ROOT_URL: 'https://wevotedeveloper.com:4500/apis/v1/',
+  // STAFF_API_SERVER_API_CDN_ROOT_URL: 'https://wevotedeveloper.com:4500/apis/v1/',
   //// Connecting to live WeConnect APIs ////
-  // STAFF_API_SERVER_ROOT_URL: 'https://weconnectserver.org/',
-  // STAFF_API_SERVER_ADMIN_ROOT_URL: 'https://weconnectserver.org/admin/',
-  // STAFF_API_SERVER_API_ROOT_URL: 'https://weconnectserver.org/apis/v1/',
-  // STAFF_API_SERVER_API_CDN_ROOT_URL: 'https://cdn.weconnectserver.org/apis/v1/',
+  // STAFF_API_SERVER_ROOT_URL: 'https://weconnect.wevoteusa.org/',
+  // STAFF_API_SERVER_ADMIN_ROOT_URL: 'https://weconnect.wevoteusa.org/admin/',
+  // STAFF_API_SERVER_API_ROOT_URL: 'https://weconnect.wevoteusa.org/apis/v1/',
+  // STAFF_API_SERVER_API_CDN_ROOT_URL: 'https://cdn.weconnect.wevoteusa.org/apis/v1/',
 
-  // For when we need to connect to the WeVote WebApp front end
+  // For when we need to connect to the WeVoteServer APIs
   VOTER_FRONT_END_APP_URL_PROTOCOL: 'http://', // 'http://' for local dev (if not using SSL), or 'https://' for live server
   VOTER_FRONT_END_APP_HOSTNAME: 'localhost:3000', // Don't add 'http...' here.  Live server: 'WeVote.US', Quality: 'quality.WeVote.US', developers: 'localhost:3000'
 
   ///////////////////////////////////////////////
-  // Keep both configuration blocks below, but only uncomment one of them at a time.
-  //// Connecting to local WeVoteServer APIs ////
+  // Keep all three configuration blocks below, but only uncomment one of them at a time.
+  //// Connecting to local WeVoteServer APIs HTTP ////
   // VOTER_FRONT_END_APP_SERVER_ROOT_URL: 'http://localhost:8000/',
   // VOTER_API_SERVER_ADMIN_ROOT_URL: 'http://localhost:8000/admin/',
   // VOTER_API_SERVER_API_ROOT_URL: 'http://localhost:8000/apis/v1/',
   // VOTER_API_SERVER_API_CDN_ROOT_URL: 'http://localhost:8000/apis/v1/',
+  //// Connecting to local WeVoteServer APIs HTTPS TLS/SSL ////
+  // VOTER_FRONT_END_APP_SERVER_ROOT_URL: 'https://wevotedeveloper.com:8000/',
+  // VOTER_API_SERVER_ADMIN_ROOT_URL: 'https://wevotedeveloper.com:8000/admin/',
+  // VOTER_API_SERVER_API_ROOT_URL: 'https://wevotedeveloper.com:8000/apis/v1/',
+  // VOTER_API_SERVER_API_CDN_ROOT_URL: 'https://wevotedeveloper.com:8000/apis/v1/',
   //// Connecting to live WeVoteServer APIs ////
   VOTER_API_SERVER_ROOT_URL: 'https://api.wevoteusa.org/',
   VOTER_API_SERVER_ADMIN_ROOT_URL: 'https://api.wevoteusa.org/admin/',
@@ -51,7 +61,7 @@ module.exports = {
   LOG_ONLY_FIRST_RENDER_EVENTS: false,
   LOG_HTTP_REQUESTS: false,
   LOG_ROUTING: false,
-  LOG_AUTHENTICATION: false,          // authLog function prints to console
+  LOG_AUTHENTICATION: false,        // authLog function prints to console
   LOG_CORDOVA_OFFSETS: false,
   SHOW_CORDOVA_URL_FIELD: false,    // Only needed for debugging in Cordova
   ENABLE_REACT_QUERY_TOOLS: false,  // Show ReactQueryDevtools icon/console
