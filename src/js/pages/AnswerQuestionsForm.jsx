@@ -11,7 +11,7 @@ import { PageContentContainer } from '../components/Style/pageLayoutStyles';
 import webAppConfig from '../config';
 import makeRequestParams from '../react-query/makeRequestParams';
 import { useQuestionnaireAnswersSaveMutation } from '../react-query/mutations';
-import { useFetchData } from '../react-query/WeConnectQuery';
+import { METHOD, useFetchData } from '../react-query/WeConnectQuery';
 
 
 // eslint-disable-next-line no-unused-vars
@@ -31,7 +31,7 @@ const AnswerQuestionsForm = ({ classes, match }) => {
   const [errorMessage, setErrorMessage] = useState(undefined);
 
   const requestParams = `personIdList[]=${personId}&questionnaireId=${questionnaireId}`;
-  const { data: dataQRL, isSuccess: isSuccessQRL, isFetching: isFetchingQRL } = useFetchData(['questionnaire-responses-list-retrieve'], requestParams);
+  const { data: dataQRL, isSuccess: isSuccessQRL, isFetching: isFetchingQRL } = useFetchData(['questionnaire-responses-list-retrieve'], requestParams, METHOD.GET);
   if (isFetchingQRL) {
     console.log('isFetching  ------------ \'questionnaire-responses-list-retrieve\'');
   }

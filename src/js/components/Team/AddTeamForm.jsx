@@ -6,7 +6,7 @@ import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
-import weConnectQueryFn from '../../react-query/WeConnectQuery';
+import weConnectQueryFn, { METHOD } from '../../react-query/WeConnectQuery';
 
 
 const AddTeamForm = ({ classes }) => {
@@ -24,7 +24,7 @@ const AddTeamForm = ({ classes }) => {
       teamName: teamNameCached,
       teamNameChanged: true,
       teamId: team ? team.id : '-1',
-    }),
+    }, METHOD.GET),
     onSuccess: () => {
       console.log('--------- saveTeamMutation addTeamForm mutated ---------');
       queryClient.invalidateQueries(['team-list-retrieve']).then(() => {});

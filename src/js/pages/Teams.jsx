@@ -13,7 +13,7 @@ import TeamMemberList from '../components/Team/TeamMemberList';
 import webAppConfig from '../config';
 import { useConnectAppContext, useConnectDispatch } from '../contexts/ConnectAppContext';
 import { TeamListRetrieveDataCapture } from '../models/TeamModel';
-import { useFetchData } from '../react-query/WeConnectQuery';
+import { METHOD, useFetchData } from '../react-query/WeConnectQuery';
 
 
 // eslint-disable-next-line no-unused-vars
@@ -26,7 +26,7 @@ const Teams = ({ classes, match }) => {
   const [showAllTeamMembers, setShowAllTeamMembers] = useState(true);
   const [teamList, setTeamList] = useState([]);
 
-  const teamListRetrieveResults = useFetchData(['team-list-retrieve'], {});
+  const teamListRetrieveResults = useFetchData(['team-list-retrieve'], {}, METHOD.GET);
   useEffect(() => {
     // console.log('useFetchData team-list-retrieve in Teams useEffect:', teamListRetrieveResults);
     if (teamListRetrieveResults) {
@@ -100,7 +100,7 @@ const Teams = ({ classes, match }) => {
         >
           Add Team
         </Button>
-        <div style={{ padding: '100px 0 25px 0', fontWeight: '700' }}>
+        <div style={{ padding: '100px 0 50px 0', fontWeight: '700' }}>
           <Link to="/login">
             Sign in
           </Link>

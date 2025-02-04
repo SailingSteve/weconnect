@@ -12,7 +12,7 @@ import { SpanWithLinkStyle } from '../../components/Style/linkStyles';
 import { PageContentContainer } from '../../components/Style/pageLayoutStyles';
 import webAppConfig from '../../config';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
-import { useFetchData } from '../../react-query/WeConnectQuery';
+import { METHOD, useFetchData } from '../../react-query/WeConnectQuery';
 
 
 // eslint-disable-next-line no-unused-vars
@@ -28,7 +28,7 @@ const TaskGroup = ({ classes, match }) => {
 
   const [taskDefinitionList, setTaskDefinitionList] = useState(undefined);
 
-  const { data: dataTSL, isSuccess: isSuccessTSL, isFetching: isFetchingTSL } = useFetchData(['task-status-list-retrieve'], {});
+  const { data: dataTSL, isSuccess: isSuccessTSL, isFetching: isFetchingTSL } = useFetchData(['task-status-list-retrieve'], {}, METHOD.GET);
   useEffect(() => {
     if (isSuccessTSL) {
       console.log('useFetchData in TeamHome (task-group-retrieve) useEffect data good:', dataTSL);

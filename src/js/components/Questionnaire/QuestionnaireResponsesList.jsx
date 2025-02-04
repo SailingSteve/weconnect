@@ -7,9 +7,9 @@ import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import { renderLog } from '../../common/utils/logging';
 import webAppConfig from '../../config';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
-import { useFetchData } from '../../react-query/WeConnectQuery';
-import CopyQuestionnaireLink from './CopyQuestionnaireLink';
 import { useGetPersonById } from '../../models/PersonModel';
+import { METHOD, useFetchData } from '../../react-query/WeConnectQuery';
+import CopyQuestionnaireLink from './CopyQuestionnaireLink';
 
 const OpenExternalWebSite = React.lazy(() => import(/* webpackChunkName: 'OpenExternalWebSite' */ '../../common/components/Widgets/OpenExternalWebSite'));
 
@@ -24,7 +24,7 @@ const QuestionnaireResponsesList = ({ personId }) => {
   // Although we are sending a list, there will only be one person id, if there were more, just append them with commas
   const requestParams = `personIdList[]=${person.id}`;
 
-  const { data: dataQRL, isSuccess: isSuccessQRL, isFetching: isFetchingQRL } = useFetchData(['questionnaire-responses-list-retrieve'], requestParams);
+  const { data: dataQRL, isSuccess: isSuccessQRL, isFetching: isFetchingQRL } = useFetchData(['questionnaire-responses-list-retrieve'], requestParams, METHOD.GET);
   if (isFetchingQRL) {
     console.log('isFetching  ------------ \'questionnaire-responses-list-retrieve\'');
   }
@@ -34,7 +34,7 @@ const QuestionnaireResponsesList = ({ personId }) => {
       console.log('Successfully retrieved QuestionnaireResponsesList...');
       setQuestionnaireList(dataQRL.questionnaireList);
     }
-  }, [dataQRL, isFetchingQRL, person]);
+  }, [dataQRL, isFetchingQRL, isSuccessQRL, person]);
 
   return (
     <div>

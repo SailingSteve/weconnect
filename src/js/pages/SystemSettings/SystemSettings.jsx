@@ -12,7 +12,7 @@ import { SpanWithLinkStyle } from '../../components/Style/linkStyles';
 import { PageContentContainer } from '../../components/Style/pageLayoutStyles';
 import webAppConfig from '../../config';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
-import { useFetchData } from '../../react-query/WeConnectQuery';
+import { METHOD, useFetchData } from '../../react-query/WeConnectQuery';
 
 
 const SystemSettings = ({ classes }) => {
@@ -25,7 +25,7 @@ const SystemSettings = ({ classes }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { data: dataQList, isFetching: isFetchingQList, isSuccess: isSuccessQList } = useFetchData(['questionnaire-list-retrieve'], {});
+  const { data: dataQList, isFetching: isFetchingQList, isSuccess: isSuccessQList } = useFetchData(['questionnaire-list-retrieve'], {}, METHOD.GET);
   if (isFetchingQList) {
     console.log('isFetching questionnaire-list-retrieve ------------');
   }
@@ -36,7 +36,7 @@ const SystemSettings = ({ classes }) => {
     }
   }, [dataQList, isSuccessQList]);
 
-  const { data: dataGroupList, isFetching: isFetchingGroupList, isSuccess: isSuccessGroupList } = useFetchData(['task-group-list-retrieve'], {});
+  const { data: dataGroupList, isFetching: isFetchingGroupList, isSuccess: isSuccessGroupList } = useFetchData(['task-group-list-retrieve'], {}, METHOD.GET);
   if (isFetchingGroupList) {
     console.log('isFetching task-group-retrieve ------------');
   }

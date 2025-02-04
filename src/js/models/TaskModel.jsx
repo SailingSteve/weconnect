@@ -3,28 +3,6 @@ import isEqual from 'lodash-es/isEqual';
 // import weConnectQueryFn from '../react-query/WeConnectQuery';
 // import { useConnectAppContext } from '../contexts/ConnectAppContext';
 
-// These are the "AppContextValues" (i.e., global state variables) used in the PersonModel
-export function getInitialGlobalTaskVariables () {
-  return {
-    allTaskGroupsCache: {}, // This is a dictionary key: taskGroupId, value: TaskGroup dict
-    allTaskDefinitionsCache: {}, // This is a dictionary key: taskDefinitionId, value: TaskDefinition dict
-    allTaskDependenciesCache: {}, // This is a dictionary key: taskDependencyId, value: TaskDependency dict
-    allTasksCache: {}, // This is a dictionary key: personId, value: another dictionary key: taskDefinitionId, value: Task dict
-    mostRecentTaskDefinitionIdSaved: -1,
-    mostRecentTaskDefinitionSaved: {
-      taskDefinitionId: -1,
-    },
-    mostRecentTaskGroupIdSaved: -1,
-    mostRecentTaskGroupSaved: {
-      firstName: '',
-      lastName: '',
-      taskDefinitionId: -1,
-    },
-    taskDefinitionsCompletedPersonIdList: {}, // This is a dictionary key: taskDefinitionId, value: list of personIds who have completed the TaskDefinition
-    taskGroupCompletedByPersonList: {}, // This is a dictionary key: taskGroupId, value: list of personIds who have completed the TaskGroup
-    searchResults: [],
-  };
-}
 
 // This is called after making this fetchData request:
 // const taskStatusListRetrieveResults = useFetchData(['task-status-list-retrieve'], { personIdList: personIdsList });
