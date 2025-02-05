@@ -24,8 +24,8 @@ const bundleAnalysis = process.env.ANALYSIS || false;  // enable the interactive
 const minimized = process.env.MINIMIZED === '1' || false;  // enable the Terser plugin that strips comments and shrinks long variable names
 const verBits = process.version.split('.');
 const major = parseInt(verBits[0].replace('v', ''));
-if (major < 13) {
-  console.error(`The minimum Node version is: v14.0.0, but you are running ${process.version}\n`);
+if (major < 22) {
+  console.error(`The minimum Node version is: v22.0.0, but you are running ${process.version}\n`);
 } else {
   console.log(`Node version is: ${process.version}`);
 }

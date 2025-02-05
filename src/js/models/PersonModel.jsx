@@ -1,21 +1,7 @@
-import isEqual from 'lodash-es/isEqual';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import weConnectQueryFn from '../react-query/WeConnectQuery';
 import { useConnectAppContext } from '../contexts/ConnectAppContext';
+import weConnectQueryFn, { METHOD } from '../react-query/WeConnectQuery';
 
-// These are the "AppContextValues" (i.e., global state variables) used in the PersonModel
-export function getInitialGlobalPersonVariables () {
-  return {
-    allPeopleCache: {}, // This is a dictionary key: personId, value: person dict
-    mostRecentPersonIdSaved: -1,
-    mostRecentPersonSaved: {
-      firstName: '',
-      lastName: '',
-      personId: '',
-    },
-    searchResults: [],
-  };
-}
 
 export const useGetPersonById = (personId) => {
   const { apiDataCache } = useConnectAppContext();
@@ -47,41 +33,24 @@ export const useGetFullNamePreferred = (personId) => {
   return fullName;
 };
 
-export function PersonListRetrieveDataCapture (incomingResults = {}, apiDataCache = {}, dispatch) {
-  const { data, isSuccess } = incomingResults;
-  const allPeopleCache = apiDataCache.allPeopleCache || {};
-  let changeResults = {
-    allPeopleCache,
-    allPeopleCacheChanged: false,
-  };
-  const allPeopleCacheNew = { ...allPeopleCache };
-  // console.log('PersonListRetrieve data: ', data, ', isFetching:', isFetching, ', isSuccess:', isSuccess);
-  // We need to only update allPeopleCache the first time we have received new data from the API server
-  if (data && data.personList && isSuccess === true) {
-    let newDataReceived = false;
-    data.personList.forEach((person) => {
-      if (person && person.personId && person.personId >= 0) {
-        if (!allPeopleCacheNew[person.personId]) {
-          allPeopleCacheNew[person.personId] = person;
-          newDataReceived = true;
-        } else if (!isEqual(person, allPeopleCacheNew[person.personId])) {
-          allPeopleCacheNew[person.personId] = person;
-          newDataReceived = true;
-        }
-      }
-    });
-    // console.log('person-list-retrieve setting allPeopleCacheNew:', allPeopleCacheNew, ', newDataReceived:', newDataReceived);
-    if (newDataReceived) {
-      // setAppContextValue('allPeopleCache', allPeopleCache);
-      dispatch({ type: 'updateByKeyValue', key: 'allPeopleCache', value: allPeopleCacheNew });
-      changeResults = {
-        allPeopleCache: allPeopleCacheNew,
-        allPeopleCacheChanged: true,
-      };
+// Needed to avoid Dependency cycle problem
+export const getFullNamePreferredPerson = (person) => {
+  let fullName = '';
+  if (person.id >= 0) {
+    if (person.firstNamePreferred) {
+      fullName += person.firstNamePreferred;
+    } else if (person.firstName) {
+      fullName += person.firstName;
+    }
+    if (fullName.length > 0 && person.lastName) {
+      fullName += ' ';
+    }
+    if (person.lastName) {
+      fullName += person.lastName;
     }
   }
-  return changeResults;
-}
+  return fullName;
+};
 
 export const usePersonSave = () => {
   // PLEASE DO NOT REMOVE
@@ -90,7 +59,7 @@ export const usePersonSave = () => {
 
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (params) => weConnectQueryFn('person-save', params),
+    mutationFn: (params) => weConnectQueryFn('person-save', params, METHOD.GET),
     networkMode: 'always', // Send queries to the server even if the cache has the data
     onError: (error) => {
       console.log('onError in usePersonSave: ', error);

@@ -4,20 +4,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import weConnectQueryFn from '../react-query/WeConnectQuery';
 import { useConnectAppContext } from '../contexts/ConnectAppContext';
 
-// These are the "AppContextValues" (i.e., global state variables) used in the TeamModel
-export function getInitialGlobalTeamVariables () {
-  return {
-    allTeamsCache: {}, // This is a dictionary key: teamId, value: team dict
-    allTeamMembersCache: {}, // This is a dictionary key: teamId, value: list of personIds in the team
-    mostRecentTeamIdSaved: -1,
-    mostRecentTeamMemberIdSaved: -1,
-    mostRecentTeamSaved: {
-      teamName: '',
-      teamId: '',
-    },
-  };
-}
-
 export const useGetTeamById = (teamId) => {
   const { apiDataCache } = useConnectAppContext();
   const { allTeamsCache } = apiDataCache;

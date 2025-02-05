@@ -11,7 +11,7 @@ import TeamMemberList from '../components/Team/TeamMemberList';
 import webAppConfig from '../config';
 import { useConnectAppContext, useConnectDispatch } from '../contexts/ConnectAppContext';
 import { TeamListRetrieveDataCapture, useGetTeamById } from '../models/TeamModel';
-import { useFetchData } from '../react-query/WeConnectQuery';
+import { METHOD, useFetchData } from '../react-query/WeConnectQuery';
 import convertToInteger from '../common/utils/convertToInteger';
 
 
@@ -24,14 +24,14 @@ const TeamHome = ({ classes }) => {
   const [team, setTeam] = useState(useGetTeamById(convertToInteger(params.teamId)));
   const [teamId] = useState(convertToInteger(params.teamId));
 
-  const updateTeam = (tList) => {
-    const oneTeam = tList.find((staff) => staff.teamId === parseInt(teamId));
-    setTeam(oneTeam);
-  };
+  // const updateTeam = (tList) => {
+  //   const oneTeam = tList.find((staff) => staff.teamId === parseInt(teamId));
+  //   setTeam(oneTeam);
+  // };
 
   // const isAddPersonDrawerOpen = document.getElementById('addPersonDrawer');
 
-  const teamListRetrieveResults = useFetchData(['team-list-retrieve'], {});
+  const teamListRetrieveResults = useFetchData(['team-list-retrieve'], {}, METHOD.GET);
   useEffect(() => {
     // console.log('useFetchData team-list-retrieve in TeamHome useEffect:', teamListRetrieveResults);
     if (teamListRetrieveResults) {

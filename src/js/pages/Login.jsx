@@ -7,12 +7,16 @@ import { useNavigate } from 'react-router';
 import styled from 'styled-components';
 import validator from 'validator';
 import { renderLog } from '../common/utils/logging';
+import compileDate from '../compileDate';
 import { PageContentContainer } from '../components/Style/pageLayoutStyles';
 import webAppConfig from '../config';
+import { useConnectAppContext } from '../contexts/ConnectAppContext';
+import weConnectQueryFn, { METHOD } from '../react-query/WeConnectQuery';
 
-/* global $  */
 
 const Login = ({ classes }) => {
+  const { setAppContextValue, getAppContextValue } = useConnectAppContext();
+
   const firstNameFldRef = useRef('');
   const lastNameFldRef = useRef('');
   const emailPersonalFldRef = useRef('');
@@ -24,14 +28,13 @@ const Login = ({ classes }) => {
   const confirmPasswordFldRef = useRef('');
   const [showCreateStuff, setShowCreateStuff] = useState(false);
   const [warningLine, setWarningLine] = useState('');
-  const isAuthenticated = localStorage.getItem('isAuthenticated');
-  const initialSuccess = isAuthenticated ? `Signed in as ${isAuthenticated}` : 'Please sign in';
+  const initialSuccess = getAppContextValue('isAuthenticated') ? `Signed in as ${getAppContextValue('authenticatedPerson')}` : 'Please sign in';
   const [successLine, setSuccessLine] = useState(initialSuccess);
   const navigate = useNavigate();
 
   renderLog('Login');  // Set LOG_RENDER_EVENTS to log all renders
 
-  const loginApi = (email, password) => {
+  const loginApi = async (email, password) => {
     if (!validator.isEmail(email)) {
       setWarningLine('Please enter a valid email address.');
       return;
@@ -41,65 +44,49 @@ const Login = ({ classes }) => {
       return;
     }
 
-    console.log(`${webAppConfig.STAFF_API_SERVER_API_ROOT_URL}login`);
-    $.post(`${webAppConfig.STAFF_API_SERVER_API_ROOT_URL}login/`,
-      { email, password },
-      (data, status) => {
-        console.log(`/login response -- status: '${status}',  data: ${JSON.stringify(data)}`);
-        if (data.userId > 0) {
-          setWarningLine('');
-          setSuccessLine(`Cheers person #${data.userId}!  You are signed in!`);
-          localStorage.setItem('isAuthenticated', data.userId);
-        } else {
-          setWarningLine(data.errors.msg);
-          setSuccessLine('');
-        }
-      });
+    const data = await weConnectQueryFn('login', { email, password }, METHOD.POST);
+    console.log(`/login response -- status: '${'status'}',  data: ${JSON.stringify(data)}`);
+    if (data.userId > 0) {
+      setWarningLine('');
+      setSuccessLine(`Cheers person #${data.userId}!  You are signed in!`);
+      setAppContextValue('isAuthenticated', true);
+      setAppContextValue('authenticatedUserId', data.userId);
+    } else {
+      setWarningLine(data.errors.msg);
+      setSuccessLine('');
+    }
   };
 
-  const logoutApi = () => {
-    console.log(`${webAppConfig.STAFF_API_SERVER_API_ROOT_URL}logout`);
-    $.post(`${webAppConfig.STAFF_API_SERVER_API_ROOT_URL}logout/`,
-      {},
-      (data, status) => {
-        console.log(`/logout response -- status: '${status}',  data: ${JSON.stringify(data)}`);
-        if (data.authenticated) {
-          setWarningLine(data.errors.msg);
-          setSuccessLine('');
-        } else {
-          setWarningLine('');
-          setSuccessLine('You are signed out');
-          localStorage.removeItem('isAuthenticated');
-        }
-      });
+  const logoutApi = async () => {
+    const data = await weConnectQueryFn('logout', {}, METHOD.POST);
+    console.log(`/logout response -- status: '${'status'}',  data: ${JSON.stringify(data)}`);
+    if (data.authenticated) {
+      setWarningLine(data.errors.msg);
+      setSuccessLine('');
+    } else {
+      setWarningLine('');
+      setSuccessLine('You are signed out');
+      setAppContextValue('isAuthenticated', false);
+      setAppContextValue('isAuthenticatedId', -1);
+    }
   };
 
-  const signupApi = (firstName, lastName, location, emailPersonal, emailOfficial, password, confirmPassword) => {
-    const postURL = `${webAppConfig.STAFF_API_SERVER_API_ROOT_URL}signup`;
-    console.log('postURL: ', postURL);
+  const signupApi = async (firstName, lastName, location, emailPersonal, emailOfficial, password, confirmPassword) => {
+    const params = { firstName, lastName, location, emailPersonal, emailOfficial, password, confirmPassword };
+    const data = await weConnectQueryFn('signup', params, METHOD.POST);
+
     try {
-      $.post(postURL,
-        {
-          firstName,
-          lastName,
-          location,
-          emailPersonal,
-          emailOfficial,
-          password,
-          confirmPassword,
-        },
-        (data, status) => {
-          console.log(`/signup response -- status: '${status}',  data: ${JSON.stringify(data)}`);
-          let errStr = '';
-          for (let i = 0; i < data.errors.length; i++) {
-            errStr += data.errors[i].msg;
-          }
-          setWarningLine(errStr);
-          if (data.personCreated) {
-            setSuccessLine(`user # ${data.userId} created, and signedIn is ${data.signedIn}`);
-            localStorage.setItem('isAuthenticated', data.userId);
-          }
-        });
+      console.log(`/signup response -- status: '${'status'}',  data: ${JSON.stringify(data)}`);
+      let errStr = '';
+      for (let i = 0; i < data.errors.length; i++) {
+        errStr += data.errors[i].msg;
+      }
+      setWarningLine(errStr);
+      if (data.personCreated) {
+        setSuccessLine(`user # ${data.userId} created, and signedIn is ${data.signedIn}`);
+        setAppContextValue('isAuthenticated', true);
+        setAppContextValue('authenticatedUserId', data.userId);
+      }
     } catch (e) {
       console.log('signup error', e);
     }
@@ -139,10 +126,12 @@ const Login = ({ classes }) => {
       // const stateCode =  stateFldRef.current.value;
       const password = passwordFldRef.current.value;
       const confirmPassword = confirmPasswordFldRef.current.value;
-      if (!validator.isEmail(emailPersonal)) errStr += 'Please enter a valid personal email address.';
-      if (emailOfficial.length > 0 && !validator.isEmail(emailOfficial)) errStr += 'Please enter a valid secondary email address.';
-      if (!validator.isLength(password, { min: 8 })) errStr += 'Password must be at least 8 characters long';
-      if (validator.escape(password) !== validator.escape(confirmPassword)) errStr += 'Passwords do not match';
+      if (!validator.isEmail(emailPersonal)) errStr += 'Please enter a valid personal email address. ';
+      if (emailOfficial.length > 0 && !validator.isEmail(emailOfficial)) errStr += 'Please enter a valid secondary email address. ';
+      if (!validator.isLength(password, { min: 8 })) errStr += 'Password must be at least 8 characters long. ';
+      if (validator.escape(password) !== validator.escape(confirmPassword)) errStr += 'Passwords do not match. ';
+      if (!validator.isLength(firstName, { min: 2 })) errStr += 'First names are required. ';
+      if (!validator.isLength(lastName, { min: 2 })) errStr += 'Last names are required. ';
 
       if (errStr.length) {
         setWarningLine(errStr);
@@ -150,6 +139,12 @@ const Login = ({ classes }) => {
         signupApi(firstName, lastName, location, emailPersonal, emailOfficial, password, confirmPassword);
       }
     }
+  };
+
+  const verifyYourEmail = async () => {
+    // const personId = 1; // TODO HACK
+    const data = await weConnectQueryFn('send-email-code', { personId: 1 }, METHOD.POST);
+    console.log(`/send-email-code response: data: ${JSON.stringify(data)}`);
   };
 
 
@@ -172,7 +167,7 @@ const Login = ({ classes }) => {
                 src="../../img/global/svg-icons/we-vote-icon-square-color-dark.svg"
               />
             </span>
-            <span style={{ float: 'right', height: '100%', paddingTop: '31px' }}>
+            <span style={{ float: 'right', height: '100%', padding: '31px 0 40px 0' }}>
               Sign in
             </span>
           </h1>
@@ -183,6 +178,7 @@ const Login = ({ classes }) => {
           <span style={{ display: 'flex' }}>
             <TextField id="outlined-basic"
                        label="First Name"
+                       helperText={showCreateStuff ? 'Required' : ''}
                        variant="outlined"
                        inputRef={firstNameFldRef}
                        sx={{ paddingBottom: '15px',
@@ -191,6 +187,7 @@ const Login = ({ classes }) => {
             />
             <TextField id="outlined-basic"
                        label="Last Name"
+                       helperText={showCreateStuff ? 'Required' : ''}
                        variant="outlined"
                        inputRef={lastNameFldRef}
                        sx={{ paddingBottom: '15px',
@@ -246,6 +243,7 @@ const Login = ({ classes }) => {
             >
               Sign In
             </Button>
+            <button type="button" onClick={verifyYourEmail} style={{ display: showCreateStuff ? 'none' : 'flex'  }}>Verify your email (temporary)</button>
             <A style={{ display: showCreateStuff ? 'none' : 'flex'  }}>Forgot your password?</A>
           </span>
           <div style={{ paddingTop: '35px' }} />
@@ -276,6 +274,10 @@ const Login = ({ classes }) => {
           >
             Sign Out
           </Button>
+          <DateDisplay>
+            <div>Compile Date:</div>
+            <div style={{ paddingLeft: 10 }}>{compileDate}</div>
+          </DateDisplay>
         </div>
       </PageContentContainer>
     </div>
@@ -303,6 +305,10 @@ const A = styled('a')`
   text-decoration-color: rgb(13, 110, 253);
   text-decoration-line: underline;
   padding: 8px 0 0 25px;
+`;
+
+const DateDisplay = styled('div')`
+  padding-top: 50px; 
 `;
 
 export default withStyles(styles)(Login);

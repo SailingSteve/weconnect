@@ -44,8 +44,8 @@ export function httpLog (text, res) {
 }
 
 //  Log oAuth steps
-export function oAuthLog (text, res) {
-  if (webAppConfig.LOG_SIGNIN_STEPS) {
+export function authLog (text, res) {
+  if (webAppConfig.LOG_AUTHENTICATION) {
     if (res) {
       console.log('>> oAuth >> ', text, res);
     } else {

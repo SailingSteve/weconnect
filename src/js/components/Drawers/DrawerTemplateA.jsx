@@ -15,6 +15,7 @@ const DrawerTemplateA = ({ classes, drawerId, drawerOpenGlobalVariableName, head
   renderLog(`DrawerTemplateA (${drawerId})`);  // Set LOG_RENDER_EVENTS to log all renders
   const { getAppContextData, setAppContextValue, getAppContextValue } = useConnectAppContext();
 
+  // eslint-disable-next-line no-unused-vars
   const [scrolledDown, setScrolledDown] = useState(false);
   const drawerOpen = getAppContextValue(drawerOpenGlobalVariableName);
 

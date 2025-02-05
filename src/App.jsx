@@ -4,12 +4,12 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router';
 import styled from 'styled-components';
-import { PrivateRoute } from './js/auth';
 import muiTheme from './js/common/components/Style/muiTheme';
 import { normalizedHref } from './js/common/utils/hrefUtils';
 import initializejQuery from './js/common/utils/initializejQuery';
 import { renderLog } from './js/common/utils/logging';
 import Drawers from './js/components/Drawers/Drawers';
+import PrivateRoute from './js/components/PrivateRoute';
 import webAppConfig from './js/config';
 import ConnectAppContext from './js/contexts/ConnectAppContext';
 import Login from './js/pages/Login';
@@ -17,7 +17,7 @@ import Login from './js/pages/Login';
 
 // Root URL pages
 
-const AnswerQuestionsForm = React.lazy(() => import(/* webpackChunkName: 'AnswerQuestionsForm' */ './js/pages/AnswerQuestionsForm'));
+// const AnswerQuestionsForm = React.lazy(() => import(/* webpackChunkName: 'AnswerQuestionsForm' */ './js/pages/AnswerQuestionsForm'));
 const FAQ = React.lazy(() => import(/* webpackChunkName: 'FAQ' */ './js/pages/FAQ'));
 // const Footer = React.lazy(() => import(/* webpackChunkName: 'Footer' */ './js/components/Navigation/Footer'));
 const Header = React.lazy(() => import(/* webpackChunkName: 'Header' */ './js/components/Navigation/Header'));

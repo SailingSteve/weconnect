@@ -1,6 +1,5 @@
 import { TextField } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router';
 import styled from 'styled-components';
 import arrayContains from '../../common/utils/arrayContains';
 import { renderLog } from '../../common/utils/logging';
@@ -23,8 +22,11 @@ const AddPersonDrawerMainContent = () => {
   const [allStaffList] = useState(getAppContextValue('allStaffList'));
   const [remainingStaffToAdd, setRemainingStaffToAdd] = useState(getAppContextValue('allStaffList'));
   const [searchResultsList, setSearchResultsList] = useState(undefined);
+  // eslint-disable-next-line no-unused-vars
   const [thisTeamsCurrentMembersList, setThisTeamsCurrentMembersList] = useState([]);
+  // eslint-disable-next-line no-unused-vars
   const [teamId, setTeamId] = useState(getAppContextValue('teamId'));
+  // eslint-disable-next-line no-unused-vars
   const [teamName, setTeamName] = useState('');
   const [teamMemberPersonIdList] = useState([]);
   const [matchingCountText, setMatchingCountText] = useState('');
@@ -32,7 +34,7 @@ const AddPersonDrawerMainContent = () => {
 
   const searchStringRef = useRef('');
 
-  let memberList = [];
+  // let memberList = [];
   // const teamListFromContext = getAppContextValue('teamListNested');
   // const teamListFromContext = GetTeamListArray();
   // if (teamListFromContext  && thisTeamsCurrentMembersList.length === 0 && teamName === '') {

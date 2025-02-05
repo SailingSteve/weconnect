@@ -12,7 +12,7 @@ import { SpanWithLinkStyle } from '../../components/Style/linkStyles';
 import { PageContentContainer } from '../../components/Style/pageLayoutStyles';
 import webAppConfig from '../../config';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
-import { useFetchData } from '../../react-query/WeConnectQuery';
+import { METHOD, useFetchData } from '../../react-query/WeConnectQuery';
 
 
 // eslint-disable-next-line no-unused-vars
@@ -24,7 +24,7 @@ const Questionnaire = ({ classes, match }) => {
   const [questionList, setQuestionList] = useState([]);
   const [questionnaire, setQuestionnaire] = useState(getAppContextValue('selectedQuestionnaire'));
 
-  const { data: dataQList, isSuccess: isSuccessQList, isFetching: isFetchingQList } = useFetchData(['questionnaire-list-retrieve'], {});
+  const { data: dataQList, isSuccess: isSuccessQList, isFetching: isFetchingQList } = useFetchData(['questionnaire-list-retrieve'], {}, METHOD.GET);
   useEffect(() => {
     console.log('useFetchData in Questionnaire useEffect:', dataQList, isSuccessQList, isFetchingQList);
     if (dataQList !== undefined && isFetchingQList === false) {
@@ -37,7 +37,7 @@ const Questionnaire = ({ classes, match }) => {
   }, [dataQList, isSuccessQList]);
 
   const { data: dataQuestionList, isSuccess: isSuccessQuestionList, isFetching: isFetchingQuestionList } =
-    useFetchData(['question-list-retrieve'], { questionnaireId: questionnaire ? questionnaire.questionnaireId : '-1' });
+    useFetchData(['question-list-retrieve'], { questionnaireId: questionnaire ? questionnaire.questionnaireId : '-1' }, METHOD.GET);
   useEffect(() => {
     console.log('useFetchData question-list-retrieve in Questionnaire useEffect:', dataQuestionList, isSuccessQuestionList, isFetchingQuestionList);
     if (dataQuestionList !== undefined && isFetchingQuestionList === false) {

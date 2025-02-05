@@ -13,7 +13,7 @@ import webAppConfig from '../config';
 import { useConnectAppContext, useConnectDispatch } from '../contexts/ConnectAppContext';
 import { TaskStatusListRetrieveDataCapture } from '../models/TaskModel';
 import { TeamListRetrieveDataCapture } from '../models/TeamModel';
-import { useFetchData } from '../react-query/WeConnectQuery';
+import { METHOD, useFetchData } from '../react-query/WeConnectQuery';
 
 
 // eslint-disable-next-line no-unused-vars
@@ -29,7 +29,7 @@ const Tasks = ({ classes, match }) => {
   const [selectedPersonList, setSelectedPersonList] = useState([]);
   const [personIdsList, setPersonIdsList] = useState([]);
 
-  const taskStatusListRetrieveResults = useFetchData(['task-status-list-retrieve'], { personIdList: personIdsList });
+  const taskStatusListRetrieveResults = useFetchData(['task-status-list-retrieve'], { personIdList: personIdsList }, METHOD.GET);
   useEffect(() => {
     if (taskStatusListRetrieveResults) {
       // const changeResults =
@@ -45,7 +45,7 @@ const Tasks = ({ classes, match }) => {
     }
   }, [allTaskDefinitionsCache]);
 
-  const teamListRetrieveResults = useFetchData(['team-list-retrieve'], {});
+  const teamListRetrieveResults = useFetchData(['team-list-retrieve'], {}, METHOD.GET);
   useEffect(() => {
     // console.log('useFetchData team-list-retrieve in Teams useEffect:', teamListRetrieveResults);
     if (teamListRetrieveResults) {

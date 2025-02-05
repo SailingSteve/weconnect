@@ -1,7 +1,7 @@
 import React from 'react';
 import webAppConfig from '../../config';
 import { isAndroid, isAndroidTablet, isCordova, isWebApp } from './isCordovaOrWebApp';
-import { cordovaOffsetLog, oAuthLog } from './logging';
+import { cordovaOffsetLog, authLog } from './logging';
 
 /* global $  */
 
@@ -76,18 +76,18 @@ export function cordovaOpenSafariViewSub (requestURL, onExit) {
   if (isIOS()) {
     console.log(`cordovaOpenSafariView -1- requestURL: ${requestURL}`);
     SafariViewController.isAvailable(() => { // eslint-disable-line no-undef
-      oAuthLog(`cordovaOpenSafariView requestURL: ${requestURL}`);
+      authLog(`cordovaOpenSafariView requestURL: ${requestURL}`);
       SafariViewController.show({ // eslint-disable-line no-undef
         url: requestURL,
         dismissButton: 1,
       },
       (result) => {
         if (result.event === 'opened') {
-          oAuthLog(`cordovaOpenSafariView opened url: ${requestURL}`);
+          authLog(`cordovaOpenSafariView opened url: ${requestURL}`);
         } else if (result.event === 'loaded') {
-          oAuthLog(`cordovaOpenSafariView URL result from loading: ${JSON.stringify(result)}`);
+          authLog(`cordovaOpenSafariView URL result from loading: ${JSON.stringify(result)}`);
         } else if (result.event === 'closed') {
-          oAuthLog(`cordovaOpenSafariView closed: ${JSON.stringify(result)}`);
+          authLog(`cordovaOpenSafariView closed: ${JSON.stringify(result)}`);
           if (onExit) {
             onExit();
           }
@@ -95,7 +95,7 @@ export function cordovaOpenSafariViewSub (requestURL, onExit) {
       },
 
       (msg) => {
-        oAuthLog(`cordovaOpenSafariView KO: ${JSON.stringify(msg)}`);
+        authLog(`cordovaOpenSafariView KO: ${JSON.stringify(msg)}`);
       });
     });
   } else {
