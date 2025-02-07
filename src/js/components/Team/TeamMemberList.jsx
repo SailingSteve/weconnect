@@ -80,6 +80,7 @@ const TeamMemberList = ({ teamId, team }) => { // teamMemberList
 };
 TeamMemberList.propTypes = {
   teamId: PropTypes.any.isRequired,
+  team: PropTypes.object.isRequired,
 };
 
 const styles = (theme) => ({

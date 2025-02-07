@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { useConnectAppContext } from '../../contexts/ConnectAppContext';
-import DrawerTemplateA from './DrawerTemplateA';
+import React, { useState } from 'react';
 import { renderLog } from '../../common/utils/logging';
+import { useConnectAppContext } from '../../contexts/ConnectAppContext';
 import EditQuestionnaireDrawerMainContent from '../Questionnaire/EditQuestionnaireDrawerMainContent';
+import DrawerTemplateA from './DrawerTemplateA';
 
 
 const EditQuestionnaireDrawer = () => {
   renderLog('EditQuestionnaireDrawer');
   const { getAppContextValue } = useConnectAppContext();
 
-  const selected = getAppContextValue('selectedQuestionnaire');
+  const selected = getAppContextValue('selectedQuestion');
   const [headerTitleJsx] = useState(selected ? <>Edit Questionnaire</> : <>Add Questionnaire</>);
   const [headerFixedJsx] = useState(<></>);
 

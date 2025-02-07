@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
 import EditQuestionDrawerMainContent from '../Questionnaire/EditQuestionDrawerMainContent';
@@ -8,19 +8,10 @@ const EditQuestionDrawer = () => {
   renderLog('EditQuestionDrawer');
   const { getAppContextValue } = useConnectAppContext();
 
-  const [headerTitleJsx, setHeaderTitleJsx] = useState(<></>);
+  const question = getAppContextValue('selectedQuestion');
+  const markup = question && question.id >= 0 ? <>Edit Question</> : <>Add Question</>;
+  const [headerTitleJsx] = useState(markup);
   const [headerFixedJsx] = useState(<></>);
-
-  useEffect(() => {
-    // console.log('EditQuestionDrawer: Context value changed:', true);
-    const question = getAppContextValue('selectedQuestion');
-    // if (question && question.id >= 0) {
-    //   setHeaderTitleJsx(<>Edit Question</>);
-    // } else {
-    //   setHeaderTitleJsx(<>Add Question</>);
-    // }
-  });
-  // }, [getAppContextValue]);  // TODO DALE: commented out for now to avoid infinite loop
 
   return (
     <DrawerTemplateA
