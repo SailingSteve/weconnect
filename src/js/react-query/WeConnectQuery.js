@@ -25,11 +25,11 @@ const weConnectQueryFn = async (queryKey, params, isGet) => {
 };
 
 const useFetchData = (queryKey, fetchParams, isGet) => {
-  httpLog('useFetchData queryKey: ', queryKey, '  fetchParams: ', fetchParams);
+  httpLog('useFetchData queryKey, fetchParams before fetch: ', queryKey, '  fetchParams: ', fetchParams);
   const { data, isSuccess, isFetching, isStale, refetch, error } = useQuery({
     queryKey,
     queryFn: () => weConnectQueryFn(queryKey, fetchParams, isGet),
-    networkMode: 'always',  // TODO: Investigate now ... We can back this off once we achieve MVP version 1
+    // networkMode: 'always',  // <-- This is not a solution, it just covers up some problem in our code, while disabling the biggest benefit of ReactQueries.
   });
   if (error) {
     console.log(`An error occurred with ${queryKey}: ${error.message}`);

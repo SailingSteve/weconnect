@@ -22,8 +22,7 @@ const AddPersonDrawerMainContent = () => {
   const [allStaffList] = useState(getAppContextValue('allStaffList'));
   const [remainingStaffToAdd, setRemainingStaffToAdd] = useState(getAppContextValue('allStaffList'));
   const [searchResultsList, setSearchResultsList] = useState(undefined);
-  // eslint-disable-next-line no-unused-vars
-  const [thisTeamsCurrentMembersList, setThisTeamsCurrentMembersList] = useState([]);
+  const [thisTeamsCurrentMembersList] = useState(getAppContextValue('addPersonDrawerTeamMemberList'));
   // eslint-disable-next-line no-unused-vars
   const [teamId, setTeamId] = useState(getAppContextValue('teamId'));
   // eslint-disable-next-line no-unused-vars
@@ -33,22 +32,6 @@ const AddPersonDrawerMainContent = () => {
   const [addPersonDrawerOpen] = useState(getAppContextValue('addPersonDrawerOpen'));
 
   const searchStringRef = useRef('');
-
-  // let memberList = [];
-  // const teamListFromContext = getAppContextValue('teamListNested');
-  // const teamListFromContext = GetTeamListArray();
-  // if (teamListFromContext  && thisTeamsCurrentMembersList.length === 0 && teamName === '') {
-  //   const oneTeam = teamListFromContext.find((team) => team.id === parseInt(teamId));
-  //   setTeamName(oneTeam.teamName);
-  //   setTeamId(oneTeam.id);
-  //
-  //   if (oneTeam && oneTeam.teamMemberList.length > 0) {
-  //     memberList = oneTeam.teamMemberList;
-  //     setThisTeamsCurrentMembersList(memberList);
-  //   }
-  // } else {
-  //   // console.log('no teamListFromContext yet!');
-  // }
 
   const initializeRemainingStaffToAddList = () => {
     console.log('initializeTheRemainingStaffToAddListList in AddPersonDrawerMainContent');
@@ -115,7 +98,10 @@ const AddPersonDrawerMainContent = () => {
     }
   };
 
-  const displayList = searchResultsList || remainingStaffToAdd || [];
+  // TODO: Need to deal with preferred name searching and display, very possible but it will get more complicated
+  let displayList = searchResultsList || remainingStaffToAdd || [];
+  displayList = displayList.filter((staff) => staff.firstName.length || staff.lastName.length);
+
   return (
     <AddPersonDrawerMainContentWrapper>
       <SearchBarWrapper>

@@ -1,7 +1,6 @@
 import { withStyles } from '@mui/styles';
-import { useQueryClient } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router';
 import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
@@ -16,7 +15,10 @@ const TeamHeader = ({ classes, showHeaderLabels, showIcons, team }) => {
   const { getAppContextValue, setAppContextValue } = useConnectAppContext();
   const { mutate } = useRemoveTeamMutation();
 
-  const [teamLocal] = useState(useQueryClient(team || getAppContextValue('teamForAddTeamDrawer')));
+  let teamLocal = team;
+  if (!teamLocal || !teamLocal.teamName) {
+    teamLocal = getAppContextValue('teamForAddTeamDrawer');
+  }
 
   const removeTeamClick = () => {
     console.log('removeTeamMutation team: ', teamLocal.id);
@@ -30,6 +32,7 @@ const TeamHeader = ({ classes, showHeaderLabels, showIcons, team }) => {
     setAppContextValue('teamForAddTeamDrawer', teamLocal);
   };
 
+  // console.log('TeamHeader teamLocal.teamName ', teamLocal.teamName);
   return (
     <OneTeamHeader>
       {/* Width (below) of this TeamHeaderCell comes from the combined widths of the first x columns in TeamMemberList */}

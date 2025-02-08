@@ -61,7 +61,8 @@ const useTaskDefinitionSaveMutation = () => {
   return useMutation({
     mutationFn: (params) => weConnectQueryFn('task-definition-save', params, METHOD.GET),
     onError: (error) => console.log('error in useTaskDefinitionSaveMutation: ', error),
-    onSuccess: () => queryClient.invalidateQueries('task-status-list-retrieve'),
+    // onSuccess: () => queryClient.invalidateQueries('task-status-list-retrieve'),
+    onSuccess: () => queryClient.invalidateQueries('task-group-retrieve'),
   });
 };
 

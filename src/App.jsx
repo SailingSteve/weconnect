@@ -38,11 +38,11 @@ function App () {
   const [showDevtools] = useState(webAppConfig.ENABLE_REACT_QUERY_TOOLS !== undefined ? webAppConfig.ENABLE_REACT_QUERY_TOOLS : true);
 
 
-  // Inject this once for the app, for all react-query queries
+  // Inject this once for the app, then it is the default for all ReactQuery queries
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        networkMode: 'always', // Send queries to the server even if the cache has the data
+        // networkMode: 'always', // <-- This is not a solution, it just covers up some problem in our code, while disabling the biggest benefit of ReactQueries. Send queries to the server even if the cache has the data
         refetchOnWindowFocus: false,
         refetchOnMount: true,
         staleTime: 1000 * 60 * 5, // 5 minutes
@@ -53,18 +53,12 @@ function App () {
   useEffect(() => {
     console.log('--------- App.jsx loading ---------');
     initializejQuery(() => {
-      console.log('--------- jQuery has been initialized ---------');
+      console.log('--------- jQuery has been initialized, indicates that a new session has been created ---------');
     });
     return () => {
       // Anything in here is fired on component unmount, equiv to componentDidUnmount()
     };
   }, []);
-
-
-  const isAuth = localStorage.getItem('isAuthenticated');
-  if (isAuth) {
-    console.log('======================================== isAuthenticated: "  ', isAuth, ' =============================');
-  }
 
   return (
     <>
@@ -92,7 +86,7 @@ function App () {
                     <Route path="/" element={<Teams />} />
                     <Route path="*" element={<PageNotFound />} />
                   </Routes>
-                  {/* Hack 1/14/25 <Footer /> */}
+                  {/* <Footer /> has problems */}
                   {showDevtools && (
                     <ReactQueryDevtools />
                   )}

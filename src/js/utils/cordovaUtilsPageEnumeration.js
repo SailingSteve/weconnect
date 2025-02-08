@@ -1,7 +1,6 @@
-import CordovaPageConstants from '../constants/CordovaPageConstants';
-import AppObservableStore from '../stores/AppObservableStore';
 import { normalizedHref } from '../common/utils/hrefUtils';
 import stringContains from '../common/utils/stringContains';
+import CordovaPageConstants from '../constants/CordovaPageConstants';
 
 // eslint-disable-next-line import/prefer-default-export
 export function pageEnumeration () {
@@ -93,8 +92,8 @@ export function pageEnumeration () {
   } else if (path.includes('/') && (
     path.includes('btcand') || path.includes('btmeas') || path.includes('/btdb'))) {
     return CordovaPageConstants.twitterInfoPage;
-  } else if (AppObservableStore.getShowTwitterLandingPage()) {
-    return CordovaPageConstants.twitterHandleLanding;
+  // } else if (AppObservableStore.getShowTwitterLandingPage()) {
+  //   return CordovaPageConstants.twitterHandleLanding;
   }
   return CordovaPageConstants.defaultVal;
 }

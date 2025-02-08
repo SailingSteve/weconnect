@@ -19,32 +19,31 @@ import { METHOD, useFetchData } from '../react-query/WeConnectQuery';
 // eslint-disable-next-line no-unused-vars
 const Teams = ({ classes, match }) => {
   renderLog('Teams');
-  const { apiDataCache, setAppContextValue, getAppContextValue } = useConnectAppContext();
-  const { allPeopleCache, allTeamsCache } = apiDataCache;
+  const { apiDataCache } = useConnectAppContext();
   const dispatch = useConnectDispatch();
 
-  const [showAllTeamMembers, setShowAllTeamMembers] = useState(true);
+  const { setAppContextValue, getAppContextValue } = useConnectAppContext();
+
+  const [showAllTeamMembers, setShowAllTeamMembers] = useState(false);
   const [teamList, setTeamList] = useState([]);
 
-  const teamListRetrieveResults = useFetchData(['team-list-retrieve'], {}, METHOD.GET);
+  const { data: dataTLR, isSuccess: isSuccessTLR, isFetching: isFetchingTLR } = useFetchData(['team-list-retrieve'], {}, METHOD.GET);
   useEffect(() => {
-    // console.log('useFetchData team-list-retrieve in Teams useEffect:', teamListRetrieveResults);
-    if (teamListRetrieveResults) {
-      // console.log('In useEffect apiDataCache:', apiDataCache);
-      // TODO Consider making this useTeamListRetrieveDataCapture so we don't have to pass in the apiDataCache or dispatch
-      // const changeResults =
-      TeamListRetrieveDataCapture(teamListRetrieveResults, apiDataCache, dispatch);
-      // console.log('Teams useEffect changeResults:', changeResults);
+    // console.log('useFetchData team-list-retrieve in Teams useEffect:', dataTLR, isSuccessTLR, isFetchingTLR);
+    // console.log('effect of useFetchData in Teams useEffect:', dataTLR, isSuccessTLR, isFetchingTLR);
+    if (dataTLR !== undefined && isFetchingTLR === false) {
+      console.log('effect of useFetchData in Teams useEffect dataTLR is good:', dataTLR, isSuccessTLR, isFetchingTLR);
+      console.log('Successfully retrieved teams in Teams.jsx from dataTLR ...');
+      const teamListTemp = dataTLR.teamList;
+      setShowAllTeamMembers(true);
+      // Do it both ways
+      setTeamList(teamListTemp);
+      setAppContextValue('teamListNested', teamListTemp);
+      TeamListRetrieveDataCapture({ data: { teamList: teamListTemp }, isSuccess: isSuccessTLR }, apiDataCache, dispatch);
+    } else {
+      console.log('effect of useFetchData in Teams useEffect NO GO:', dataTLR, isSuccessTLR, isFetchingTLR);
     }
-  }, [teamListRetrieveResults]);
-
-  useEffect(() => {
-    // console.log('In useEffect apiDataCache:', apiDataCache);
-    if (allTeamsCache) {
-      const teamListSimple = Object.values(allTeamsCache);
-      setTeamList(teamListSimple);
-    }
-  }, [allPeopleCache, allTeamsCache]);
+  }, [dataTLR, isSuccessTLR]);
 
   const addTeamClick = () => {
     setAppContextValue('addTeamDrawerOpen', true);
@@ -53,10 +52,13 @@ const Teams = ({ classes, match }) => {
 
   const personProfile = getAppContextValue('personProfileDrawerOpen');
   if (personProfile === undefined) {
-    // setAppContextValue('personProfileDrawerOpen', false);
-    // setAppContextValue('addTeamDrawerOpen', false);
+    setAppContextValue('personProfileDrawerOpen', false);
+    setAppContextValue('addTeamDrawerOpen', false);
   }
 
+  // const oneTeam = teamList.find((tm) => tm.teamId === 10);
+  // console.log('teams render, team.length: ', teamList.length);
+  // console.log('teams render, team 10, (cyclorama ) team name: ', oneTeam && oneTeam.teamName);
   return (
     <div>
       <Helmet>
@@ -65,8 +67,7 @@ const Teams = ({ classes, match }) => {
           {' '}
           {webAppConfig.NAME_FOR_BROWSER_TAB_TITLE}
         </title>
-        {/* Hack to get to compile */}
-        {/* <link rel="canonical" href={`${webAppConfig.WECONNECT_URL_FOR_SEO}/team-home`} /> */}
+        {/* Don't think we can do this anymore ... <link rel="canonical" href={`${webAppConfig.WECONNECT_URL_FOR_SEO}/team-home`} /> */}
       </Helmet>
       <PageContentContainer>
         <h1>
@@ -81,14 +82,12 @@ const Teams = ({ classes, match }) => {
         </div>
         {teamList.map((team, index) => (
           <OneTeamWrapper key={`team-${team.id}`}>
-            <TeamHeader
-              team={team}
-              showHeaderLabels={(index === 0) && showAllTeamMembers}
-              // showHeaderLabels={(index === 0) && showAllTeamMembers && (team.teamMemberList && team.teamMemberList.length > 0)}
-              showIcons
-            />
+            <TeamHeader team={team} showHeaderLabels={(index === 0) && showAllTeamMembers && (team.teamMemberList && team.teamMemberList.length > 0)} showIcons />
             {showAllTeamMembers && (
-              <TeamMemberList teamId={team.id} />
+              <>
+                {/* DO NOT REMOVE PASSED IN team */}
+                <TeamMemberList teamId={team.id} team={team} />
+              </>
             )}
           </OneTeamWrapper>
         ))}
@@ -97,6 +96,7 @@ const Teams = ({ classes, match }) => {
           color="primary"
           variant="outlined"
           onClick={addTeamClick}
+          sx={{ marginTop: '30px' }}
         >
           Add Team
         </Button>
