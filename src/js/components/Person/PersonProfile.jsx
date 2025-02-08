@@ -2,21 +2,21 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
-// import useGetFullNamePreferredReactQuery from '../../react-query/useGetFullNamePreferredReactQuery';
+import { useGetFullNamePreferred } from '../../models/PersonModel';
 import CopyQuestionnaireLink from '../Questionnaire/CopyQuestionnaireLink';
-import { useGetFullNamePreferred, useGetPersonById } from '../../models/PersonModel';
+// import useGetFullNamePreferredReactQuery from '../../react-query/useGetFullNamePreferredReactQuery';
 
 
 const PersonProfile = () => {
   renderLog('PersonProfile');  // Set LOG_RENDER_EVENTS to log all renders
   const { getAppContextValue, setAppContextValue } = useConnectAppContext();
 
-  // const [person] = useState(getAppContextValue('personDrawersPerson'));
-  const [person] = useState(useGetPersonById(getAppContextValue('personDrawersPersonId')));
+  const [person] = useState(getAppContextValue('personDrawersPerson'));
+  // const [person] = useState(useGetPersonById(getAppContextValue('personDrawersPersonId')));
 
   useEffect(() => {
     // Hard coded temporarily while we are in development
-    setAppContextValue('QuestionnaireId', 1);
+    setAppContextValue('questionnaireId', 1);
   }, []);
 
   return (

@@ -7,7 +7,7 @@ import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import { renderLog } from '../../common/utils/logging';
 import webAppConfig from '../../config';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
-import { useGetPersonById } from '../../models/PersonModel';
+// import { useGetPersonById } from '../../models/PersonModel';
 import { METHOD, useFetchData } from '../../react-query/WeConnectQuery';
 import CopyQuestionnaireLink from './CopyQuestionnaireLink';
 
@@ -17,8 +17,8 @@ const QuestionnaireResponsesList = ({ personId }) => {
   renderLog('QuestionnaireList');  // Set LOG_RENDER_EVENTS to log all renders
   const { getAppContextValue } = useConnectAppContext();
 
-  // const [person] = useState(getAppContextValue('personDrawersPerson'));
-  const [person] = useState(useGetPersonById(getAppContextValue('personDrawersPersonId')));
+  const [person] = useState(getAppContextValue('personDrawersPerson'));
+  // const [person] = useState(useGetPersonById(getAppContextValue('personDrawersPersonId')));
   const [questionnaireList, setQuestionnaireList] = useState([]);
 
   // Although we are sending a list, there will only be one person id, if there were more, just append them with commas

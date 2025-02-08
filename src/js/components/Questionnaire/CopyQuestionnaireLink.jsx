@@ -6,16 +6,16 @@ import { renderLog } from '../../common/utils/logging';
 import webAppConfig from '../../config';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
 import { SpanWithLinkStyle } from '../Style/linkStyles';
-import { useGetPersonById } from '../../models/PersonModel';
+// import { useGetPersonById } from '../../models/PersonModel';
 
 
 const CopyQuestionnaireLink = () => {
   renderLog('CopyQuestionnaireLink');
   const { getAppContextValue } = useConnectAppContext();
 
-  // const [person] = useState(getAppContextValue('personDrawersPerson'));
-  const [person] = useState(useGetPersonById(getAppContextValue('personDrawersPersonId')));
-  const [questionnaireId] = useState(getAppContextValue('QuestionnaireId'));
+  const [person] = useState(getAppContextValue('personDrawersPerson'));
+  // const [person] = useState(useGetPersonById(getAppContextValue('personDrawersPersonId')));
+  const [questionnaireId] = useState(getAppContextValue('questionnaireId'));
   const [linkCopied, setLinkCopied] = useState(false);
   const [linkToBeShared] = useState(`${webAppConfig.PROTOCOL}${webAppConfig.HOSTNAME}/q/${questionnaireId}/${person.id}`);
 

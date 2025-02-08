@@ -9,7 +9,7 @@ const EditQuestionnaireDrawer = () => {
   renderLog('EditQuestionnaireDrawer');
   const { getAppContextValue } = useConnectAppContext();
 
-  const selected = getAppContextValue('selectedQuestion');
+  const selected = getAppContextValue('selectedQuestionnaire');
   const [headerTitleJsx] = useState(selected ? <>Edit Questionnaire</> : <>Add Questionnaire</>);
   const [headerFixedJsx] = useState(<></>);
 
