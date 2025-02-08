@@ -20,6 +20,7 @@ import { METHOD, useFetchData } from '../react-query/WeConnectQuery';
 const Teams = ({ classes, match }) => {
   renderLog('Teams');
   const { apiDataCache } = useConnectAppContext();
+  const { allPeopleCache, allTeamsCache } = apiDataCache;
   const dispatch = useConnectDispatch();
 
   const { setAppContextValue, getAppContextValue } = useConnectAppContext();
@@ -27,7 +28,15 @@ const Teams = ({ classes, match }) => {
   const [showAllTeamMembers, setShowAllTeamMembers] = useState(false);
   const [teamList, setTeamList] = useState([]);
 
-  const { data: dataTLR, isSuccess: isSuccessTLR, isFetching: isFetchingTLR } = useFetchData(['team-list-retrieve'], {}, METHOD.GET);
+  // const { data: dataTLR, isSuccess: isSuccessTLR, isFetching: isFetchingTLR } = useFetchData(['team-list-retrieve'], {}, METHOD.GET);
+  const teamListRetrieveResults = useFetchData(['team-list-retrieve'], {}, METHOD.GET);
+  const { data: dataTLR, isSuccess: isSuccessTLR, isFetching: isFetchingTLR } = teamListRetrieveResults;
+  // ///////////////////////////////////////////////////////
+  // Steve's approach to use data directly from react-query
+  // Requires using data directly from the specific API
+  // Has the problem that we had discussed refactoring team-list-retrieve to not include person data,
+  // so that team.teamMemberList would only include the personIds of team members, and not have the
+  // teamMemberList data when we render <TeamMemberList below
   useEffect(() => {
     // console.log('useFetchData team-list-retrieve in Teams useEffect:', dataTLR, isSuccessTLR, isFetchingTLR);
     // console.log('effect of useFetchData in Teams useEffect:', dataTLR, isSuccessTLR, isFetchingTLR);
@@ -44,6 +53,23 @@ const Teams = ({ classes, match }) => {
       console.log('effect of useFetchData in Teams useEffect NO GO:', dataTLR, isSuccessTLR, isFetchingTLR);
     }
   }, [dataTLR, isSuccessTLR]);
+
+  // ////////////////////////////////////////////
+  // Dale's approach to use organize incoming data and then use that data from apiDataCache
+  // Allows us to organize incoming data independent of the specific API, potentially from multiple API or sources
+  // useEffect(() => {
+  //   if (teamListRetrieveResults) {
+  //     // TODO Consider making this useTeamListRetrieveDataCapture so we don't have to pass in the apiDataCache or dispatch
+  //     TeamListRetrieveDataCapture(teamListRetrieveResults, apiDataCache, dispatch);
+  //   }
+  // }, [teamListRetrieveResults]);
+  //
+  // useEffect(() => {
+  //   if (allTeamsCache) {
+  //     const teamListSimple = Object.values(allTeamsCache);
+  //     setTeamList(teamListSimple);
+  //   }
+  // }, [allPeopleCache, allTeamsCache]);
 
   const addTeamClick = () => {
     setAppContextValue('addTeamDrawerOpen', true);
@@ -80,9 +106,15 @@ const Teams = ({ classes, match }) => {
             <SpanWithLinkStyle onClick={() => setShowAllTeamMembers(true)}>show people</SpanWithLinkStyle>
           )}
         </div>
+        {/* NOTE: we had discussed refactoring team-list-retrieve to not include person data, */}
+        {/* so that team.teamMemberList would only include the personIds of team members */}
         {teamList.map((team, index) => (
           <OneTeamWrapper key={`team-${team.id}`}>
-            <TeamHeader team={team} showHeaderLabels={(index === 0) && showAllTeamMembers && (team.teamMemberList && team.teamMemberList.length > 0)} showIcons />
+            <TeamHeader
+              team={team}
+              showHeaderLabels={(index === 0) && showAllTeamMembers && (team.teamMemberList && team.teamMemberList.length > 0)}
+              showIcons
+            />
             {showAllTeamMembers && (
               <>
                 {/* DO NOT REMOVE PASSED IN team */}

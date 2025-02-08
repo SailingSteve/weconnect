@@ -25,6 +25,8 @@ const TeamMemberList = ({ teamId, team }) => { // teamMemberList
     if (dataTLR !== undefined && isSuccessTLR) {
       const oneTeam = dataTLR.teamList.find((tm) => tm.teamId === parseInt(teamId));
       if (oneTeam) {  // We might have just deleted the team
+        // NOTE: we had discussed refactoring team-list-retrieve to not include person data,
+        // so that team.teamMemberList would only include the personIds of team members
         setTeamMemberListReactQuery(oneTeam.teamMemberList);
       }
     }
@@ -38,11 +40,10 @@ const TeamMemberList = ({ teamId, team }) => { // teamMemberList
   }, [allPeopleCache, allTeamsCache, teamId]);
 
   // const oneTeam = teamList.find((tm) => tm.teamId === parseInt(teamId));
-  console.log('Cached by ReactQuery teamMemberList: ', teamMemberListReactQuery);
-  console.log('Cached by apiDataCache teamMemberList: ', teamMemberListApiDataCache);
 
   // DO NOT REMOVE: diffs the ReactQuery cache results with the ApiDataCache
-  if (teamMemberListReactQuery && teamMemberListApiDataCache) {
+  let isPerfectMatch = true;
+  if (teamMemberListReactQuery && teamMemberListApiDataCache && teamMemberListReactQuery.length > 0 && teamMemberListApiDataCache.length > 0) {
     for (let i = 0; i < teamMemberListReactQuery.length; i++) {
       Object.keys(teamMemberListReactQuery[i]).forEach((key) => {
         if (key !== 'id' && !key.startsWith('date')) {
@@ -50,11 +51,20 @@ const TeamMemberList = ({ teamId, team }) => { // teamMemberList
           const valApiCacheQuery = teamMemberListApiDataCache && teamMemberListApiDataCache[i] && teamMemberListApiDataCache[i][key];
           if (valApiCacheQuery !== valReactQueryCache) {
             console.log(`ERROR: teamMemberList authoritative ReactQuery cache for key: ${key} value: '${valReactQueryCache}' does not match processed cache value: '${valApiCacheQuery}'`);
+            isPerfectMatch = false;
           }
         }
       });
     }
+    if (isPerfectMatch) {
+      console.log('=== PERFECT MATCH');
+    }
+  } else {
+    console.log(`=== CANNOT COMPARE: teamMemberListReactQuery.length: ${teamMemberListReactQuery.length}, teamMemberListApiDataCache.length: ${teamMemberListApiDataCache.length}`);
   }
+  console.log('====== Cached by ReactQuery teamMemberList: ', teamMemberListReactQuery);
+  console.log('====== Cached by apiDataCache teamMemberList: ', teamMemberListApiDataCache);
+
 
   return (
     <TeamMembersWrapper>
