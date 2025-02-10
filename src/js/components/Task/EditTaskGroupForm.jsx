@@ -13,10 +13,10 @@ import { useGroupSaveMutation } from '../../react-query/mutations';
 
 const EditTaskGroupForm = ({ classes }) => {
   renderLog('EditTaskGroupForm');
-  const { getAppContextValue } = useConnectAppContext();
+  const { getAppContextValue, setAppContextValue } = useConnectAppContext();
   const { mutate } = useGroupSaveMutation();
 
-  const [group] = useState(getAppContextValue('editTaskGroupDrawerTaskGroup'));
+  const [taskGroup] = useState(getAppContextValue('editTaskGroupDrawerTaskGroup'));
   const [groupNameValue, setGroupNameValue] = useState('');
   const [groupDescValue, setGroupDescValue] = useState('');
   const [saveButtonActive, setSaveButtonActive] = useState(false);
@@ -25,24 +25,27 @@ const EditTaskGroupForm = ({ classes }) => {
   const groupDescFldRef = useRef('');
 
   useEffect(() => {
-    if (group) {
-      setGroupNameValue(group.taskGroupName);
-      setGroupDescValue(group.taskGroupDescription);
+    if (taskGroup) {
+      setGroupNameValue(taskGroup.taskGroupName);
+      setGroupDescValue(taskGroup.taskGroupDescription);
     } else {
       setGroupNameValue('');
       setGroupDescValue('');
     }
-  }, [group]);
+  }, [taskGroup]);
 
   const saveTaskGroup = () => {
     const requestParams = makeRequestParams({
-      taskGroupId: group ? group.id : '-1',
+      taskGroupId: taskGroup ? taskGroup.id : '-1',
     }, {
       taskGroupName: groupNameFldRef.current.value,
       taskGroupDescription: groupDescFldRef.current.value,
     });
     mutate(requestParams);
     setSaveButtonActive(false);
+    setAppContextValue('editTaskGroupDrawerOpen', false);
+    setAppContextValue('editTaskGroupDrawerTaskGroup', undefined);
+    setAppContextValue('editTaskGroupDrawerLabel', '');
   };
 
   const updateSaveButton = () => {

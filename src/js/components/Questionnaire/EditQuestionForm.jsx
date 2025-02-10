@@ -31,7 +31,7 @@ const PERSON_FIELDS_ACCEPTED = [
 
 const EditQuestionForm = ({ classes }) => {
   renderLog('EditQuestionForm');
-  const {  getAppContextValue } = useConnectAppContext();
+  const { getAppContextValue, setAppContextValue } = useConnectAppContext();
   const { mutate } = useQuestionSaveMutation();
 
   const [question] = useState(getAppContextValue('selectedQuestion'));
@@ -90,20 +90,26 @@ const EditQuestionForm = ({ classes }) => {
   };
 
   const saveQuestion = () => {
-    const requestParams = makeRequestParams({
+    const plainParams = {
       questionId: question ? question.id : '-1',
       questionnaireId: questionnaire ? questionnaire.id : 'Need to navigate from earlier page where q is put in AppContext',   // hack
-    }, {
+    };
+    const params = {
       answerType: radioValue,
       // fieldMappingRule: fieldMappingRuleFldRef.current.checked,
       questionInstructions: questionInstructionsFldRef.current.value,
       questionText: questionTextFldRef.current.value,
       requireAnswer: (requireAnswerFldRef.current.value === 'on'),
       statusActive: (statusActiveFldRef.current.value === 'on'),
-    });
+    };
+    const requestParams = makeRequestParams(plainParams, params);
     mutate(requestParams);
     console.log('saveQuestionnaire requestParams:', requestParams);
     setSaveButtonActive(false);
+    setAppContextValue('editQuestionDrawerOpen', false);
+    setAppContextValue('selectedQuestion', undefined);
+    setAppContextValue('selectedQuestionnaire', undefined);
+    setAppContextValue('editQuestionDrawerLabel', '');
   };
 
   const updateSaveButton = () => {

@@ -19,9 +19,9 @@ const TeamMemberList = ({ teamId, team }) => { // teamMemberList
   // console.log('TeamMemberList teamMemberList:', teamMemberList);
 
   const { data: dataTLR, isSuccess: isSuccessTLR, isFetching: isFetchingTLR } = useFetchData(['team-list-retrieve'], {}, METHOD.GET);
-  console.log('useFetchData in TeamMemberList:', dataTLR, isSuccessTLR, isFetchingTLR);
+  // console.log('useFetchData in TeamMemberList:', dataTLR, isSuccessTLR, isFetchingTLR);
   useEffect(() => {
-    console.log('effect of useFetchData in TeamMemberList useEffect:', dataTLR, isSuccessTLR, isFetchingTLR);
+    // console.log('effect of useFetchData in TeamMemberList useEffect:', dataTLR, isSuccessTLR, isFetchingTLR);
     if (dataTLR !== undefined && isSuccessTLR) {
       const oneTeam = dataTLR.teamList.find((tm) => tm.teamId === parseInt(teamId));
       if (oneTeam) {  // We might have just deleted the team
@@ -50,36 +50,34 @@ const TeamMemberList = ({ teamId, team }) => { // teamMemberList
           const valReactQueryCache = teamMemberListReactQuery && teamMemberListReactQuery[i] && teamMemberListReactQuery[i][key];
           const valApiCacheQuery = teamMemberListApiDataCache && teamMemberListApiDataCache[i] && teamMemberListApiDataCache[i][key];
           if (valApiCacheQuery !== valReactQueryCache) {
-            console.log(`ERROR: teamMemberList authoritative ReactQuery cache for key: ${key} value: '${valReactQueryCache}' does not match processed cache value: '${valApiCacheQuery}'`);
+            // console.log(`ERROR: teamMemberList authoritative ReactQuery cache for key: ${key} value: '${valReactQueryCache}' does not match processed cache value: '${valApiCacheQuery}'`);
             isPerfectMatch = false;
           }
         }
       });
     }
     if (isPerfectMatch) {
-      console.log('=== PERFECT MATCH');
+      // console.log('=== PERFECT MATCH');
     }
   } else {
-    console.log(`=== CANNOT COMPARE: teamMemberListReactQuery.length: ${teamMemberListReactQuery.length}, teamMemberListApiDataCache.length: ${teamMemberListApiDataCache.length}`);
+    // console.log(`=== CANNOT COMPARE: teamMemberListReactQuery.length: ${teamMemberListReactQuery.length}, teamMemberListApiDataCache.length: ${teamMemberListApiDataCache.length}`);
   }
-  console.log('====== Cached by ReactQuery teamMemberList: ', teamMemberListReactQuery);
-  console.log('====== Cached by apiDataCache teamMemberList: ', teamMemberListApiDataCache);
+  // console.log('====== Cached by ReactQuery teamMemberList: ', teamMemberListReactQuery);
+  // console.log('====== Cached by apiDataCache teamMemberList: ', teamMemberListApiDataCache);
 
 
   return (
     <TeamMembersWrapper>
-      {teamMemberListReactQuery.map((person, index) => {
+      {teamMemberListApiDataCache.map((person, index) => {
         if (teamId === 10) console.log(`TeamMemberList teamId: ${teamId}, person: ${person} location ${person.location}`);
         if (person) {
           return (
-            <>
-              <PersonSummaryRow
-                key={`teamMember-${teamId}-${person.id}`}
-                person={person}
-                rowNumberForDisplay={index + 1}
-                teamId={teamId}
-              />
-            </>
+            <PersonSummaryRow
+              key={`teamMember-${teamId}-${person.id}`}
+              person={person}
+              rowNumberForDisplay={index + 1}
+              teamId={teamId}
+            />
           );
         } else {
           return null; // Empty row for non-existing members

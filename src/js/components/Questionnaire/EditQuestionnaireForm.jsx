@@ -11,7 +11,7 @@ import { useQuestionnaireSaveMutation } from '../../react-query/mutations';
 
 const EditQuestionnaireForm = ({ classes }) => {
   renderLog('EditQuestionnaireForm');
-  const { getAppContextValue } = useConnectAppContext();
+  const { getAppContextValue, setAppContextValue } = useConnectAppContext();
   const { mutate } = useQuestionnaireSaveMutation();
 
   const [questionnaire]  = useState(getAppContextValue('selectedQuestionnaire'));
@@ -47,12 +47,14 @@ const EditQuestionnaireForm = ({ classes }) => {
     };
     mutate(makeRequestParams(plainParams, params));
     setSaveButtonActive(false);
+    setAppContextValue('editQuestionnaireDrawerOpen', false);
+    setAppContextValue('selectedQuestionnaire', undefined);
+    setAppContextValue('editQuestionnaireDrawerLabel', '');
   };
 
   const updateSaveButton = () => {
     if (nameFldRef.current.value && nameFldRef.current.value.length &&
-      titleFldRef.current.value && titleFldRef.current.value.length &&
-      instructionsFldRef.current.value && instructionsFldRef.current.value.length) {
+      titleFldRef.current.value && titleFldRef.current.value.length) {
       if (!saveButtonActive) {
         setSaveButtonActive(true);
       }

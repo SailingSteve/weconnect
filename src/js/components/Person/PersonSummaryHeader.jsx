@@ -9,7 +9,7 @@ const PersonSummaryHeader = () => {
   return (
     <OnePersonHeader>
       {/* Width (below) of this PersonHeaderCell comes from the combined widths of the first x columns in PersonMemberList */}
-      <PersonHeaderCell $largeFont $titleCell cellwidth={200}>
+      <PersonHeaderCell largefont="true" titlecell="true" cellwidth={200}>
         &nbsp;
       </PersonHeaderCell>
       <PersonHeaderCell cellwidth={300}>
@@ -32,18 +32,18 @@ const OnePersonHeader = styled('div')`
 `;
 
 const PersonHeaderCell = styled('div', {
-  shouldForwardProp: (prop) => !['largeFont', 'titleCell', 'cellwidth'].includes(prop),
-})(({ largeFont, titleCell, cellwidth }) => (`
+  shouldForwardProp: (prop) => !['largefont', 'titlecell', 'cellwidth'].includes(prop),
+})(({ largefont, titlecell, cellwidth }) => (`
   align-content: center;
-  ${(titleCell) ? '' : 'border-bottom: 1px solid #ccc;'}
-  ${(largeFont) ? 'font-size: 1.1em;' : 'font-size: .8em;'};
-  ${(titleCell) ? '' : 'font-weight: 550;'}
+  ${(titlecell) ? '' : 'border-bottom: 1px solid #ccc;'}
+  ${(largefont) ? 'font-size: 1.1em;' : 'font-size: .8em;'};
+  ${(titlecell) ? '' : 'font-weight: 550;'}
   height: 22px;
-  ${cellwidth ? `max-width: ${cellwidth}px;` : ''};
-  ${cellwidth ? `min-width: ${cellwidth}px;` : ''};
+  ${cellwidth ? `max-width: ${cellwidth}px;` : ''}
+  ${cellwidth ? `min-width: ${cellwidth}px;` : ''}
   overflow: hidden;
   white-space: nowrap;
-  ${cellwidth ? `width: ${cellwidth}px;` : ''};
+  ${cellwidth ? `width: ${cellwidth}px;` : ''}
 `));
 
 export default PersonSummaryHeader;

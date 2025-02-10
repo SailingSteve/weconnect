@@ -1,14 +1,19 @@
 import PropTypes from 'prop-types';
-import React, { createContext, useContext, useEffect, useReducer, useState } from 'react';
+import React, { createContext, useContext, useReducer, useState } from 'react';
 import initialApiDataCache from '../models/initialApiDataCache';
-import personListRetrieveDataCapture from '../models/personListRetrieve';
-import { METHOD, useFetchData } from '../react-query/WeConnectQuery';
-
+// import capturePersonListRetrieveData from '../models/capturePersonListRetrieveData';
+// import { METHOD, useFetchData } from '../react-query/WeConnectQuery';
+// import { getInitialGlobalPersonVariables, PersonListRetrieveDataCapture } from '../models/PersonModel';
+// import { getInitialGlobalTaskVariables } from '../models/TaskModel';
+// import { getInitialGlobalTeamVariables } from '../models/TeamModel';
 
 // Replaces AppObservableStore.js
 // Create the context
 const ConnectAppContext = createContext({});
 const ConnectDispatch = createContext(null);
+// const initialCachedApiPersonVariables = getInitialGlobalPersonVariables();
+// const initialCachedApiTaskVariables = getInitialGlobalTaskVariables();
+// const initialCachedApiTeamVariables = getInitialGlobalTeamVariables();
 
 function apiDataCacheReducer (apiDataCache, action) {
   let revisedApiDataCache = { ...apiDataCache };
@@ -24,6 +29,11 @@ function apiDataCacheReducer (apiDataCache, action) {
   }
 }
 
+// const initialApiDataCache = {
+//   ...initialCachedApiPersonVariables,
+//   ...initialCachedApiTaskVariables,
+//   ...initialCachedApiTeamVariables,
+// };
 
 // Create the provider component
 // eslint-disable-next-line no-unused-vars
@@ -52,7 +62,7 @@ export const ConnectAppContextProvider = ({ children }) => {
   };
 
   // const { data: dataP, isSuccess: isSuccessP, isFetching: isFetchingP, isStale: isStaleP } = useFetchData(['person-list-retrieve'], {}, METHOD.GET);
-  const personListRetrieveResults = useFetchData(['person-list-retrieve'], {}, METHOD.GET);
+  // const personListRetrieveResults = useFetchData(['person-list-retrieve'], {}, METHOD.GET);
   // This is not currently the right place to pass these values, but I'm saving these here for the next 30 days until we work out the correct place.
   // {
   //   cacheTime: 0,
@@ -62,26 +72,29 @@ export const ConnectAppContextProvider = ({ children }) => {
   //   refetchInterval: 0,
   //   staleTime: 0,
   // }
-  const { data: dataP, isSuccess: isSuccessP, isFetching: isFetchingP } = personListRetrieveResults;
-  useEffect(() => {
-    // console.log('useFetchData person-list-retrieve in Teams useEffect:', personListRetrieveResults);
-    if (personListRetrieveResults) {
-      // console.log('In useEffect apiDataCache:', apiDataCache);
-      // const changeResults =
-      personListRetrieveDataCapture(personListRetrieveResults, apiDataCache, dispatch);
-      // console.log('ConnectAppContext useEffect personListRetrieveDataCapture changeResults:', changeResults);
-    }
-  }, [personListRetrieveResults]);
 
-  useEffect(() => {
-    // console.log('useFetchData in TeamHome (person-list-retrieve) useEffect:', dataP, isSuccessP, isFetchingP, isStaleP);
-    if (isSuccessP) {
-      // console.log('useFetchData in TeamHome (person-list-retrieve)useEffect data good:', dataP, isSuccessP, isFetchingP, isStaleP);
-      setAppContextValue('allStaffList', dataP ? dataP.personList : []);
-      // console.log('ConnectAppContext useEffect allStaffList fetched');
-    }
-  }, [dataP, isSuccessP, isFetchingP]);
+  // Moved to root pages: Teams, TeamHome, etc.
+  // useEffect(() => {
+  //   // console.log('useFetchData person-list-retrieve in Teams useEffect:', personListRetrieveResults);
+  //   if (personListRetrieveResults) {
+  //     // console.log('In useEffect apiDataCache:', apiDataCache);
+  //     // const changeResults =
+  //     capturePersonListRetrieveData(personListRetrieveResults, apiDataCache, dispatch);
+  //     // console.log('ConnectAppContext useEffect capturePersonListRetrieveData changeResults:', changeResults);
+  //   }
+  // }, [personListRetrieveResults]);
 
+  // const { data: dataP, isSuccess: isSuccessP, isFetching: isFetchingP } = personListRetrieveResults;
+  // useEffect(() => {
+  //   // console.log('useFetchData in TeamHome (person-list-retrieve) useEffect:', dataP, isSuccessP, isFetchingP, isStaleP);
+  //   if (isSuccessP) {
+  //     // console.log('useFetchData in TeamHome (person-list-retrieve)useEffect data good:', dataP, isSuccessP, isFetchingP, isStaleP);
+  //     setAppContextValue('allStaffList', dataP ? dataP.personList : []);
+  //     // console.log('ConnectAppContext useEffect allStaffList fetched');
+  //   }
+  // }, [dataP, isSuccessP, isFetchingP]);
+
+  // The following prints console log errors
   const { data: dataAuth, isSuccess: isSuccessAuth, isFetching: isFetchingAuth } = useFetchData(['get-auth'], {}, METHOD.POST);
   useEffect(() => {
     if (isSuccessAuth) {

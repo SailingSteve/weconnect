@@ -58,7 +58,6 @@ const AddPersonDrawerMainContent = () => {
     setMatchingCountText(matchingCount);
   };
 
-
   const searchFunction = () => {   // Now searches first and last name
     const currentValue = searchStringRef.current.value;
     if (currentValue.length === 0) {

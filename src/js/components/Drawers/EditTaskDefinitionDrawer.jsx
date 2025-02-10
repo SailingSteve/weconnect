@@ -13,9 +13,9 @@ const EditTaskDefinitionDrawer = () => {
     <DrawerTemplateA
       drawerId="editTaskDefinitionDrawer"
       drawerOpenGlobalVariableName="editTaskDefinitionDrawerOpen"
-      mainContentJsx={<EditTaskDefinitionDrawerMainContent />}
-      headerTitleJsx={getAppContextValue('editTaskDefinitionDrawerLabel')}
       headerFixedJsx={<></>}
+      headerTitleJsx={<>{getAppContextValue('editTaskDefinitionDrawerLabel')}</>}
+      mainContentJsx={<EditTaskDefinitionDrawerMainContent />}
     />
   );
 };

@@ -5,6 +5,10 @@ import styled from 'styled-components';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
+import {
+  getFullNamePreferredPerson,
+  // useGetFullNamePreferred,
+} from '../../models/PersonModel';
 import { useRemoveTeamMemberMutation } from '../../react-query/mutations';
 import { DeleteStyled, EditStyled } from '../Style/iconStyles';
 // import { useRemoveTeamMemberMutationDiverged } from '../../models/TeamModel';
@@ -49,7 +53,7 @@ const PersonSummaryRow = ({ person, rowNumberForDisplay, teamId }) => {
   return (
     <OnePersonWrapper key={`teamMember-${person.personId}`}>
       {rowNumberForDisplay && (
-        <PersonCell id={`index-personId-${person.personId}`} width={15}>
+        <PersonCell id={`index-personId-${person.personId}`} cellwidth={15}>
           <GraySpan>
             {rowNumberForDisplay}
           </GraySpan>
@@ -63,15 +67,26 @@ const PersonSummaryRow = ({ person, rowNumberForDisplay, teamId }) => {
           textDecoration: 'underline',
           color: DesignTokenColors.primary500,
         }}
-        width={200}
+        // cellwidth="200"
+        cellwidth={200}
       >
-        {`${person.firstName} ${person.lastName}`}
-        {/* useGetFullNamePreferred(person.personId) 2/6/25 currently if you save a first name preferred, it shows up here, but will not be searchable on add team member If you */}
+        {/* {`${person.firstName} ${person.lastName}`} */}
+        {getFullNamePreferredPerson(person)} {/* 2/6/25 currently if you save a first name preferred, it shows up here, but will not be searchable on add team member If you */}
       </PersonCell>
-      <PersonCell id={`location-personId-${person.personId}`} $smallFont width={300}>
+      <PersonCell
+        id={`location-personId-${person.personId}`}
+        smallfont="true" // $smallfont gets rid of error message, but doesn't get passed to PersonCell styled div
+        // cellwidth="300"
+        cellwidth={300}
+      >
         {person.location}
       </PersonCell>
-      <PersonCell id={`jobTitle-personId-${person.personId}`} $smallestFont width={225}>
+      <PersonCell
+        id={`jobTitle-personId-${person.personId}`}
+        smallestfont="true" // $smallestfont gets rid of error message, but doesn't get passed to PersonCell styled div
+        // cellwidth="225"
+        cellwidth={225}
+      >
         {person.jobTitle}
       </PersonCell>
       {hasEditRights ? (
@@ -79,14 +94,16 @@ const PersonSummaryRow = ({ person, rowNumberForDisplay, teamId }) => {
           id={`editPerson-personId-${person.personId}`}
           onClick={() => editPersonClick(hasEditRights)}
           style={{ cursor: 'pointer' }}
-          width={20}
+          // cellwidth="20"
+          cellwidth={20}
         >
           <EditStyled />
         </PersonCell>
       ) : (
         <PersonCell
           id={`editPerson-personId-${person.personId}`}
-          width={20}
+          // cellwidth="20"
+          cellwidth={20}
         >
           &nbsp;
         </PersonCell>
@@ -98,7 +115,8 @@ const PersonSummaryRow = ({ person, rowNumberForDisplay, teamId }) => {
               id={`removeMember-personId-${person.personId}`}
               onClick={() => removeTeamMemberClick(person)}
               style={{ cursor: 'pointer' }}
-              width={20}
+              // cellwidth="20"
+              cellwidth={20}
             >
               <DeleteStyled />
             </PersonCell>
@@ -106,7 +124,8 @@ const PersonSummaryRow = ({ person, rowNumberForDisplay, teamId }) => {
             <PersonCell
               id={`removeMember-personId-${person.personId}`}
               onClick={() => removeTeamMemberClick(person)}
-              width={20}
+              // cellwidth="20"
+              cellwidth={20}
             >
               &nbsp;
             </PersonCell>
@@ -145,18 +164,18 @@ const OnePersonWrapper = styled('div')`
 `;
 
 const PersonCell = styled('div', {
-  shouldForwardProp: (prop) => !['smallFont', 'smallestFont', 'width'].includes(prop),
-})(({ smallFont, smallestFont, width }) => (`
+  shouldForwardProp: (prop) => !['smallfont', 'smallestfont', 'cellwidth'].includes(prop),
+})(({ smallfont, smallestfont, cellwidth }) => (`
   align-content: center;
   border-bottom: 1px solid #ccc;
-  ${(smallFont && !smallestFont) ? 'font-size: .9em;' : ''};
-  ${(smallestFont && !smallFont) ? 'font-size: .8em;' : ''};
+  ${(smallfont && !smallestfont) ? 'font-size: .9em;' : ''}
+  ${(smallestfont && !smallfont) ? 'font-size: .8em;' : ''}
   height: 22px;
-  ${width ? `max-width: ${width}px;` : ''};
-  ${width ? `min-width: ${width}px;` : ''};
+  ${cellwidth ? `max-width: ${cellwidth}px;` : ''}
+  ${cellwidth ? `min-width: ${cellwidth}px;` : ''}
   overflow: hidden;
   white-space: nowrap;
-  ${width ? `width: ${width}px;` : ''};
+  ${cellwidth ? `width: ${cellwidth}px;` : ''}
 `));
 
 export default withStyles(styles)(PersonSummaryRow);

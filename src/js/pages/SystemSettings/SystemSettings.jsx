@@ -11,60 +11,89 @@ import { EditStyled } from '../../components/Style/iconStyles';
 import { SpanWithLinkStyle } from '../../components/Style/linkStyles';
 import { PageContentContainer } from '../../components/Style/pageLayoutStyles';
 import webAppConfig from '../../config';
-import { useConnectAppContext } from '../../contexts/ConnectAppContext';
+import { useConnectAppContext, useConnectDispatch } from '../../contexts/ConnectAppContext';
 import { METHOD, useFetchData } from '../../react-query/WeConnectQuery';
+import { captureQuestionnaireListRetrieveData } from '../../models/QuestionnaireModel';
+import capturePersonListRetrieveData from '../../models/capturePersonListRetrieveData';
+import { captureTaskStatusListRetrieveData } from '../../models/TaskModel';
 
 
 const SystemSettings = ({ classes }) => {
   renderLog('SystemSettings');
   const { setAppContextValue } = useConnectAppContext();
+  const { apiDataCache } = useConnectAppContext();
+  const { allPeopleCache, allTaskGroupsCache, allQuestionnairesCache } = apiDataCache;
+  const dispatch = useConnectDispatch();
 
+  const [personIdsList, setPersonIdsList] = useState([]);
   const [questionnaireList, setQuestionnaireList] = useState([]);
   const [taskGroupList, setTaskGroupList] = useState([]);
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { data: dataQList, isFetching: isFetchingQList, isSuccess: isSuccessQList } = useFetchData(['questionnaire-list-retrieve'], {}, METHOD.GET);
-  if (isFetchingQList) {
-    console.log('isFetching questionnaire-list-retrieve ------------');
-  }
+  const personListRetrieveResults = useFetchData(['person-list-retrieve'], {}, METHOD.GET);
   useEffect(() => {
-    if (dataQList !== undefined && isFetchingQList === false) {
-      const questionnaireListTemp = dataQList.questionnaireList;
-      setQuestionnaireList(questionnaireListTemp);
+    if (personListRetrieveResults) {
+      capturePersonListRetrieveData(personListRetrieveResults, apiDataCache, dispatch);
     }
-  }, [dataQList, isSuccessQList]);
+  }, [personListRetrieveResults, allPeopleCache, apiDataCache, dispatch]);
 
-  const { data: dataGroupList, isFetching: isFetchingGroupList, isSuccess: isSuccessGroupList } = useFetchData(['task-group-list-retrieve'], {}, METHOD.GET);
-  if (isFetchingGroupList) {
-    console.log('isFetching task-group-retrieve ------------');
-  }
+  const questionnaireListRetrieveResults = useFetchData(['questionnaire-list-retrieve'], {}, METHOD.GET);
   useEffect(() => {
-    if (dataGroupList !== undefined && isFetchingGroupList === false) {
-      const taskListTemp = dataGroupList.taskGroupList;
-      setTaskGroupList(taskListTemp);
+    if (questionnaireListRetrieveResults) {
+      captureQuestionnaireListRetrieveData(questionnaireListRetrieveResults, apiDataCache, dispatch);
     }
-  }, [dataGroupList, isSuccessGroupList]);
+  }, [questionnaireListRetrieveResults, allQuestionnairesCache, apiDataCache, dispatch]);
+
+  const taskStatusListRetrieveResults = useFetchData(['task-status-list-retrieve'], { personIdList: personIdsList }, METHOD.GET);
+  useEffect(() => {
+    if (taskStatusListRetrieveResults) {
+      captureTaskStatusListRetrieveData(taskStatusListRetrieveResults, apiDataCache, dispatch);
+    }
+  }, [apiDataCache, dispatch, personIdsList, taskStatusListRetrieveResults]);
+
+  useEffect(() => {
+    if (allPeopleCache) {
+      const allCachedPeopleList = Object.values(allPeopleCache);
+      setPersonIdsList(allCachedPeopleList.map((person) => person.personId));
+    }
+  }, [allPeopleCache]);
+
+  useEffect(() => {
+    if (allQuestionnairesCache) {
+      setQuestionnaireList(Object.values(allQuestionnairesCache));
+    }
+  }, [allQuestionnairesCache]);
+
+  useEffect(() => {
+    if (allTaskGroupsCache) {
+      setTaskGroupList(Object.values(allTaskGroupsCache));
+    }
+  }, [allTaskGroupsCache]);
 
   const addQuestionnaireClick = () => {
     setAppContextValue('editQuestionnaireDrawerOpen', true);
     setAppContextValue('selectedQuestionnaire', undefined);
+    setAppContextValue('editQuestionnaireDrawerLabel', 'Add Questionnaire');
   };
 
   const editQuestionnaireClick = (questionnaire) => {
     setAppContextValue('editQuestionnaireDrawerOpen', true);
     setAppContextValue('selectedQuestionnaire', questionnaire);
+    setAppContextValue('editQuestionnaireDrawerLabel', 'Edit Questionnaire');
   };
 
   const addTaskGroupClick = () => {
     setAppContextValue('editTaskGroupDrawerOpen', true);
     setAppContextValue('editTaskGroupDrawerTaskGroup', undefined);
+    setAppContextValue('editTaskGroupDrawerLabel', 'Add Task Grouping');
   };
 
   const editTaskGroupClick = (taskGroup) => {
     setAppContextValue('editTaskGroupDrawerOpen', true);
     setAppContextValue('editTaskGroupDrawerTaskGroup', taskGroup);
+    setAppContextValue('editTaskGroupDrawerLabel', 'Edit Task Grouping');
   };
 
   const goToQuestionnairePageClick = (questionnaire) => {
@@ -96,11 +125,11 @@ const SystemSettings = ({ classes }) => {
           <OneQuestionnaireWrapper key={`questionnaire-${questionnaire.questionnaireId}`}>
             <QuestionnaireInnerWrapper>
               {/* {console.log('questionnaireList.map((questionnaire)', questionnaire.questionnaireId)} */}
-              <GoToQuestionairePage onClick={() => goToQuestionnairePageClick(questionnaire)}>
+              <GoToQuestionnairePage onClick={() => goToQuestionnairePageClick(questionnaire)}>
                 <SpanWithLinkStyle>
                   {questionnaire.questionnaireName}
                 </SpanWithLinkStyle>
-              </GoToQuestionairePage>
+              </GoToQuestionnairePage>
               <EditQuestionnaire onClick={() => editQuestionnaireClick(questionnaire)}>
                 <EditStyled />
               </EditQuestionnaire>
@@ -166,14 +195,16 @@ const AddButtonWrapper = styled('div')`
 `;
 
 const EditQuestionnaire = styled('div')`
+  cursor: pointer;
   margin-left: 25px;
 `;
 
 const EditTaskGroup = styled('div')`
+  cursor: pointer;
   margin-left: 25px;
 `;
 
-const GoToQuestionairePage = styled('div')`
+const GoToQuestionnairePage = styled('div')`
 `;
 
 const OneQuestionnaireWrapper = styled('div')`

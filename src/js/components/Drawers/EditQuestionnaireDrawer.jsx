@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
 import EditQuestionnaireDrawerMainContent from '../Questionnaire/EditQuestionnaireDrawerMainContent';
@@ -9,17 +9,13 @@ const EditQuestionnaireDrawer = () => {
   renderLog('EditQuestionnaireDrawer');
   const { getAppContextValue } = useConnectAppContext();
 
-  const selected = getAppContextValue('selectedQuestion');
-  const [headerTitleJsx] = useState(selected ? <>Edit Questionnaire</> : <>Add Questionnaire</>);
-  const [headerFixedJsx] = useState(<></>);
-
   return (
     <DrawerTemplateA
       drawerId="editQuestionnaireDrawer"
       drawerOpenGlobalVariableName="editQuestionnaireDrawerOpen"
+      headerFixedJsx={<></>}
+      headerTitleJsx={<>{getAppContextValue('editQuestionnaireDrawerLabel')}</>}
       mainContentJsx={<EditQuestionnaireDrawerMainContent />}
-      headerTitleJsx={headerTitleJsx}
-      headerFixedJsx={headerFixedJsx}
     />
   );
 };

@@ -10,7 +10,8 @@ import TeamHeader from '../components/Team/TeamHeader';
 import TeamMemberList from '../components/Team/TeamMemberList';
 import webAppConfig from '../config';
 import { useConnectAppContext, useConnectDispatch } from '../contexts/ConnectAppContext';
-import { TeamListRetrieveDataCapture, useGetTeamById } from '../models/TeamModel';
+import capturePersonListRetrieveData from '../models/capturePersonListRetrieveData';
+import { captureTeamListRetrieveData, useGetTeamById } from '../models/TeamModel';
 import { METHOD, useFetchData } from '../react-query/WeConnectQuery';
 import convertToInteger from '../common/utils/convertToInteger';
 
@@ -18,6 +19,7 @@ import convertToInteger from '../common/utils/convertToInteger';
 const TeamHome = ({ classes }) => {
   renderLog('TeamHome');
   const { apiDataCache, setAppContextValue } = useConnectAppContext();
+  const { allPeopleCache, allTeamsCache } = apiDataCache;
   const dispatch = useConnectDispatch();
 
   const params  = useParams();
@@ -32,6 +34,13 @@ const TeamHome = ({ classes }) => {
 
   // const isAddPersonDrawerOpen = document.getElementById('addPersonDrawer');
 
+  const personListRetrieveResults = useFetchData(['person-list-retrieve'], {}, METHOD.GET);
+  useEffect(() => {
+    if (personListRetrieveResults) {
+      capturePersonListRetrieveData(personListRetrieveResults, apiDataCache, dispatch);
+    }
+  }, [personListRetrieveResults, allPeopleCache, dispatch]);
+
   const teamListRetrieveResults = useFetchData(['team-list-retrieve'], {}, METHOD.GET);
   useEffect(() => {
     // console.log('useFetchData team-list-retrieve in TeamHome useEffect:', teamListRetrieveResults);
@@ -39,23 +48,12 @@ const TeamHome = ({ classes }) => {
       setTeamMemberLists(teamListRetrieveResults.data);
       // console.log('In useEffect apiDataCache:', apiDataCache);
       // const changeResults =
-      TeamListRetrieveDataCapture(teamListRetrieveResults, apiDataCache, dispatch);
+      captureTeamListRetrieveData(teamListRetrieveResults, apiDataCache, dispatch);
       // console.log('Teams useEffect changeResults:', changeResults);
     }
-  }, [teamListRetrieveResults]);
-
-  // useEffect(() => {
-  //   // console.log('In useEffect apiDataCache:', apiDataCache);
-  //   const { allTeamsCache } = apiDataCache;
-  //   if (allTeamsCache) {
-  //     const teamListSimple = Object.values(allTeamsCache);
-  //     setTeamList(teamListSimple);
-  //   }
-  // }, [apiDataCache]);
+  }, [teamListRetrieveResults, allPeopleCache, allTeamsCache, dispatch]);
 
   useEffect(() => {
-    // console.log('In useEffect apiDataCache:', apiDataCache);
-    const { allTeamsCache } = apiDataCache;
     // console.log('TeamHome teamId: ', teamId, ', allTeamsCache:', allTeamsCache);
     if (allTeamsCache && teamId && allTeamsCache[teamId]) {
       setTeam(allTeamsCache[teamId]);
