@@ -8,53 +8,60 @@ import makeRequestParams from '../../react-query/makeRequestParams';
 import { useAddPersonToTeamMutation } from '../../react-query/mutations';
 import { SpanWithLinkStyle } from '../Style/linkStyles';
 import AddPersonForm from './AddPersonForm';
-// import { GetTeamListArray } from '../../models/TeamModel';
 
 
 const AddPersonDrawerMainContent = () => {
   renderLog('AddPersonDrawerMainContent');
-  const { getAppContextValue } = useConnectAppContext();
+  const { apiDataCache, getAppContextValue } = useConnectAppContext();
+  const { allPeopleCache } = apiDataCache;
   const { mutate } = useAddPersonToTeamMutation();
 
   // const params  = useParams();
   // console.log('AddPersonDrawerMainContent params: ', params);
 
-  const [allStaffList] = useState(getAppContextValue('allStaffList'));
-  const [remainingStaffToAdd, setRemainingStaffToAdd] = useState(getAppContextValue('allStaffList'));
+  const [allPeopleList, setAllPeopleList] = useState([]);
+  const [remainingPeopleToAdd, setRemainingPeopleToAdd] = useState([]);
   const [searchResultsList, setSearchResultsList] = useState(undefined);
   const [thisTeamsCurrentMembersList] = useState(getAppContextValue('addPersonDrawerTeamMemberList'));
-  // eslint-disable-next-line no-unused-vars
-  const [teamId, setTeamId] = useState(getAppContextValue('teamId'));
-  // eslint-disable-next-line no-unused-vars
-  const [teamName, setTeamName] = useState('');
+  const [team] = useState(getAppContextValue('addPersonDrawerTeam'));
   const [teamMemberPersonIdList] = useState([]);
   const [matchingCountText, setMatchingCountText] = useState('');
-  const [addPersonDrawerOpen] = useState(getAppContextValue('addPersonDrawerOpen'));
 
   const searchStringRef = useRef('');
 
-  const initializeRemainingStaffToAddList = () => {
-    console.log('initializeTheRemainingStaffToAddListList in AddPersonDrawerMainContent');
-    // Start with the passed in allStaffList, create the remainingStaffToAddList, by removing any staff already on the team
-    if (allStaffList && allStaffList.length > 0) {
-      const staffToDisplay = [];
-      allStaffList.forEach((oneStaff) => {
-        const isOnTeam = thisTeamsCurrentMembersList.some((obj) => obj.id === oneStaff.id);
+  const initializeRemainingPeopleToAddList = () => {
+    // console.log('initializeTheRemainingPeopleToAddListList in AddPersonDrawerMainContent');
+    // Start with the passed in allPeopleList, create the remainingPeopleToAddList, by removing any people already on the team
+    if (allPeopleList && allPeopleList.length > 0) {
+      const personToDisplay = [];
+      allPeopleList.forEach((onePeople) => {
+        const isOnTeam = thisTeamsCurrentMembersList.some((obj) => obj.id === onePeople.id);
         if (!isOnTeam) {
-          staffToDisplay.push(oneStaff);
+          personToDisplay.push(onePeople);
         }
       });
-      setRemainingStaffToAdd(staffToDisplay);
+      setRemainingPeopleToAdd(personToDisplay);
     }
   };
 
   useEffect(() => {
-    setRemainingStaffToAdd(allStaffList);  // handles navigate to issues
-    initializeRemainingStaffToAddList();
-  }, [addPersonDrawerOpen]);
+    initializeRemainingPeopleToAddList();
+  }, [apiDataCache]);
+
+  useEffect(() => {
+    initializeRemainingPeopleToAddList();
+  }, [allPeopleList]);
+
+  useEffect(() => {
+    // console.log('useEffect in AddPersonDrawerMainContent allPeopleCache:', allPeopleCache);
+    if (allPeopleCache) {
+      setAllPeopleList(Object.values(allPeopleCache));
+      setRemainingPeopleToAdd(Object.values(allPeopleCache));  // handles navigate to issues
+    }
+  }, []);
 
   const setMatchingCounter = (matchingElements) => {
-    const matchingCount = matchingElements.length === 0 ? '' : `${matchingElements.length} matches out of ${remainingStaffToAdd.length} staff members`;
+    const matchingCount = matchingElements.length === 0 ? '' : `${matchingElements.length} matches out of ${remainingPeopleToAdd.length} people`;
     setMatchingCountText(matchingCount);
   };
 
@@ -66,7 +73,7 @@ const AddPersonDrawerMainContent = () => {
     } else {
       const isMatch = (element) => (element.lastName.toLowerCase().includes(currentValue.toLowerCase()) ||
           element.firstName.toLowerCase().includes(currentValue.toLowerCase()));
-      const matchingElements = remainingStaffToAdd ? remainingStaffToAdd.filter((element) => isMatch(element)) : {};
+      const matchingElements = remainingPeopleToAdd ? remainingPeopleToAdd.filter((element) => isMatch(element)) : {};
       if (matchingElements && matchingElements.length) {
         setSearchResultsList(matchingElements);
         setMatchingCounter(matchingElements);
@@ -80,26 +87,26 @@ const AddPersonDrawerMainContent = () => {
   const addClicked = (person) => {
     const plainParams = {
       personId: person.id,
-      teamId,
+      teamId: team.teamId,
       teamMemberFirstName: person.firstName,
       teamMemberLastName: person.lastName,
-      teamName,
+      teamName: team.teamName,
     };
     mutate(makeRequestParams(plainParams, {}));
-    // Remove this staff from the All Staff less Adds list (since they were added to the team)
-    const updatedRemainingStaffToAdd = remainingStaffToAdd.filter((staff) => staff.id !== person.id);
-    setRemainingStaffToAdd(updatedRemainingStaffToAdd);
+    // Remove this person from the All People less Adds list (since they were added to the team)
+    const updatedRemainingPeopleToAdd = remainingPeopleToAdd.filter((person) => person.id !== person.id);
+    setRemainingPeopleToAdd(updatedRemainingPeopleToAdd);
     if (searchResultsList && searchResultsList.length) {
       // also remove them from the searchResultsList if it exists
-      const updatedSearchResultsList = searchResultsList.filter((staff) => staff.id !== person.id);
+      const updatedSearchResultsList = searchResultsList.filter((person) => person.id !== person.id);
       setSearchResultsList(updatedSearchResultsList);
       setMatchingCounter(updatedSearchResultsList);
     }
   };
 
   // TODO: Need to deal with preferred name searching and display, very possible but it will get more complicated
-  let displayList = searchResultsList || remainingStaffToAdd || [];
-  displayList = displayList.filter((staff) => staff.firstName.length || staff.lastName.length);
+  let displayList = searchResultsList || remainingPeopleToAdd || [];
+  displayList = displayList.filter((person) => person.firstName.length || person.lastName.length);
 
   return (
     <AddPersonDrawerMainContentWrapper>

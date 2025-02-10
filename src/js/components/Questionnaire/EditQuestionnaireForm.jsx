@@ -73,7 +73,7 @@ const EditQuestionnaireForm = ({ classes }) => {
           margin="dense"
           name="questionnaireName"
           onChange={() => updateSaveButton()}
-          placeholder="Name of the questionnaire, staff only"
+          placeholder="Name of the questionnaire, hr staff only"
           variant="outlined"
         />
         <TextField

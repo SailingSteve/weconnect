@@ -70,10 +70,7 @@ const EditTaskDefinitionForm = ({ classes }) => {
   };
 
   const updateSaveButton = () => {
-    if (taskNameFldRef.current.value && taskNameFldRef.current.value.length &&
-      taskDescFldRef.current.value && taskDescFldRef.current.value.length &&
-      taskInstFldRef.current.value && taskInstFldRef.current.value.length &&
-      taskUrlFldRef.current.value && taskUrlFldRef.current.value.length) {
+    if (taskNameFldRef.current.value && taskNameFldRef.current.value.length) {
       if (!saveButtonActive) {
         setSaveButtonActive(true);
       }

@@ -28,7 +28,7 @@ const TeamHome = ({ classes }) => {
   const [teamId] = useState(convertToInteger(params.teamId));
 
   // const updateTeam = (tList) => {
-  //   const oneTeam = tList.find((staff) => staff.teamId === parseInt(teamId));
+  //   const oneTeam = tList.find((person) => person.teamId === parseInt(teamId));
   //   setTeam(oneTeam);
   // };
 
@@ -51,20 +51,19 @@ const TeamHome = ({ classes }) => {
       captureTeamListRetrieveData(teamListRetrieveResults, apiDataCache, dispatch);
       // console.log('Teams useEffect changeResults:', changeResults);
     }
-  }, [teamListRetrieveResults, allPeopleCache, allTeamsCache, dispatch]);
+  }, [teamListRetrieveResults, allTeamsCache, dispatch]);
 
   useEffect(() => {
     // console.log('TeamHome teamId: ', teamId, ', allTeamsCache:', allTeamsCache);
     if (allTeamsCache && teamId && allTeamsCache[teamId]) {
       setTeam(allTeamsCache[teamId]);
     }
-  }, [apiDataCache, teamId]);
+  }, [allTeamsCache, teamId]);
 
   const addTeamMemberClick = () => {
     // console.log('TeamHome addTeamMemberClick, teamId:', teamId);
     setAppContextValue('addPersonDrawerOpen', true);
     setAppContextValue('addPersonDrawerTeam', team);
-    setAppContextValue('teamId', team.id);
     const teamWithEmbeddedMemberList = (teamMemberLists && teamMemberLists.teamList.filter((list) => list.id === team.id)[0]) || [];
     setAppContextValue('addPersonDrawerTeamMemberList', teamWithEmbeddedMemberList && teamWithEmbeddedMemberList.teamMemberList);
   };

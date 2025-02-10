@@ -12,7 +12,9 @@ import TaskListForPerson from '../components/Task/TaskListForPerson';
 import webAppConfig from '../config';
 import { useConnectAppContext, useConnectDispatch } from '../contexts/ConnectAppContext';
 import capturePersonListRetrieveData from '../models/capturePersonListRetrieveData';
-import { captureTaskStatusListRetrieveData } from '../models/TaskModel';
+import {
+  captureTaskDefinitionListRetrieveData, captureTaskGroupListRetrieveData, captureTaskStatusListRetrieveData,
+} from '../models/TaskModel';
 import { captureTeamListRetrieveData } from '../models/TeamModel';
 import { METHOD, useFetchData } from '../react-query/WeConnectQuery';
 
@@ -36,6 +38,20 @@ const Tasks = ({ classes, match }) => {
       capturePersonListRetrieveData(personListRetrieveResults, apiDataCache, dispatch);
     }
   }, [personListRetrieveResults, allPeopleCache, dispatch]);
+
+  const taskDefinitionListRetrieveResults = useFetchData(['task-definition-list-retrieve'], {}, METHOD.GET);
+  useEffect(() => {
+    if (taskDefinitionListRetrieveResults) {
+      captureTaskDefinitionListRetrieveData(taskDefinitionListRetrieveResults, apiDataCache, dispatch);
+    }
+  }, [apiDataCache, dispatch, taskDefinitionListRetrieveResults]);
+
+  const taskGroupListRetrieveResults = useFetchData(['task-group-list-retrieve'], {}, METHOD.GET);
+  useEffect(() => {
+    if (taskGroupListRetrieveResults) {
+      captureTaskGroupListRetrieveData(taskGroupListRetrieveResults, apiDataCache, dispatch);
+    }
+  }, [apiDataCache, dispatch, taskGroupListRetrieveResults]);
 
   const taskStatusListRetrieveResults = useFetchData(['task-status-list-retrieve'], { personIdList: personIdsList }, METHOD.GET);
   useEffect(() => {

@@ -4,9 +4,9 @@ import { useConnectAppContext } from '../contexts/ConnectAppContext';
 // When the function name starts with 'use' React treats it as a custom hook, and it can then access Context variables
 const useGetFullNamePreferredReactQuery = (person) => {
   const { getAppContextValue } = useConnectAppContext();
-  const [allStaffList] = useState(getAppContextValue('allStaffList'));
+  const [allPeopleList] = useState(getAppContextValue('allPeopleList'));
   const [personId] = Object.values(person);  // This is silly, but this is a proof of concept
-  const foundPerson = allStaffList && allStaffList.find((onePerson) => onePerson.id === parseInt(personId));
+  const foundPerson = allPeopleList && allPeopleList.find((onePerson) => onePerson.id === parseInt(personId));
   let fullName = '';
   if (foundPerson?.id >= 0) {
     if (foundPerson?.firstNamePreferred) {

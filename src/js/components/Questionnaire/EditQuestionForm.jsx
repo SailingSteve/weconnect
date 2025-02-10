@@ -104,7 +104,7 @@ const EditQuestionForm = ({ classes }) => {
     };
     const requestParams = makeRequestParams(plainParams, params);
     mutate(requestParams);
-    console.log('saveQuestionnaire requestParams:', requestParams);
+    // console.log('saveQuestionnaire requestParams:', requestParams);
     setSaveButtonActive(false);
     setAppContextValue('editQuestionDrawerOpen', false);
     setAppContextValue('selectedQuestion', undefined);
