@@ -11,8 +11,9 @@ import { PageContentContainer } from '../components/Style/pageLayoutStyles';
 import TaskListForPerson from '../components/Task/TaskListForPerson';
 import webAppConfig from '../config';
 import { useConnectAppContext, useConnectDispatch } from '../contexts/ConnectAppContext';
-import { TaskStatusListRetrieveDataCapture } from '../models/TaskModel';
-import { TeamListRetrieveDataCapture } from '../models/TeamModel';
+import capturePersonListRetrieveData from '../models/capturePersonListRetrieveData';
+import { captureTaskStatusListRetrieveData } from '../models/TaskModel';
+import { captureTeamListRetrieveData } from '../models/TeamModel';
 import { METHOD, useFetchData } from '../react-query/WeConnectQuery';
 
 
@@ -23,36 +24,30 @@ const Tasks = ({ classes, match }) => {
   const { allPeopleCache, allTaskDefinitionsCache, allTasksCache } = apiDataCache;
   const dispatch = useConnectDispatch();
 
+  const [personIdsList, setPersonIdsList] = useState([]);
+  const [selectedPersonList, setSelectedPersonList] = useState([]);
   const [showCompletedTasks, setShowCompletedTasks] = useState(false);
   const [taskListByPersonId, setTaskListByPersonId] = useState({});
   const [taskDefinitionList, setTaskDefinitionList] = useState([]);
-  const [selectedPersonList, setSelectedPersonList] = useState([]);
-  const [personIdsList, setPersonIdsList] = useState([]);
+
+  const personListRetrieveResults = useFetchData(['person-list-retrieve'], {}, METHOD.GET);
+  useEffect(() => {
+    if (personListRetrieveResults) {
+      capturePersonListRetrieveData(personListRetrieveResults, apiDataCache, dispatch);
+    }
+  }, [personListRetrieveResults, allPeopleCache, dispatch]);
 
   const taskStatusListRetrieveResults = useFetchData(['task-status-list-retrieve'], { personIdList: personIdsList }, METHOD.GET);
   useEffect(() => {
     if (taskStatusListRetrieveResults) {
-      // const changeResults =
-      TaskStatusListRetrieveDataCapture(taskStatusListRetrieveResults, apiDataCache, dispatch);
-      // console.log('Tasks useEffect changeResults:', changeResults);
+      captureTaskStatusListRetrieveData(taskStatusListRetrieveResults, apiDataCache, dispatch);
     }
   }, [personIdsList, taskStatusListRetrieveResults]);
 
-  useEffect(() => {
-    // console.log('Tasks useEffect allTaskDefinitionsCache:', allTaskDefinitionsCache);
-    if (allTaskDefinitionsCache) {
-      setTaskDefinitionList(Object.values(allTaskDefinitionsCache));
-    }
-  }, [allTaskDefinitionsCache]);
-
   const teamListRetrieveResults = useFetchData(['team-list-retrieve'], {}, METHOD.GET);
   useEffect(() => {
-    // console.log('useFetchData team-list-retrieve in Teams useEffect:', teamListRetrieveResults);
     if (teamListRetrieveResults) {
-      // console.log('In useEffect apiDataCache:', apiDataCache);
-      // const changeResults =
-      TeamListRetrieveDataCapture(teamListRetrieveResults, apiDataCache, dispatch);
-      // console.log('Teams useEffect changeResults:', changeResults);
+      captureTeamListRetrieveData(teamListRetrieveResults, apiDataCache, dispatch);
     }
   }, [teamListRetrieveResults]);
 
@@ -64,6 +59,13 @@ const Tasks = ({ classes, match }) => {
       setSelectedPersonList(allCachedPeopleList);
     }
   }, [allPeopleCache]);
+
+  useEffect(() => {
+    // console.log('Tasks useEffect allTaskDefinitionsCache:', allTaskDefinitionsCache);
+    if (allTaskDefinitionsCache) {
+      setTaskDefinitionList(Object.values(allTaskDefinitionsCache));
+    }
+  }, [allTaskDefinitionsCache]);
 
   useEffect(() => {
     const taskListByPersonIdTemp = {};

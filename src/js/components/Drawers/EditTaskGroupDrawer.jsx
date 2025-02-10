@@ -9,25 +9,13 @@ const EditTaskGroupDrawer = () => {
   renderLog('EditTaskGroupDrawer');  // Set LOG_RENDER_EVENTS to log all renders
   const { getAppContextValue } = useConnectAppContext();
 
-  const [headerTitleJsx, setHeaderTitleJsx] = useState(<></>);
-  const [headerFixedJsx] = useState(<></>);
-
-  useEffect(() => {
-    const taskGroup = getAppContextValue('editTaskGroupDrawerTaskGroup');
-    if (taskGroup) {
-      setHeaderTitleJsx(<>Add Task Grouping</>);
-    } else {
-      setHeaderTitleJsx(<>Edit Task Grouping</>);
-    }
-  }, []);
-
   return (
     <DrawerTemplateA
       drawerId="editTaskGroupDrawer"
       drawerOpenGlobalVariableName="editTaskGroupDrawerOpen"
+      headerFixedJsx={<></>}
+      headerTitleJsx={<>{getAppContextValue('editTaskGroupDrawerLabel')}</>}
       mainContentJsx={<EditTaskGroupDrawerMainContent />}
-      headerTitleJsx={headerTitleJsx}
-      headerFixedJsx={headerFixedJsx}
     />
   );
 };

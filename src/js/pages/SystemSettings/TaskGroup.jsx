@@ -11,41 +11,63 @@ import { EditStyled } from '../../components/Style/iconStyles';
 import { SpanWithLinkStyle } from '../../components/Style/linkStyles';
 import { PageContentContainer } from '../../components/Style/pageLayoutStyles';
 import webAppConfig from '../../config';
-import { useConnectAppContext } from '../../contexts/ConnectAppContext';
+import { useConnectAppContext, useConnectDispatch } from '../../contexts/ConnectAppContext';
 import { METHOD, useFetchData } from '../../react-query/WeConnectQuery';
+import capturePersonListRetrieveData from '../../models/capturePersonListRetrieveData';
+import { captureTaskStatusListRetrieveData } from '../../models/TaskModel';
 
 
-// eslint-disable-next-line no-unused-vars
-const TaskGroup = ({ classes, match }) => {
+const TaskGroup = ({ classes }) => {
   renderLog('TaskGroup');
+  const { apiDataCache } = useConnectAppContext();
+  const { allPeopleCache, allTaskDefinitionsCache, allTaskGroupsCache } = apiDataCache;
+  const dispatch = useConnectDispatch();
+
   const { setAppContextValue } = useConnectAppContext();
 
   const location = useLocation();
+  const [personIdsList, setPersonIdsList] = useState([]);
   const [taskGroupId] = useState(parseInt(useParams().taskGroupId));
-  // const [taskGroupFromContext] = useState(getAppContextValue('editTaskGroupDrawerTaskGroup'));
   const [taskGroupName] = useState(location.state.taskGroupName);
   const [taskGroup, setTaskGroup] = useState(undefined);
-
   const [taskDefinitionList, setTaskDefinitionList] = useState(undefined);
 
-  const { data: dataTSL, isSuccess: isSuccessTSL, isFetching: isFetchingTSL } = useFetchData(['task-status-list-retrieve'], {}, METHOD.GET);
+  const personListRetrieveResults = useFetchData(['person-list-retrieve'], {}, METHOD.GET);
   useEffect(() => {
-    if (isSuccessTSL) {
-      console.log('useFetchData in TeamHome (task-group-retrieve) useEffect data good:', dataTSL);
-      // We don't need this list for this object, but extracting as an example for other objects
-      // setTaskGroupList(dataTSL ? dataTSL.taskGroupList : {});
-      setTaskDefinitionList(dataTSL ? dataTSL.taskDefinitionList : undefined);
-      // We don't need this list for this object, but extracting as an example for other objects
-      // setTaskList(dataTSL ? dataTSL.taskList : []);
-      const oneGroup = dataTSL.taskGroupList.find((group) => parseInt(group.taskGroupId) === parseInt(taskGroupId));
-      setTaskGroup(oneGroup);
+    if (personListRetrieveResults) {
+      capturePersonListRetrieveData(personListRetrieveResults, apiDataCache, dispatch);
     }
-  }, [dataTSL, isSuccessTSL, isFetchingTSL]);
+  }, [personListRetrieveResults, allPeopleCache, dispatch]);
 
+  const taskStatusListRetrieveResults = useFetchData(['task-status-list-retrieve'], { personIdList: personIdsList }, METHOD.GET);
+  useEffect(() => {
+    if (taskStatusListRetrieveResults) {
+      captureTaskStatusListRetrieveData(taskStatusListRetrieveResults, apiDataCache, dispatch);
+    }
+  }, [personIdsList, taskStatusListRetrieveResults]);
+
+  useEffect(() => {
+    if (allPeopleCache) {
+      const allCachedPeopleList = Object.values(allPeopleCache);
+      setPersonIdsList(allCachedPeopleList.map((person) => person.personId));
+    }
+  }, [allPeopleCache]);
+
+  useEffect(() => {
+    if (allTaskDefinitionsCache) {
+      setTaskDefinitionList(Object.values(allTaskDefinitionsCache));
+    }
+  }, [allTaskDefinitionsCache]);
+
+  useEffect(() => {
+    if (allTaskGroupsCache && allTaskGroupsCache[taskGroupId]) {
+      setTaskGroup(allTaskGroupsCache[taskGroupId]);
+    }
+  }, [allTaskGroupsCache]);
 
   const addTaskDefinitionClick = () => {
     setAppContextValue('editTaskDefinitionDrawerOpen', true);
-    setAppContextValue('editTaskDefinitionDrawerTaskDefinitionId', -1);
+    setAppContextValue('editTaskDefinitionDrawerTaskDefinition', undefined);
     setAppContextValue('editTaskDefinitionDrawerTaskGroup', taskGroup);
     setAppContextValue('editTaskDefinitionDrawerLabel', 'Add Task');
   };
@@ -58,10 +80,9 @@ const TaskGroup = ({ classes, match }) => {
   };
 
   const editTaskGroupClick = () => {
-    // const { params } = match;
-    // const taskGroupIdTemp = convertToInteger(params.taskGroupId);
-    // AppObservableStore.setGlobalVariableState('editTaskGroupDrawerOpen', true);
-    // AppObservableStore.setGlobalVariableState('editTaskGroupDrawerTaskGroupId', taskGroupIdTemp);
+    setAppContextValue('editTaskGroupDrawerOpen', true);
+    setAppContextValue('editTaskGroupDrawerTaskGroup', taskGroup);
+    setAppContextValue('editTaskGroupDrawerLabel', 'Edit Task Group');
   };
 
   return (
@@ -75,7 +96,7 @@ const TaskGroup = ({ classes, match }) => {
         <link rel="canonical" href={`${webAppConfig.WECONNECT_URL_FOR_SEO}/task-group/${taskGroupId}`} />
       </Helmet>
       <PageContentContainer>
-        <TaskGroupTitleWrapper>
+        <TaskGroupBreadcrumbWrapper>
           <Link to="/system-settings">Task Groups</Link>
           {' '}
           &gt;
@@ -84,7 +105,7 @@ const TaskGroup = ({ classes, match }) => {
           <SpanWithLinkStyle onClick={editTaskGroupClick}>
             <EditStyled />
           </SpanWithLinkStyle>
-        </TaskGroupTitleWrapper>
+        </TaskGroupBreadcrumbWrapper>
         {taskGroup && taskGroup.taskGroupDescription && (
           <InstructionsWrapper>
             {taskGroup.taskGroupDescription}
@@ -117,7 +138,6 @@ const TaskGroup = ({ classes, match }) => {
 };
 TaskGroup.propTypes = {
   classes: PropTypes.object.isRequired,
-  match: PropTypes.object,
 };
 
 const styles = (theme) => ({
@@ -132,7 +152,7 @@ const styles = (theme) => ({
   },
 });
 
-const TaskGroupTitleWrapper = styled('div')`
+const TaskGroupBreadcrumbWrapper = styled('div')`
   height: 100px;
   align-content: center;
 `;

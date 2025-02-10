@@ -40,12 +40,12 @@ export const useGetTeamMembersListByTeamId = (teamId) => {
 
 // This is called following:
 // const teamListRetrieveResults = useFetchData(['team-list-retrieve'], {});
-export function TeamListRetrieveDataCapture (
+export function captureTeamListRetrieveData (
   incomingRetrieveResults = {},
   apiDataCache = {},
   dispatch,
 ) {
-  // console.log('||||||| TeamListRetrieveDataCapture should be called after useFetchData([\'team-list-retrieve\'], {})')
+  // console.log('||||||| captureTeamListRetrieveData should be called after useFetchData([\'team-list-retrieve\'], {})')
   const { data, isSuccess } = incomingRetrieveResults;
   const allTeamMembersCache = apiDataCache.allTeamMembersCache || {};
   const allTeamsCache = apiDataCache.allTeamsCache || {};

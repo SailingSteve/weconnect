@@ -8,18 +8,13 @@ const EditQuestionDrawer = () => {
   renderLog('EditQuestionDrawer');
   const { getAppContextValue } = useConnectAppContext();
 
-  const question = getAppContextValue('selectedQuestion');
-  const markup = question && question.id >= 0 ? <>Edit Question</> : <>Add Question</>;
-  const [headerTitleJsx] = useState(markup);
-  const [headerFixedJsx] = useState(<></>);
-
   return (
     <DrawerTemplateA
       drawerId="editQuestionDrawer"
       drawerOpenGlobalVariableName="editQuestionDrawerOpen"
+      headerFixedJsx={<></>}
+      headerTitleJsx={<>{getAppContextValue('editQuestionDrawerLabel')}</>}
       mainContentJsx={<EditQuestionDrawerMainContent />}
-      headerTitleJsx={headerTitleJsx}
-      headerFixedJsx={headerFixedJsx}
     />
   );
 };

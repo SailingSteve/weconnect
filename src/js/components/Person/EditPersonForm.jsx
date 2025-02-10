@@ -78,7 +78,7 @@ const EditPersonForm = ({ classes }) => {
           defaultValue={activePerson.firstNamePreferred || ''}
           id="firstNamePreferredToBeSaved"
           inputRef={firstNamePreferred}
-          label="Preferred FIRST Name (if different from legal)"
+          label="First (Preferred) if different from legal"
           margin="dense"
           name="firstNamePreferred"
           onChange={() => setSaveButtonActive(true)}

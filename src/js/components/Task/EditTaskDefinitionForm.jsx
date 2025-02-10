@@ -21,10 +21,10 @@ import { useTaskDefinitionSaveMutation } from '../../react-query/mutations';
 
 const EditTaskDefinitionForm = ({ classes }) => {
   renderLog('EditTaskDefinitionForm');  // Set LOG_RENDER_EVENTS to log all renders
-  const { getAppContextValue } = useConnectAppContext();
+  const { getAppContextValue, setAppContextValue } = useConnectAppContext();
   const { mutate } = useTaskDefinitionSaveMutation();
 
-  const [group] = useState(getAppContextValue('editTaskDefinitionDrawerTaskGroup'));
+  const [taskGroup] = useState(getAppContextValue('editTaskDefinitionDrawerTaskGroup'));
   const [taskDefinition] = useState(getAppContextValue('editTaskDefinitionDrawerTaskDefinition'));
   const [taskNameValue, setTaskNameValue] = useState('');
   const [taskDescValue, setTaskDescValue] = useState('');
@@ -54,7 +54,7 @@ const EditTaskDefinitionForm = ({ classes }) => {
   const saveTaskDefinition = () => {
     const requestParams = makeRequestParams({
       taskDefinitionId: taskDefinition ? taskDefinition.id : '-1',
-      taskGroupId: group.taskGroupId,
+      taskGroupId: taskGroup.taskGroupId,
     }, {
       taskName: taskNameFldRef.current.value,
       taskDescription: taskDescFldRef.current.value,
@@ -63,6 +63,10 @@ const EditTaskDefinitionForm = ({ classes }) => {
     });
     mutate(requestParams);
     setSaveButtonActive(false);
+    setAppContextValue('editTaskDefinitionDrawerOpen', false);
+    setAppContextValue('editTaskDefinitionDrawerTaskDefinition', undefined);
+    setAppContextValue('editTaskDefinitionDrawerTaskGroup', undefined);
+    setAppContextValue('editTaskDefinitionDrawerLabel', '');
   };
 
   const updateSaveButton = () => {

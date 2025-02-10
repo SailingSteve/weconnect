@@ -36,28 +36,28 @@ const TeamHeader = ({ classes, showHeaderLabels, showIcons, team }) => {
   return (
     <OneTeamHeader>
       {/* Width (below) of this TeamHeaderCell comes from the combined widths of the first x columns in TeamMemberList */}
-      <TeamHeaderCell $largeFont $titleCell width={215}>
+      <TeamHeaderCell cellwidth={215} largefont="true" titlecell="true">
         {teamLocal && (
           <Link to={`/team-home/${teamLocal.id}`}>
             {teamLocal.teamName}
           </Link>
         )}
       </TeamHeaderCell>
-      <TeamHeaderCell width={300}>
+      <TeamHeaderCell cellwidth={300}>
         {showHeaderLabels ? 'Location' : ''}
       </TeamHeaderCell>
-      <TeamHeaderCell width={225}>
+      <TeamHeaderCell cellwidth={225}>
         {showHeaderLabels ? 'Title / Volunteering Love' : ''}
       </TeamHeaderCell>
       {/* Edit icon */}
       {showIcons && (
-        <TeamHeaderCell width={20} onClick={editTeamClick}>
+        <TeamHeaderCell cellwidth={20} onClick={editTeamClick}>
           <EditStyled />
         </TeamHeaderCell>
       )}
       {/* Delete icon */}
       {showIcons && (
-        <TeamHeaderCell width={20} onClick={removeTeamClick}>
+        <TeamHeaderCell cellwidth={20} onClick={removeTeamClick}>
           <DeleteStyled />
         </TeamHeaderCell>
       )}
@@ -91,18 +91,18 @@ const OneTeamHeader = styled('div')`
 `;
 
 const TeamHeaderCell = styled('div', {
-  shouldForwardProp: (prop) => !['largeFont', 'titleCell', 'width'].includes(prop),
-})(({ largeFont, titleCell, width }) => (`
+  shouldForwardProp: (prop) => !['largefont', 'titlecell', 'cellwidth'].includes(prop),
+})(({ largefont, titlecell, cellwidth }) => (`
   align-content: center;
-  ${(titleCell) ? '' : 'border-bottom: 1px solid #ccc;'}
-  ${(largeFont) ? 'font-size: 1.1em;' : 'font-size: .8em;'};
-  ${(titleCell) ? '' : 'font-weight: 550;'}
+  ${(titlecell) ? '' : 'border-bottom: 1px solid #ccc;'}
+  ${(largefont) ? 'font-size: 1.1em;' : 'font-size: .8em;'}
+  ${(titlecell) ? '' : 'font-weight: 550;'}
   height: 22px;
-  ${width ? `max-width: ${width}px;` : ''};
-  ${width ? `min-width: ${width}px;` : ''};
+  ${cellwidth ? `max-width: ${cellwidth}px;` : ''}
+  ${cellwidth ? `min-width: ${cellwidth}px;` : ''}
   overflow: hidden;
   white-space: nowrap;
-  ${width ? `width: ${width}px;` : ''};
+  ${cellwidth ? `width: ${cellwidth}px;` : ''}
 `));
 
 export default withStyles(styles)(TeamHeader);

@@ -11,12 +11,12 @@ const METHOD = {
 // https://refine.dev/blog/react-query-guide/#performing-basic-data-fetching
 // Define a default query function that will receive the query key
 const weConnectQueryFn = async (queryKey, params, isGet) => {
-  console.log('weConnectQueryFn : ', queryKey, params, isGet);
+  // console.log('weConnectQueryFn : ', queryKey, params, isGet);
   const url = new URL(`${queryKey}/`, webAppConfig.STAFF_API_SERVER_API_ROOT_URL);
   if (isGet) {
     url.search = new URLSearchParams(params);
   }
-  console.log(`weConnectQueryFn ${isGet ? 'GET' : 'POST'} url.href: ${url.href}`);
+  // console.log(`weConnectQueryFn ${isGet ? 'GET' : 'POST'} url.href: ${url.href}`);
 
   const response = isGet ? await axios.get(url.href) : await axios.post(url.href, params);
   // console.log('weConnectQueryFn  response.data: ', JSON.stringify(response.data));
