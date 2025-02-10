@@ -89,8 +89,8 @@ export const ConnectAppContextProvider = ({ children }) => {
   //   // console.log('useFetchData in TeamHome (person-list-retrieve) useEffect:', dataP, isSuccessP, isFetchingP, isStaleP);
   //   if (isSuccessP) {
   //     // console.log('useFetchData in TeamHome (person-list-retrieve)useEffect data good:', dataP, isSuccessP, isFetchingP, isStaleP);
-  //     setAppContextValue('allStaffList', dataP ? dataP.personList : []);
-  //     // console.log('ConnectAppContext useEffect allStaffList fetched');
+  //     setAppContextValue('allPeopleList', dataP ? dataP.personList : []);
+  //     // console.log('ConnectAppContext useEffect allPeopleList fetched');
   //   }
   // }, [dataP, isSuccessP, isFetchingP]);
 

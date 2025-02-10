@@ -3,7 +3,7 @@ import { withStyles } from '@mui/styles';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link, useLocation } from 'react-router';
+import { Link, useParams } from 'react-router';
 import styled from 'styled-components';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import { renderLog } from '../../common/utils/logging';
@@ -22,19 +22,18 @@ const Questionnaire = ({ classes }) => {
   const { apiDataCache } = useConnectAppContext();
   const { allQuestionsCache, allQuestionnairesCache } = apiDataCache;
   const dispatch = useConnectDispatch();
-  const { pathname } = useLocation();
-  const pathSegments = pathname.split('/').filter(Boolean);
-  const targetQuestionnaireId = parseInt(pathSegments[1], 10); // Assuming the questionnaireId is the second segment of the path
-  const getQuestionsForQuestionnaire = (questionnaireId) => {
+
+  const [questionList, setQuestionList] = useState([]);
+  const [questionnaire, setQuestionnaire] = useState(getAppContextValue('selectedQuestionnaire'));
+
+  const targetQuestionnaireId = parseInt(useParams().questionnaireId, 10);
+  const getQuestionsForQuestionnaire = (incomingQuestionnaireId) => {
     if (allQuestionsCache) {
-      return Object.values(allQuestionsCache).filter((question) => question.questionnaireId === questionnaireId);
+      return Object.values(allQuestionsCache).filter((question) => question.questionnaireId === incomingQuestionnaireId);
     }
     return [];
   };
   const questionsForCurrentQuestionnaire = getQuestionsForQuestionnaire(targetQuestionnaireId) || [];
-
-  const [questionList, setQuestionList] = useState([]);
-  const [questionnaire, setQuestionnaire] = useState(getAppContextValue('selectedQuestionnaire'));
 
   const questionnaireListRetrieveResults = useFetchData(['questionnaire-list-retrieve'], {}, METHOD.GET);
   useEffect(() => {
@@ -55,9 +54,8 @@ const Questionnaire = ({ classes }) => {
   useEffect(() => {
     // console.log('Questionnaire useEffect setQuestionnaire targetQuestionnaireId:', targetQuestionnaireId);
     if (allQuestionnairesCache) {
-      const questionnaireIdTemp = pathSegments[1];
-      if (questionnaireIdTemp && allQuestionnairesCache[questionnaireIdTemp]) {
-        setQuestionnaire(allQuestionnairesCache[questionnaireIdTemp]);
+      if (targetQuestionnaireId && allQuestionnairesCache[targetQuestionnaireId]) {
+        setQuestionnaire(allQuestionnairesCache[targetQuestionnaireId]);
       }
     }
   }, [allQuestionnairesCache]);
@@ -132,7 +130,7 @@ const Questionnaire = ({ classes }) => {
           <QuestionListWrapper>
             {questionList.map((question) => (
               <OneQuestionnaireWrapper key={`questionnaire-${question.id}`}>
-                Question: {question.questionText}
+                {question.questionText}
                 {' '}
                 {question.requireAnswer && (
                   <RequiredStar> *</RequiredStar>

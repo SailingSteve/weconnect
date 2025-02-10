@@ -33,11 +33,9 @@ const TeamMemberList = ({ teamId, team }) => { // teamMemberList
   }, [dataTLR, isSuccessTLR]);
 
   useEffect(() => {
-    // console.log(`TeamMemberList useEffect teamId: ${teamId} apiDataCache:`, apiDataCache);
     const updatedTeamMemberList = getTeamMembersListByTeamId(teamId, apiDataCache);
-    // console.log(`TeamMemberList useEffect teamId: ${teamId} updatedTeamMemberList:`, updatedTeamMemberList);
     setTeamMemberListApiDataCache(updatedTeamMemberList);
-  }, [allPeopleCache, allTeamsCache, teamId]);
+  }, [apiDataCache, teamId]);
 
   // const oneTeam = teamList.find((tm) => tm.teamId === parseInt(teamId));
 
