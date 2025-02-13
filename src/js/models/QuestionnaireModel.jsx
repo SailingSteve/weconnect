@@ -61,88 +61,87 @@ export function captureQuestionnaireListRetrieveData (
 }
 
 // This is called after making this fetchData request:
-// const questionnaireResponsesListRetrieveResults = useFetchData(['questionnaire-responses-list-retrieve'], {});
-export function captureQuestionnaireResponsesListRetrieveData (
+// const answerListRetrieveData = useFetchData(['questionnaire-responses-list-retrieve'], {}); // ...with params for questionnaireId and personId
+export function captureAnswerListRetrieveData ( // Was captureQuestionnaireResponsesListRetrieveData
   incomingRetrieveResults = {},
   apiDataCache = {},
   dispatch,
 ) {
   const { data, isSuccess } = incomingRetrieveResults;
-  // allTaskDefinitionsCache -> allQuestionnairesCache
-  const allQuestionnairesCache = apiDataCache.allQuestionnairesCache || {};
-  // allTaskGroupsCache -> allQuestionsCache
-  const allQuestionsCache = apiDataCache.allQuestionsCache || {};
-  // allTasksCache -> allAnswersCache
+  // const allQuestionnairesCache = apiDataCache.allQuestionnairesCache || {};
+  // const allQuestionsCache = apiDataCache.allQuestionsCache || {};
   const allAnswersCache = apiDataCache.allAnswersCache || {};
   const changeResults = {
-    allQuestionnairesCache,
-    allQuestionnairesCacheChanged: false,
-    allQuestionsCache,
-    allQuestionsCacheChanged: false,
+    // allQuestionnairesCache,
+    // allQuestionnairesCacheChanged: false,
+    // allQuestionsCache,
+    // allQuestionsCacheChanged: false,
     allAnswersCache,
     allAnswersCacheChanged: false,
   };
-  const allQuestionnairesCacheNew = { ...allQuestionnairesCache };
-  const allQuestionsCacheNew = { ...allQuestionsCache };
+  // const allQuestionnairesCacheNew = { ...allQuestionnairesCache };
+  // const allQuestionsCacheNew = { ...allQuestionsCache };
   const allAnswersCacheNew = { ...allAnswersCache };
-  let newQuestionnaireListDataReceived = false;
-  if (data && data.questionnaireList && isSuccess === true) {
-    data.questionnaireList.forEach((questionnaire) => {
-      if (questionnaire && questionnaire.questionnaireId && questionnaire.questionnaireId >= 0) {
-        if (!allQuestionnairesCacheNew[questionnaire.questionnaireId]) {
-          allQuestionnairesCacheNew[questionnaire.questionnaireId] = questionnaire;
-          newQuestionnaireListDataReceived = true;
-        } else if (!isEqual(questionnaire, allQuestionnairesCacheNew[questionnaire.questionnaireId])) {
-          allQuestionnairesCacheNew[questionnaire.questionnaireId] = questionnaire;
-          newQuestionnaireListDataReceived = true;
-        }
-      }
-    });
-  }
-  let newQuestionListDataReceived = false;
-  if (data && data.questionList && isSuccess === true) {
-    data.questionList.forEach((question) => {
-      if (question && question.questionId && question.questionId >= 0) {
-        if (!allQuestionsCacheNew[question.questionId]) {
-          allQuestionsCacheNew[question.questionId] = question;
-          newQuestionListDataReceived = true;
-        } else if (!isEqual(question, allQuestionsCacheNew[question.questionId])) {
-          allQuestionsCacheNew[question.questionId] = question;
-          newQuestionListDataReceived = true;
-        }
-      }
-    });
-  }
+  // let newQuestionnaireListDataReceived = false;
+  // if (data && data.questionnaireList && isSuccess === true) {
+  //   data.questionnaireList.forEach((questionnaire) => {
+  //     if (questionnaire && questionnaire.questionnaireId && questionnaire.questionnaireId >= 0) {
+  //       if (!allQuestionnairesCacheNew[questionnaire.questionnaireId]) {
+  //         allQuestionnairesCacheNew[questionnaire.questionnaireId] = questionnaire;
+  //         newQuestionnaireListDataReceived = true;
+  //       } else if (!isEqual(questionnaire, allQuestionnairesCacheNew[questionnaire.questionnaireId])) {
+  //         allQuestionnairesCacheNew[questionnaire.questionnaireId] = questionnaire;
+  //         newQuestionnaireListDataReceived = true;
+  //       }
+  //     }
+  //   });
+  // }
+  // let newQuestionListDataReceived = false;
+  // if (data && data.questionList && isSuccess === true) {
+  //   data.questionList.forEach((question) => {
+  //     if (question && question.questionId && question.questionId >= 0) {
+  //       if (!allQuestionsCacheNew[question.questionId]) {
+  //         allQuestionsCacheNew[question.questionId] = question;
+  //         newQuestionListDataReceived = true;
+  //       } else if (!isEqual(question, allQuestionsCacheNew[question.questionId])) {
+  //         allQuestionsCacheNew[question.questionId] = question;
+  //         newQuestionListDataReceived = true;
+  //       }
+  //     }
+  //   });
+  // }
   let newAnswerListDataReceived = false;
-  if (data && data.taskList && isSuccess === true) {
-    data.taskList.forEach((task) => {
-      if (task && task.personId && task.personId >= 0 && task.questionnaireId && task.questionnaireId >= 0) {
-        if (!allAnswersCacheNew[task.personId]) {
-          allAnswersCacheNew[task.personId] = {};
+  if (data && data.questionAnswerList && isSuccess === true) {
+    // console.log('AnswerListRetrieve data:', data);
+    data.questionAnswerList.forEach((answer) => {
+      // console.log('== Answer:', answer);
+      if (answer && answer.personId >= 0 && answer.questionnaireId >= 0) {
+        // console.log('Answer from personId:', answer.personId);
+        if (!allAnswersCacheNew[answer.personId]) {
+          allAnswersCacheNew[answer.personId] = {};
         }
-        if (!allAnswersCacheNew[task.personId][task.questionnaireId]) {
-          allAnswersCacheNew[task.personId][task.questionnaireId] = task;
+        if (!allAnswersCacheNew[answer.personId][answer.questionId]) {
+          allAnswersCacheNew[answer.personId][answer.questionId] = answer;
           newAnswerListDataReceived = true;
-        } else if (!isEqual(task, allAnswersCacheNew[task.personId][task.questionnaireId])) {
-          allAnswersCacheNew[task.personId][task.questionnaireId] = task;
+        } else if (!isEqual(answer, allAnswersCacheNew[answer.personId][answer.questionId])) {
+          allAnswersCacheNew[answer.personId][answer.questionId] = answer;
           newAnswerListDataReceived = true;
         }
       }
     });
-    if (newQuestionnaireListDataReceived) {
-      // console.log('QuestionnaireListRetrieve setting allQuestionnairesCacheNew:', allQuestionnairesCacheNew);
-      dispatch({ type: 'updateByKeyValue', key: 'allQuestionnairesCache', value: allQuestionnairesCacheNew });
-      changeResults.allQuestionnairesCache = allQuestionnairesCacheNew;
-      changeResults.allQuestionnairesCacheChanged = true;
-    }
-    if (newQuestionListDataReceived) {
-      // console.log('QuestionnaireListRetrieve setting allQuestionsCacheNew:', allQuestionsCacheNew);
-      dispatch({ type: 'updateByKeyValue', key: 'allQuestionsCache', value: allQuestionsCacheNew });
-      changeResults.allQuestionsCache = allQuestionsCacheNew;
-      changeResults.allQuestionsCacheChanged = true;
-    }
+    // if (newQuestionnaireListDataReceived) {
+    //   // console.log('QuestionnaireListRetrieve setting allQuestionnairesCacheNew:', allQuestionnairesCacheNew);
+    //   dispatch({ type: 'updateByKeyValue', key: 'allQuestionnairesCache', value: allQuestionnairesCacheNew });
+    //   changeResults.allQuestionnairesCache = allQuestionnairesCacheNew;
+    //   changeResults.allQuestionnairesCacheChanged = true;
+    // }
+    // if (newQuestionListDataReceived) {
+    //   // console.log('QuestionnaireListRetrieve setting allQuestionsCacheNew:', allQuestionsCacheNew);
+    //   dispatch({ type: 'updateByKeyValue', key: 'allQuestionsCache', value: allQuestionsCacheNew });
+    //   changeResults.allQuestionsCache = allQuestionsCacheNew;
+    //   changeResults.allQuestionsCacheChanged = true;
+    // }
     if (newAnswerListDataReceived) {
-      // console.log('QuestionnaireListRetrieve setting allAnswersCacheNew:', allAnswersCacheNew);
       dispatch({ type: 'updateByKeyValue', key: 'allAnswersCache', value: allAnswersCacheNew });
       changeResults.allAnswersCache = allAnswersCacheNew;
       changeResults.allAnswersCacheChanged = true;
@@ -187,3 +186,53 @@ export function captureQuestionListRetrieveData (
   }
   return changeResults;
 }
+
+export const getAnswerToQuestion = (personId, questionId, allAnswersCache) => {
+  let answer = {};
+  if (allAnswersCache) {
+    // personId, then questionId
+    const dictOfQuestionsForThisPerson = allAnswersCache[personId] || {};
+    // console.log('dictOfQuestionsForThisPerson:', dictOfQuestionsForThisPerson);
+    answer = dictOfQuestionsForThisPerson[questionId] || {};
+  }
+  return answer;
+};
+
+export const getAnswerValueToQuestion = (personId, questionId, allAnswersCache) => {
+  const answer = getAnswerToQuestion(personId, questionId, allAnswersCache) || {};
+  if (!answer || !answer.answerType) {
+    // console.log(`No answer found for questionId: ${questionId}`);
+    return undefined;
+  }
+  let answerValue;
+  switch (answer.answerType) {
+    case 'BOOLEAN':
+      answerValue = answer.answerBoolean || '';
+      break;
+    case 'INTEGER':
+      answerValue = answer.answerInteger || '';
+      break;
+    default:
+    case 'STRING':
+      answerValue = answer.answerString || '';
+      break;
+  }
+  // console.log('getValueFromAnswerDictByQuestionId answerValue:', answerValue);
+  return answerValue;
+};
+
+export const getQuestionById = (questionId, allQuestionsCache) => {
+  let question = {};
+  // console.log('getQuestionById questionId:', questionId, ', allQuestionsCache:', allQuestionsCache, ', AllQuestionsCache[questionId]:', allQuestionsCache[questionId]);
+  if (allQuestionsCache) {
+    question = allQuestionsCache[questionId] || {};
+  }
+  return question;
+};
+
+export const getQuestionsForQuestionnaire = (incomingQuestionnaireId, allQuestionsCache) => {
+  if (allQuestionsCache) {
+    return Object.values(allQuestionsCache).filter((question) => question.questionnaireId === incomingQuestionnaireId);
+  }
+  return [];
+};

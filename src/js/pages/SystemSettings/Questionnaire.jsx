@@ -13,7 +13,7 @@ import { PageContentContainer } from '../../components/Style/pageLayoutStyles';
 import webAppConfig from '../../config';
 import { useConnectAppContext, useConnectDispatch } from '../../contexts/ConnectAppContext';
 import { METHOD, useFetchData } from '../../react-query/WeConnectQuery';
-import { captureQuestionListRetrieveData, captureQuestionnaireListRetrieveData } from '../../models/QuestionnaireModel';
+import { captureQuestionListRetrieveData, captureQuestionnaireListRetrieveData, getQuestionsForQuestionnaire } from '../../models/QuestionnaireModel';
 
 
 const Questionnaire = ({ classes }) => {
@@ -27,13 +27,6 @@ const Questionnaire = ({ classes }) => {
   const [questionnaire, setQuestionnaire] = useState(getAppContextValue('selectedQuestionnaire'));
 
   const targetQuestionnaireId = parseInt(useParams().questionnaireId, 10);
-  const getQuestionsForQuestionnaire = (incomingQuestionnaireId) => {
-    if (allQuestionsCache) {
-      return Object.values(allQuestionsCache).filter((question) => question.questionnaireId === incomingQuestionnaireId);
-    }
-    return [];
-  };
-  const questionsForCurrentQuestionnaire = getQuestionsForQuestionnaire(targetQuestionnaireId) || [];
 
   const questionnaireListRetrieveResults = useFetchData(['questionnaire-list-retrieve'], {}, METHOD.GET);
   useEffect(() => {
@@ -62,12 +55,11 @@ const Questionnaire = ({ classes }) => {
 
   useEffect(() => {
     // console.log('Questionnaire useEffect getQuestionsForQuestionnaire(targetQuestionnaireId):', targetQuestionnaireId);
-    if (questionsForCurrentQuestionnaire) {
-      if (questionsForCurrentQuestionnaire.length > 0) {
-        setQuestionList(questionsForCurrentQuestionnaire);
-      }
+    const questionsForCurrentQuestionnaire = getQuestionsForQuestionnaire(targetQuestionnaireId, allQuestionsCache) || [];
+    if (questionsForCurrentQuestionnaire && questionsForCurrentQuestionnaire.length > 0) {
+      setQuestionList(questionsForCurrentQuestionnaire);
     }
-  }, [allQuestionsCache]);
+  }, [allQuestionsCache, targetQuestionnaireId]);
 
   const addQuestionClick = () => {
     setAppContextValue('editQuestionDrawerOpen', true);

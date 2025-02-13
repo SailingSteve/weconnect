@@ -92,7 +92,7 @@ const Tasks = ({ classes, match }) => {
     }
     setTaskListByPersonId(taskListByPersonIdTemp);
     // console.log('=== taskListByPersonIdTemp:', taskListByPersonIdTemp);
-  }, [allTasksCache]);
+  }, [allPeopleCache, allTasksCache]);
 
   const teamId = 0;  // hack 1/15/25
   return (
