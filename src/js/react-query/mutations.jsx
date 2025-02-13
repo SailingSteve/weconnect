@@ -38,12 +38,17 @@ const useQuestionSaveMutation = () => {
   });
 };
 
-const useQuestionnaireAnswersSaveMutation = () => {
+const useAnswerListSaveMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (params) => weConnectQueryFn('answer-list-save', params, METHOD.GET),
-    onError: (error) => console.log('error in useQuestionnaireAnswersSaveMutation: ', error),
-    onSuccess: () => queryClient.invalidateQueries('questionnaire-list-retrieve'),
+    onError: (error) => console.log('error in useAnswerListSaveMutation: ', error),
+    onSuccess: () => {
+      // We request a fresh person-list-retrieve because some questionnaire responses get saved to the person table.
+      // This can be optimized to be conditional and only request person-list-retrieve for questionnaires that update the person table.
+      queryClient.invalidateQueries('person-list-retrieve');
+      queryClient.invalidateQueries('questionnaire-responses-list-retrieve');
+    },
   });
 };
 
@@ -99,5 +104,5 @@ const useSaveTaskMutation = () => {
 
 export { useRemoveTeamMutation, useRemoveTeamMemberMutation, useAddPersonToTeamMutation,
   useQuestionnaireSaveMutation, useTaskDefinitionSaveMutation, useGroupSaveMutation,
-  useQuestionSaveMutation, usePersonSaveMutation, useSaveTaskMutation, useQuestionnaireAnswersSaveMutation };
+  useQuestionSaveMutation, usePersonSaveMutation, useSaveTaskMutation, useAnswerListSaveMutation };
 

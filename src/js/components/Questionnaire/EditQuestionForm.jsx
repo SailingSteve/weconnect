@@ -37,6 +37,7 @@ const EditQuestionForm = ({ classes }) => {
   const [question] = useState(getAppContextValue('selectedQuestion'));
   const [questionnaire] = useState(getAppContextValue('selectedQuestionnaire'));
   const [fieldMappingRuleValue, setFieldMappingRuleValue] = useState('');
+  const [placeholderValue, setPlaceholderValue] = useState('');
   const [questionInstructionsValue, setQuestionInstructionsValue] = useState('');
   const [questionTextValue, setQuestionTextValue] = useState('');
   const [requireAnswerValue, setRequireAnswerValue] = useState(false);
@@ -48,26 +49,29 @@ const EditQuestionForm = ({ classes }) => {
   const [showFieldMappingOptions, setShowFieldMappingOptions] = useState(false);
   const [radioValue, setRadioValue] = useState('STRING');
 
-  const fieldMappingRuleFldRef = useRef('');
-  const questionInstructionsFldRef = useRef('');
-  const questionTextFldRef = useRef('');
-  const requireAnswerFldRef = useRef(false);
-  const statusActiveFldRef = useRef(true);
-  const formatRadioFldRef = useRef(true);
+  const fieldMappingRuleInputRef = useRef('');
+  const formatRadioInputRef = useRef(true);
+  const placeholderInputRef = useRef('');
+  const questionInstructionsInputRef = useRef('');
+  const questionTextInputRef = useRef('');
+  const requireAnswerInputRef = useRef(false);
+  const statusActiveInputRef = useRef(true);
 
   useEffect(() => {
     if (question) {
-      setRadioValue(question.answerType);
       setFieldMappingRuleValue(question.fieldMappingRule);
+      setPlaceholderValue(question.questionPlaceholder);
       setQuestionInstructionsValue(question.questionInstructions);
       setQuestionTextValue(question.questionText);
+      setRadioValue(question.answerType);
       setRequireAnswerValue(question.requireAnswer);
       setStatusActiveValue(question.statusActive);
     } else {
-      setRadioValue('STRING');
       setFieldMappingRuleValue('');
+      setPlaceholderValue('');
       setQuestionInstructionsValue('');
       setQuestionTextValue('');
+      setRadioValue('STRING');
       setRequireAnswerValue(false);
       setStatusActiveValue(true);
     }
@@ -75,18 +79,18 @@ const EditQuestionForm = ({ classes }) => {
 
   // eslint-disable-next-line no-unused-vars
   const copyFieldMappingRule = (fieldMappingRule) => {
-  //   // console.log('EditQuestionForm copyFieldMappingRule');
-  //   // openSnackbar({ message: 'Copied!' });
-  //   setFieldMappingRuleCopied(fieldMappingRule);
-  //   setInputValues({ ...inputValues, ['fieldMappingRule']: fieldMappingRule });
-  //   // Hack 1/14/25 to get compile
-  //   // AppObservableStore.setGlobalVariableState('fieldMappingRuleChanged', true);
-  //   // AppObservableStore.setGlobalVariableState('fieldMappingRuleToBeSaved', fieldMappingRule);
-  //   // End Hack 1/14/25 to get compile
-  //   setSaveButtonActive(true);
-  //   setTimeout(() => {
-  //     setFieldMappingRuleCopied('');
-  //   }, 1500);
+    // openSnackbar({ message: 'Copied!' });
+    setFieldMappingRuleCopied(fieldMappingRule);
+    setFieldMappingRuleValue(fieldMappingRule);
+    if (fieldMappingRuleInputRef.current) {
+      fieldMappingRuleInputRef.current.value = fieldMappingRule;
+      fieldMappingRuleInputRef.current.focus();
+      // console.log('fieldMappingRuleInputRef.current.value:', fieldMappingRuleInputRef.current.value);
+    }
+    setSaveButtonActive(true);
+    setTimeout(() => {
+      setFieldMappingRuleCopied('');
+    }, 1500);
   };
 
   const saveQuestion = () => {
@@ -96,11 +100,12 @@ const EditQuestionForm = ({ classes }) => {
     };
     const params = {
       answerType: radioValue,
-      // fieldMappingRule: fieldMappingRuleFldRef.current.checked,
-      questionInstructions: questionInstructionsFldRef.current.value,
-      questionText: questionTextFldRef.current.value,
-      requireAnswer: (requireAnswerFldRef.current.value === 'on'),
-      statusActive: (statusActiveFldRef.current.value === 'on'),
+      fieldMappingRule: fieldMappingRuleInputRef.current.value,
+      questionPlaceholder: placeholderInputRef.current.value,
+      questionInstructions: questionInstructionsInputRef.current.value,
+      questionText: questionTextInputRef.current.value,
+      requireAnswer: (requireAnswerInputRef.current.value === 'on'),
+      statusActive: (statusActiveInputRef.current.value === 'on'),
     };
     const requestParams = makeRequestParams(plainParams, params);
     mutate(requestParams);
@@ -113,9 +118,7 @@ const EditQuestionForm = ({ classes }) => {
   };
 
   const updateSaveButton = () => {
-    if (questionTextFldRef.current.value && questionTextFldRef.current.value.length &&
-      questionInstructionsFldRef.current.value && questionInstructionsFldRef.current.value.length &&
-      questionInstructionsFldRef.current.value && questionInstructionsFldRef.current.value.length) {
+    if (questionTextInputRef.current.value && questionTextInputRef.current.value.length) {
       if (!saveButtonActive) {
         setSaveButtonActive(true);
       }
@@ -136,7 +139,7 @@ const EditQuestionForm = ({ classes }) => {
           autoFocus
           defaultValue={questionTextValue}
           id="questionTextToBeSaved"
-          inputRef={questionTextFldRef}
+          inputRef={questionTextInputRef}
           label="Question"
           margin="dense"
           multiline
@@ -149,7 +152,7 @@ const EditQuestionForm = ({ classes }) => {
         <TextField
           defaultValue={questionInstructionsValue}
           id="questionInstructionsToBeSaved"
-          inputRef={questionInstructionsFldRef}
+          inputRef={questionInstructionsInputRef}
           label="Special Instructions"
           margin="dense"
           multiline
@@ -159,11 +162,22 @@ const EditQuestionForm = ({ classes }) => {
           rows={4}
           variant="outlined"
         />
+        <TextField
+          defaultValue={placeholderValue}
+          id="questionPlaceholderToBeSaved"
+          inputRef={placeholderInputRef}
+          label="Placeholder text when input empty"
+          margin="dense"
+          name="questionPlaceholder"
+          onChange={() => updateSaveButton()}
+          placeholder="Text in the question input"
+          variant="outlined"
+        />
         <FormControl>
-          <FormLabel id="demo-radio-buttons-group-label">Data format of answer</FormLabel>
+          <FormLabel id="demo-radio-buttons-group-label">Answer Type</FormLabel>
           <RadioGroup
             aria-labelledby="demo-radio-buttons-group-label"
-            inputRef={formatRadioFldRef}
+            inputRef={formatRadioInputRef}
             value={radioValue}
             name="radio-buttons-group"
             onChange={handleRadioChange}
@@ -183,7 +197,7 @@ const EditQuestionForm = ({ classes }) => {
               className={classes.checkboxRoot}
               color="primary"
               id="requireAnswerToBeSaved"
-              inputRef={requireAnswerFldRef}
+              inputRef={requireAnswerInputRef}
               name="requireAnswer"
               onChange={() => updateSaveButton()}
             />
@@ -194,11 +208,11 @@ const EditQuestionForm = ({ classes }) => {
           classes={{ label: classes.checkboxLabel }}
           control={(
             <Checkbox
-              id="statusActiveToBeSaved"
-              inputRef={statusActiveFldRef}
               checked={Boolean(statusActiveValue)}
               className={classes.checkboxRoot}
               color="primary"
+              id="statusActiveToBeSaved"
+              inputRef={statusActiveInputRef}
               name="statusActive"
               onChange={() => updateSaveButton()}
             />
@@ -216,15 +230,15 @@ const EditQuestionForm = ({ classes }) => {
         </ShowMappingOptions>
         {showFieldMappingOptions && (
           <TextField
+            defaultValue={fieldMappingRuleValue}
             id="fieldMappingRuleToBeSaved"
-            inputRef={fieldMappingRuleFldRef}
+            inputRef={fieldMappingRuleInputRef}
             label="Save answer to this database field"
             name="fieldMappingRule"
             margin="dense"
-            variant="outlined"
-            placeholder="ex/ Person.firstName"
-            value={fieldMappingRuleValue}
             onChange={() => updateSaveButton()}
+            placeholder="ex/ Person.firstName"
+            variant="outlined"
           />
         )}
         {showFieldMappingOptions && (
@@ -247,8 +261,8 @@ const EditQuestionForm = ({ classes }) => {
           classes={{ root: classes.saveQuestionButton }}
           color="primary"
           disabled={!saveButtonActive}
-          variant="contained"
           onClick={saveQuestion}
+          variant="contained"
         >
           Save Question
         </Button>
@@ -280,11 +294,6 @@ const styles = (theme) => ({
   },
 });
 
-const ShowMappingOptions = styled('div')`
-  margin-bottom: 10px;
-  margin-top: 5px;
-`;
-
 const CheckboxLabel = styled(FormControlLabel)`
   margin-bottom: 0 !important;
 `;
@@ -307,6 +316,11 @@ const OneFieldMappingOption = styled('div')`
   align-items: center;
   color: ${DesignTokenColors.neutral300};
   display: flex;
+`;
+
+const ShowMappingOptions = styled('div')`
+  margin-bottom: 10px;
+  margin-top: 5px;
 `;
 
 export default withStyles(styles)(EditQuestionForm);

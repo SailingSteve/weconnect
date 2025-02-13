@@ -17,7 +17,7 @@ import Login from './js/pages/Login';
 
 // Root URL pages
 
-// const AnswerQuestionsForm = React.lazy(() => import(/* webpackChunkName: 'AnswerQuestionsForm' */ './js/pages/AnswerQuestionsForm'));
+const AnswerQuestions = React.lazy(() => import(/* webpackChunkName: 'AnswerQuestions' */ './js/pages/AnswerQuestions'));
 const FAQ = React.lazy(() => import(/* webpackChunkName: 'FAQ' */ './js/pages/FAQ'));
 // const Footer = React.lazy(() => import(/* webpackChunkName: 'Footer' */ './js/components/Navigation/Footer'));
 const Header = React.lazy(() => import(/* webpackChunkName: 'Header' */ './js/components/Navigation/Header'));
@@ -76,7 +76,7 @@ function App () {
                       <Route path="/faq" element={<FAQ />} />
                     </Route>
                     <Route path="/login" element={<Login />} />
-                    {/* <Route path="/q/:questionnaireId/:personId" element={<AnswerQuestionsForm />} /> */}
+                    <Route path="/q/:questionnaireId/:personId" element={<AnswerQuestions />} />
                     <Route path="/questionnaire/:questionnaireId" element={<QuestionnaireQuestionList />} />
                     <Route path="/system-settings" element={<SystemSettings />} />
                     <Route path="/tasks" element={<Tasks />} />
