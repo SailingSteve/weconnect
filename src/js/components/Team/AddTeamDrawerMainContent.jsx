@@ -5,44 +5,63 @@ import styled from 'styled-components';
 import SearchBar2024 from '../../common/components/Search/SearchBar2024';
 import { renderLog } from '../../common/utils/logging';
 import AddTeamForm from './AddTeamForm';
+import { useConnectAppContext } from '../../contexts/ConnectAppContext';
 
 
 // eslint-disable-next-line no-unused-vars
 const AddTeamDrawerMainContent = ({ classes }) => {  //  classes, teamId
   renderLog('AddTeamDrawerMainContent');  // Set LOG_RENDER_EVENTS to log all renders
-  // eslint-disable-next-line no-unused-vars
-  const [personSearchResultsList, setPersonSearchResultsList] = useState([]);
+  const { apiDataCache } = useConnectAppContext();
+  const { allTeamsCache } = apiDataCache;
 
-  // TODO: 12/6/25, temporarily removed to simplify debug
-  // const searchFunction = (incomingSearchText) => {
-  //   let searchingJustStarted = false;
-  //   if (searchText.length === 0 && incomingSearchText.length > 0) {
-  //     searchingJustStarted = true;
-  //   }
-  //   const isSearching = (incomingSearchText && incomingSearchText.length > 0);
-  //   const teamIdTemp = AppObservableStore.getGlobalVariableState('addPersonDrawerTeamId');
-  //   if (apiCalming(`addPersonToTeamSearch-${teamIdTemp}-${incomingSearchText}`, 60000)) { // Only once per 60 seconds
-  //     PersonActions.capturePersonListRetrieveData(incomingSearchText);
-  //   }
-  //   setSearchText(incomingSearchText);
-  // };
+  const [allTeamsList] = useState(Object.values(allTeamsCache));
+  const [teamSearchResultsList, setTeamSearchResultsList] = useState([]);
+
+  const searchFunction = (incomingSearchText) => {
+    // console.log('AddTeamDrawerMainContent searchFunction incomingSearchText: ', incomingSearchText);
+    const isSearching = (incomingSearchText && incomingSearchText.length > 0);
+    if (isSearching) {
+      const isMatch = (team) => {
+        if (team) {
+          if (team.teamName && team.teamName.toLowerCase().includes(incomingSearchText.toLowerCase())) return true;
+          if (team.description && team.description.toLowerCase().includes(incomingSearchText.toLowerCase())) return true;
+        }
+        return false;
+      };
+      const matchingTeams = allTeamsList ? allTeamsList.filter((team) => isMatch(team)) : [];
+      if (matchingTeams && matchingTeams.length > 0) {
+        setTeamSearchResultsList(matchingTeams);
+      } else {
+        setTeamSearchResultsList([]);
+      }
+    } else {
+      setTeamSearchResultsList([]);
+    }
+  };
 
   const clearFunction = () => {
-    setPersonSearchResultsList([]);
-    // TODO setSearchText('');
+    setTeamSearchResultsList([]);
   };
 
   return (
     <AddTeamDrawerMainContentWrapper>
       <SearchBarWrapper>
         <SearchBar2024
-          placeholder="Search by team name"
-          // searchFunction={searchFunction}
-          searchFunction={() => console.log('searchFunction in AddTeamDrawerMainContent')}
+          placeholder="Search existing teams"
+          searchFunction={searchFunction}
           clearFunction={clearFunction}
           searchUpdateDelayTime={250}
         />
       </SearchBarWrapper>
+      {teamSearchResultsList.length > 0 && (
+        <>
+          {teamSearchResultsList.map((team) => (
+            <TeamItem key={`teamResult-${team.id}`}>
+              {team.teamName}
+            </TeamItem>  // eslint-disable-line react/no-array-index-key
+          ))}
+        </>
+      )}
       <AddTeamWrapper>
         <AddTeamForm />
       </AddTeamWrapper>
@@ -65,6 +84,9 @@ const AddTeamWrapper = styled('div')`
 
 const SearchBarWrapper = styled('div')`
   margin-bottom: 16px;
+`;
+
+const TeamItem = styled('div')`
 `;
 
 export default withStyles(styles)(AddTeamDrawerMainContent);

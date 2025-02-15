@@ -1,5 +1,6 @@
 import { Button, Tab, Tabs } from '@mui/material';
 import { withStyles } from '@mui/styles';
+import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
@@ -16,7 +17,7 @@ import HeaderBarLogo from './HeaderBarLogo';
 
 
 // eslint-disable-next-line no-unused-vars
-const HeaderBar = (classes) => {
+const HeaderBar = ({ hideTabs }) => {
   renderLog('HeaderBar');
   const navigate = useNavigate();
   const { setAppContextValue, getAppContextValue } = useConnectAppContext();
@@ -24,7 +25,7 @@ const HeaderBar = (classes) => {
 
   const [scrolledDown] = useState(false);
   const [tabsValue, setTabsValue] = useState('1');
-  const [showTabs] = useState(true);
+  const [showTabs, setShowTabs] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const isAuth = getAppContextValue('isAuthenticated');
@@ -71,22 +72,49 @@ const HeaderBar = (classes) => {
   const handleTabChange = (event, newValue) => {
     // console.log(`handleTabChange newValue: ${newValue}`);
     // setTabsValue(newValue);
-    switch (newValue) {
-      case '1':
-        navigate('/tasks');
-        break;
-      case '2':
-        navigate('/teams');
-        break;
-      case '3':
-        navigate('/system-settings');
-        break;
-      default:
-        navigate('/tasks');
-        break;
+    if (newValue) {
+      switch (newValue) {
+        case '1':
+          navigate('/tasks');
+          break;
+        case '2':
+          navigate('/teams');
+          break;
+        case '3':
+          navigate('/system-settings');
+          break;
+        default:
+          navigate('/tasks');
+          break;
+      }
+      initializeTabValue();
     }
-    initializeTabValue();
   };
+
+  const handleTabChangeClick = (newValue) => {
+    // console.log(`handleTabChangeClick newValue: ${newValue}`);
+    // setTabsValue(newValue);
+    if (newValue) {
+      switch (newValue) {
+        case '1':
+          navigate('/tasks');
+          break;
+        case '2':
+          navigate('/teams');
+          break;
+        case '3':
+          navigate('/system-settings');
+          break;
+        default:
+          navigate('/tasks');
+          break;
+      }
+    }
+  };
+
+  useEffect(() => {
+    setShowTabs(!hideTabs);
+  }, [hideTabs]);
 
   useEffect(() => {
     initializeTabValue();
@@ -104,10 +132,14 @@ const HeaderBar = (classes) => {
         </TopRowOneLeftContainer>
         <TopRowOneMiddleContainer>
           {showTabs && (
-            <Tabs value={tabsValue} onChange={handleTabChange} aria-label="Tabs selector">
-              <Tab value="1" label="Dashboard" />
-              <Tab value="2" label="Teams" />
-              <Tab value="3" label="Settings" />
+            <Tabs
+              value={tabsValue}
+              onChange={handleTabChange}
+              aria-label="Tabs selector"
+            >
+              <Tab value="1" label="Dashboard" onClick={() => handleTabChangeClick('1')} />
+              <Tab value="2" label="Teams" onClick={() => handleTabChangeClick('2')} />
+              <Tab value="3" label="Settings" onClick={() => handleTabChangeClick('3')} />
             </Tabs>
           )}
         </TopRowOneMiddleContainer>
@@ -127,6 +159,9 @@ const HeaderBar = (classes) => {
       </TopOfPageHeader>
     </HeaderBarWrapper>
   );
+};
+HeaderBar.propTypes = {
+  hideTabs: PropTypes.bool,
 };
 
 const styles = (theme) => ({

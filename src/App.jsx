@@ -34,7 +34,7 @@ const Teams = React.lazy(() => import(/* webpackChunkName: 'Teams' */ './js/page
 
 function App () {
   renderLog('App');
-  const [hideHeader] = useState(false);
+  const [hideHeader, setHideHeader] = useState(false);
   const [showDevtools] = useState(webAppConfig.ENABLE_REACT_QUERY_TOOLS !== undefined ? webAppConfig.ENABLE_REACT_QUERY_TOOLS : true);
 
 
@@ -60,6 +60,11 @@ function App () {
     };
   }, []);
 
+  const setShowHeaderFooter = (showHeaderFooter) => {
+    console.log('--------- setShowHeaderFooter: ', showHeaderFooter);
+    setHideHeader(!showHeaderFooter);
+  };
+
   return (
     <>
       <StyledEngineProvider injectFirst>
@@ -73,10 +78,10 @@ function App () {
                   <Routes>
                     <Route path="/answers/:questionnaireId/:personId" element={<QuestionnaireAnswers />} />
                     <Route path="/login" element={<Login />} />
+                    <Route path="/q/:questionnaireId/:personId" element={<AnswerQuestions setShowHeaderFooter={setShowHeaderFooter} />} />
                     <Route element={<PrivateRoute />}>
                       <Route path="/faq" element={<FAQ />} />
                       <Route path="/login" element={<Login />} />
-                      <Route path="/q/:questionnaireId/:personId" element={<AnswerQuestions />} />
                       <Route path="/questionnaire/:questionnaireId" element={<QuestionnaireQuestionList />} />
                       <Route path="/system-settings" element={<SystemSettings />} />
                       <Route path="/tasks" element={<Tasks />} />

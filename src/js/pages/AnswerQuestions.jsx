@@ -25,7 +25,7 @@ import {
 import convertToInteger from '../common/utils/convertToInteger';
 
 
-const AnswerQuestions = ({ classes }) => {
+const AnswerQuestions = ({ classes, setShowHeaderFooter }) => {
   renderLog('AnswerQuestions');  // Set LOG_RENDER_EVENTS to log all renders
   const { apiDataCache } = useConnectAppContext();
   const { allAnswersCache, allPeopleCache, allQuestionnairesCache, allQuestionsCache } = apiDataCache;
@@ -88,6 +88,13 @@ const AnswerQuestions = ({ classes }) => {
       setQuestionList(questionsForCurrentQuestionnaire);
     }
   }, [allQuestionsCache, questionnaireId]);
+
+  useEffect(() => {
+    setShowHeaderFooter(false);
+    return () => {
+      setShowHeaderFooter(true);
+    };
+  }, []);
 
   const allRequiredFieldsHaveValue = (inputValuesRevised) => {
     let requiredValueMissing = false;
@@ -293,6 +300,7 @@ const AnswerQuestions = ({ classes }) => {
 };
 AnswerQuestions.propTypes = {
   classes: PropTypes.object.isRequired,
+  setShowHeaderFooter: PropTypes.func.isRequired,
 };
 
 const styles = (theme) => ({

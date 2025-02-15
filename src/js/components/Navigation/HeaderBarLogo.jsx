@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-// import { Link } from 'react-router';
+import { Link } from 'react-router';
 import styled from 'styled-components';
 import normalizedImagePath from '../../common/utils/normalizedImagePath';
 import HeaderLogoImage from './HeaderLogoImage';
@@ -15,11 +15,9 @@ const HeaderBarLogo = ({ light, linkOff }) => (
       {linkOff ? (
         <HeaderLogoImage src={light ? normalizedImagePath(logoLight) : normalizedImagePath(logoDark)} />
       ) : (
-        // Hack 1/14/25
-        <></>
-        // <Link to="/" id="logoHeaderBar">
-        //   <HeaderLogoImage src={light ? normalizedImagePath(logoLight) : normalizedImagePath(logoDark)} />
-        // </Link>
+        <Link to="/" id="logoHeaderBar">
+          <HeaderLogoImage src={light ? normalizedImagePath(logoLight) : normalizedImagePath(logoDark)} />
+        </Link>
       )}
     </WeVoteLogoWrapper>
   </HeaderBarLogoWrapper>

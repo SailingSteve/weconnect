@@ -286,7 +286,7 @@ const Login = ({ classes }) => {
             >
               Sign In
             </Button>
-            <A style={{ display: showCreateStuff ? 'none' : 'flex'  }}>Forgot your password?</A>
+            <AStyled style={{ display: showCreateStuff ? 'none' : 'flex'  }}>Forgot your password?</AStyled>
           </span>
           <div style={{ paddingTop: '35px' }} />
           <Button
@@ -344,7 +344,7 @@ const styles = (theme) => ({
   },
 });
 
-const A = styled('a')`
+const AStyled = styled('a')`
   font-weight: 400;
   color: rgb(13, 110, 253);
   text-decoration-color: rgb(13, 110, 253);
@@ -353,7 +353,7 @@ const A = styled('a')`
 `;
 
 const DateDisplay = styled('div')`
-  padding: 50px 0 50px 0; 
+  padding: 50px 0 50px 0;
 `;
 
 export default withStyles(styles)(Login);
