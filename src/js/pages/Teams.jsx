@@ -45,7 +45,7 @@ const Teams = ({ classes, match }) => {
   // Allows us to organize incoming data independent of the specific API, potentially from multiple API or sources
   useEffect(() => {
     if (teamListRetrieveResults) {
-      // TODO Consider making this usecaptureTeamListRetrieveData so we don't have to pass in the apiDataCache or dispatch
+      // TODO Consider making this useCaptureTeamListRetrieveData so we don't have to pass in the apiDataCache or dispatch
       captureTeamListRetrieveData(teamListRetrieveResults, apiDataCache, dispatch);
     }
   }, [teamListRetrieveResults, apiDataCache, dispatch]);
