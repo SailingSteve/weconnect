@@ -1,4 +1,4 @@
-import { Tab, Tabs } from '@mui/material';
+import { Button, Tab, Tabs } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -7,28 +7,41 @@ import standardBoxShadow from '../../common/components/Style/standardBoxShadow';
 import { hasIPhoneNotch } from '../../common/utils/cordovaUtils';
 import { normalizedHrefPage } from '../../common/utils/hrefUtils';
 import { renderLog } from '../../common/utils/logging';
+import { useConnectAppContext } from '../../contexts/ConnectAppContext';
+import { useLogoutMutation } from '../../react-query/mutations';
+import weConnectQueryFn, { METHOD } from '../../react-query/WeConnectQuery';
 import { displayTopMenuShadow } from '../../utils/applicationUtils';
 import { TopOfPageHeader, TopRowOneLeftContainer, TopRowOneMiddleContainer, TopRowOneRightContainer, TopRowTwoLeftContainer } from '../Style/pageLayoutStyles';
 import HeaderBarLogo from './HeaderBarLogo';
-// import { handleResize } from '../../common/utils/isMobileScreenSize';
 
 
-const HeaderBar = () => {
-  renderLog('HeaderBar');  // Set LOG_RENDER_EVENTS to log all renders
-  // eslint-disable-next-line no-unused-vars
-  const [scrolledDown, setScrolledDown] = useState(false);
-  const [tabsValue, setTabsValue] = useState('1');
-  // eslint-disable-next-line no-unused-vars
-  const [showTabs, setShowTabs] = useState(true);
+// eslint-disable-next-line no-unused-vars
+const HeaderBar = (classes) => {
+  renderLog('HeaderBar');
   const navigate = useNavigate();
+  const { setAppContextValue, getAppContextValue } = useConnectAppContext();
+  const { mutate: mutateLogout } = useLogoutMutation();
 
+  const [scrolledDown] = useState(false);
+  const [tabsValue, setTabsValue] = useState('1');
+  const [showTabs] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // This does not do anything
-  // const handleResizeLocal = () => {
-  //   if (handleResize('HeaderBar')) {
-  //     // this.setState({});
-  //   }
-  // };
+  const isAuth = getAppContextValue('isAuthenticated');
+  useEffect(() => {
+    if (isAuth !== null) {
+      console.log('----------- isAuthenticated changed =', isAuth);
+      setIsAuthenticated(isAuth);
+    }
+  }, [isAuth]);
+
+  const logoutApi = async () => {
+    const data = await weConnectQueryFn('logout', {}, METHOD.POST);
+    console.log(`/logout response in HeaderBar -- status: '${'status'}',  data: ${JSON.stringify(data)}`);
+    setAppContextValue('isAuthenticated', false);
+    navigate('/login');
+    mutateLogout();
+  };
 
   const initializeTabValue = () => {
     // console.log('initializeTabValue normalizedHrefPage():', normalizedHrefPage());
@@ -60,7 +73,6 @@ const HeaderBar = () => {
     // setTabsValue(newValue);
     switch (newValue) {
       case '1':
-        // window.history.pushState({}, '', '/tasks'); Only changes the url, does not change the page render
         navigate('/tasks');
         break;
       case '2':
@@ -80,23 +92,6 @@ const HeaderBar = () => {
     initializeTabValue();
   }, []);
 
-  // This does not look like it does anything, except always return true
-  // const showTabs = () => {
-  //   // console.log('showTabs normalizedHrefPage():', normalizedHrefPage());
-  //   switch (normalizedHrefPage()) {
-  //     case 'q':
-  //       return false;
-  //     default:
-  //       break;
-  //   }
-  //   return true;
-  // };
-
-  // const onAppObservableStoreChange = () => {
-  //   // console.log('------ HeaderBar, onAppObservableStoreChange received: ', msg);
-  //   setScrolledDown(false);
-  // };
-  // console.log('tabs value ==== ', tabsValue);
   return (
     <HeaderBarWrapper
       $hasNotch={hasIPhoneNotch()}
@@ -117,7 +112,14 @@ const HeaderBar = () => {
           )}
         </TopRowOneMiddleContainer>
         <TopRowOneRightContainer className="u-cursor--pointer">
-          &nbsp;
+          <Button
+            variant="outlined"
+            sx={{ border: 'none' }}
+            id="signInButton"
+            onClick={() => (isAuthenticated ? logoutApi() : navigate('/login'))}
+          >
+            {isAuthenticated ? 'Sign Out' : 'Sign In'}
+          </Button>
         </TopRowOneRightContainer>
         <TopRowTwoLeftContainer>
          &nbsp;
@@ -137,6 +139,24 @@ const styles = (theme) => ({
       width: '100%',
     },
   },
+  navButtonOutlined: {
+    height: 32,
+    borderRadius: 32,
+    color: 'white',
+    backgroundColor: 'yellow',
+    border: '1px solid white',
+    marginBottom: '1em',
+    fontWeight: '300',
+    width: '47%',
+    fontSize: 12,
+    padding: '5px 0',
+    marginTop: 8,
+  },
+  navClose: {
+    position: 'fixed',
+    right: 16,
+    cursor: 'pointer',
+  },
 });
 
 const HeaderBarWrapper = styled('div', {
@@ -147,35 +167,5 @@ const HeaderBarWrapper = styled('div', {
   border-bottom: ${(!scrolledDown || !hasSubmenu) ? '' : '1px solid #aaa'};
 `));
 
-// const TabsStyled = styled(Tabs)`
-// `;
 
 export default withStyles(styles)(HeaderBar);
-
-
-// {/* <TabsStyled */}
-// {/*   value={tabsValue} */}
-// {/*   indicatorColor="primary" */}
-// {/* > */}
-// {/*         <TabWithPushHistory */}
-// {/*           id="headerTabDashboard" */}
-// {/*           label="Dashboard" */}
-// {/*           change={handleTabChange} */}
-// {/*           to="/tasks" */}
-// {/*           value={0} */}
-// {/*         /> */}
-// {/*         <TabWithPushHistory */}
-// {/*           id="headerTabTeams" */}
-// {/*           label="Teams" */}
-// {/*           change={handleTabChange} */}
-// {/*           to="/teams" */}
-// {/*           value={1} */}
-// {/*         /> */}
-// {/*         <TabWithPushHistory */}
-// {/*           id="headerTabSettings" */}
-// {/*           label="Settings" */}
-// {/*           change={handleTabChange} */}
-// {/*           to="/system-settings" */}
-// {/*           value={2} */}
-// {/*         /> */}
-// </TabsStyled>

@@ -72,18 +72,19 @@ function App () {
                   <Drawers />
                   <Routes>
                     <Route path="/answers/:questionnaireId/:personId" element={<QuestionnaireAnswers />} />
+                    <Route path="/login" element={<Login />} />
                     <Route element={<PrivateRoute />}>
                       <Route path="/faq" element={<FAQ />} />
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/q/:questionnaireId/:personId" element={<AnswerQuestions />} />
+                      <Route path="/questionnaire/:questionnaireId" element={<QuestionnaireQuestionList />} />
+                      <Route path="/system-settings" element={<SystemSettings />} />
+                      <Route path="/tasks" element={<Tasks />} />
+                      <Route path="/task-group/:taskGroupId" element={<TaskGroup />} />
+                      <Route path="/teams" element={<Teams />} />
+                      <Route path="/team-home/:teamId" element={<TeamHome />} />
+                      <Route path="/" element={<Teams />} />
                     </Route>
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/q/:questionnaireId/:personId" element={<AnswerQuestions />} />
-                    <Route path="/questionnaire/:questionnaireId" element={<QuestionnaireQuestionList />} />
-                    <Route path="/system-settings" element={<SystemSettings />} />
-                    <Route path="/tasks" element={<Tasks />} />
-                    <Route path="/task-group/:taskGroupId" element={<TaskGroup />} />
-                    <Route path="/teams" element={<Teams />} />
-                    <Route path="/team-home/:teamId" element={<TeamHome />} />
-                    <Route path="/" element={<Teams />} />
                     <Route path="*" element={<PageNotFound />} />
                   </Routes>
                   {/* <Footer /> has problems */}

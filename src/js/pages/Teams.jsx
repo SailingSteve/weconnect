@@ -40,30 +40,6 @@ const Teams = ({ classes, match }) => {
   }, [personListRetrieveResults, allPeopleCache, dispatch]);
 
   const teamListRetrieveResults = useFetchData(['team-list-retrieve'], {}, METHOD.GET);
-  // ///////////////////////////////////////////////////////
-  // Steve's approach to use data directly from react-query
-  // Requires using data directly from the specific API
-  // Has the problem that we had discussed refactoring team-list-retrieve to not include person data,
-  // so that team.teamMemberList would only include the personIds of team members, and not have the
-  // teamMemberList data when we render <TeamMemberList below
-  // const { data: dataTLR, isSuccess: isSuccessTLR, isFetching: isFetchingTLR } = teamListRetrieveResults;
-  // useEffect(() => {
-  //   // console.log('useFetchData team-list-retrieve in Teams useEffect:', dataTLR, isSuccessTLR, isFetchingTLR);
-  //   // console.log('effect of useFetchData in Teams useEffect:', dataTLR, isSuccessTLR, isFetchingTLR);
-  //   if (dataTLR !== undefined && isFetchingTLR === false) {
-  //     console.log('effect of useFetchData in Teams useEffect dataTLR is good:', dataTLR, isSuccessTLR, isFetchingTLR);
-  //     console.log('Successfully retrieved teams in Teams.jsx from dataTLR ...');
-  //     const teamListTemp = dataTLR.teamList;
-  //     setShowAllTeamMembers(true);
-  //     // Do it both ways
-  //     setTeamList(teamListTemp);
-  //     setAppContextValue('teamListNested', teamListTemp);
-  //     captureTeamListRetrieveData({ data: { teamList: teamListTemp }, isSuccess: isSuccessTLR }, apiDataCache, dispatch);
-  //   } else {
-  //     console.log('effect of useFetchData in Teams useEffect NO GO:', dataTLR, isSuccessTLR, isFetchingTLR);
-  //   }
-  // }, [dataTLR, isSuccessTLR]);
-
   // ////////////////////////////////////////////
   // Dale's approach to use organize incoming data and then use that data from apiDataCache
   // Allows us to organize incoming data independent of the specific API, potentially from multiple API or sources
@@ -146,7 +122,7 @@ const Teams = ({ classes, match }) => {
         </Button>
         <div style={{ padding: '100px 0 50px 0', fontWeight: '700' }}>
           <Link to="/login">
-            Sign in
+            Jump to the &quot;Sign in&quot; /login page (Temporary Link)
           </Link>
         </div>
       </PageContentContainer>

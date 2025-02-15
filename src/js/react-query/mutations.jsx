@@ -79,7 +79,7 @@ const useGroupSaveMutation = () => {
   });
 };
 
-// Moved to /models/PersonModel.jsx
+// Moved to /models/PersonModel.jsx with a non-conflicting function name
 const usePersonSaveMutation = () => {
   const queryClient = useQueryClient();
 
@@ -100,9 +100,27 @@ const useSaveTaskMutation = () => {
   });
 };
 
+const useLogoutMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => weConnectQueryFn('logout', {}, METHOD.POST),
+    onError: (error) => console.log('error in useLogoutMutation: ', error),
+    onSuccess: () => queryClient.invalidateQueries('get-auth'),
+  });
+};
+
+const useGetAuthMutation = () => {
+  console.log('entry to useGetAuthMutation');
+  return useMutation({
+    mutationFn: () => weConnectQueryFn('get-auth', {}, METHOD.POST),
+    onError: (error) => console.log('error in useGetAuthMutation: ', error),
+    onSuccess: () => console.log('useGetAuthMutation called to force refresh'),
+  });
+};
 
 
 export { useRemoveTeamMutation, useRemoveTeamMemberMutation, useAddPersonToTeamMutation,
   useQuestionnaireSaveMutation, useTaskDefinitionSaveMutation, useGroupSaveMutation,
-  useQuestionSaveMutation, usePersonSaveMutation, useSaveTaskMutation, useAnswerListSaveMutation };
+  useQuestionSaveMutation, usePersonSaveMutation, useSaveTaskMutation, useAnswerListSaveMutation,
+  useLogoutMutation, useGetAuthMutation };
 

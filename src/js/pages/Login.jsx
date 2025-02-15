@@ -1,7 +1,7 @@
 import { Button, TextField } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import PropTypes from 'prop-types';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
@@ -9,13 +9,21 @@ import validator from 'validator';
 import { renderLog } from '../common/utils/logging';
 import compileDate from '../compileDate';
 import { PageContentContainer } from '../components/Style/pageLayoutStyles';
+import VerifySecretCodeModal from '../components/VerifySecretCodeModal';
 import webAppConfig from '../config';
 import { useConnectAppContext } from '../contexts/ConnectAppContext';
-import weConnectQueryFn, { METHOD } from '../react-query/WeConnectQuery';
+import { getFullNamePreferredPerson } from '../models/PersonModel';
+import { useGetAuthMutation, useLogoutMutation } from '../react-query/mutations';
+import weConnectQueryFn, { METHOD, useFetchData } from '../react-query/WeConnectQuery';
+import ReactQuerySaveReadTest from '../test/ReactQuerySaveReadTest';
 
 
 const Login = ({ classes }) => {
-  const { setAppContextValue, getAppContextValue } = useConnectAppContext();
+  renderLog('Login');  // Set LOG_RENDER_EVENTS to log all renders
+  const navigate = useNavigate();
+  const { setAppContextValue } = useConnectAppContext();
+  const { mutate: mutateLogout } = useLogoutMutation();
+  const { mutate: mutateAuth } = useGetAuthMutation();
 
   const firstNameFldRef = useRef('');
   const lastNameFldRef = useRef('');
@@ -26,13 +34,33 @@ const Login = ({ classes }) => {
   // const stateFldRef = useRef('');
   const passwordFldRef = useRef('');
   const confirmPasswordFldRef = useRef('');
+
   const [showCreateStuff, setShowCreateStuff] = useState(false);
   const [warningLine, setWarningLine] = useState('');
-  const initialSuccess = getAppContextValue('isAuthenticated') ? `Signed in as ${getAppContextValue('authenticatedPerson')}` : 'Please sign in';
-  const [successLine, setSuccessLine] = useState(initialSuccess);
-  const navigate = useNavigate();
+  const [successLine, setSuccessLine] = useState('');
+  const [authPerson, setAuthPerson] = useState({});
+  // eslint-disable-next-line no-unused-vars
+  const [isAuth, setIsAuth] = useState(false);
+  const [openVerifyModalDialog, setOpenVerifyModalDialog] = useState(false);
 
-  renderLog('Login');  // Set LOG_RENDER_EVENTS to log all renders
+  const { data: dataAuth, isSuccess: isSuccessAuth, isFetching: isFetchingAuth } = useFetchData(['get-auth'], {}, METHOD.POST);
+  useEffect(() => {
+    if (isSuccessAuth) {
+      console.log('useFetchData in Login useEffect dataAuth good:', dataAuth, isSuccessAuth, isFetchingAuth);
+
+      const { isAuthenticated } = dataAuth;
+      setIsAuth(isAuthenticated);
+      const authenticatedPerson = dataAuth.person;
+      setAuthPerson(authenticatedPerson);
+      const success = isAuthenticated && authenticatedPerson ? `Signed in as ${getFullNamePreferredPerson(authenticatedPerson)}` : 'Please sign in';
+      setSuccessLine(success);
+      // if (isAuthenticated) {
+      //   setTimeout(() => {
+      //     navigate('/tasks');
+      //   }, 2000);
+      // }
+    }
+  }, [dataAuth, isSuccessAuth]);
 
   const loginApi = async (email, password) => {
     if (!validator.isEmail(email)) {
@@ -46,13 +74,17 @@ const Login = ({ classes }) => {
 
     const data = await weConnectQueryFn('login', { email, password }, METHOD.POST);
     console.log(`/login response -- status: '${'status'}',  data: ${JSON.stringify(data)}`);
-    if (data.userId > 0) {
+    if (data.personId > 0) {
       setWarningLine('');
-      setSuccessLine(`Cheers person #${data.userId}!  You are signed in!`);
+      setSuccessLine(`Cheers person #${data.personId}!  You are signed in!`);
       setAppContextValue('isAuthenticated', true);
-      setAppContextValue('authenticatedUserId', data.userId);
+      setAppContextValue('authenticatedPersonId', data.personId);
+      if (!data.emailVerified) {
+        setOpenVerifyModalDialog(true);
+      }
+      mutateAuth();  // to propagate the invalidation to HeaderBar (might be a better way to do this)
     } else {
-      setWarningLine(data.errors.msg);
+      setWarningLine(data.error.msg);
       setSuccessLine('');
     }
   };
@@ -66,9 +98,18 @@ const Login = ({ classes }) => {
     } else {
       setWarningLine('');
       setSuccessLine('You are signed out');
-      setAppContextValue('isAuthenticated', false);
-      setAppContextValue('isAuthenticatedId', -1);
+      mutateLogout();
     }
+  };
+
+  const verifyYourEmail = async (personId) => {
+    console.log('verifyYourEmail ----------------');
+    if (!personId || personId < 1) {
+      console.error('Invalid personId found in verifyYourEmail');
+    }
+    console.error('TESTING personId found in verifyYourEmail');
+    const data = await weConnectQueryFn('send-email-code', { personId }, METHOD.POST);
+    console.log(`/send-email-code response: data: ${JSON.stringify(data)}`);
   };
 
   const signupApi = async (firstName, lastName, location, emailPersonal, emailOfficial, password, confirmPassword) => {
@@ -83,9 +124,14 @@ const Login = ({ classes }) => {
       }
       setWarningLine(errStr);
       if (data.personCreated) {
-        setSuccessLine(`user # ${data.userId} created, and signedIn is ${data.signedIn}`);
-        setAppContextValue('isAuthenticated', true);
-        setAppContextValue('authenticatedUserId', data.userId);
+        setSuccessLine(`user # ${data.personId} created`);
+        // setAppContextValue('isAuthenticated', true);
+        setAppContextValue('authenticatedPersonId', data.personId);
+        verifyYourEmail(data.personId).then(() => {
+          setSuccessLine('A verification email has been sent to your address');
+          console.log('verifyYourEmail in signupApi then clause , setOpenVerifyModalDialog true');
+          setOpenVerifyModalDialog(true);
+        });
       }
     } catch (e) {
       console.log('signup error', e);
@@ -101,12 +147,14 @@ const Login = ({ classes }) => {
       setWarningLine('Enter a valid username and password');
     } else {
       setWarningLine('');
-      loginApi(email, password);
+      setAppContextValue('personIsSignedIn', true);
+      loginApi(email, password).then();
     }
   };
 
   const signOutPressed = () => {
-    logoutApi();
+    setAppContextValue('personIsSignedIn', false);
+    logoutApi().then();
   };
 
   const createPressed = () => {
@@ -141,13 +189,8 @@ const Login = ({ classes }) => {
     }
   };
 
-  const verifyYourEmail = async () => {
-    // const personId = 1; // TODO HACK
-    const data = await weConnectQueryFn('send-email-code', { personId: 1 }, METHOD.POST);
-    console.log(`/send-email-code response: data: ${JSON.stringify(data)}`);
-  };
 
-
+  // console.log(getAppContextData());
   return (
     <div>
       <Helmet>
@@ -239,11 +282,10 @@ const Login = ({ classes }) => {
               color="primary"
               variant="contained"
               onClick={showCreateStuff ? createPressed : loginPressed}
-              sx={{ paddingBottom: '15px', display: showCreateStuff ? 'none' : 'flex'  }}
+              sx={{ marginBottom: '15px', display: showCreateStuff ? 'none' : 'flex'  }}
             >
               Sign In
             </Button>
-            <button type="button" onClick={verifyYourEmail} style={{ display: showCreateStuff ? 'none' : 'flex'  }}>Verify your email (temporary)</button>
             <A style={{ display: showCreateStuff ? 'none' : 'flex'  }}>Forgot your password?</A>
           </span>
           <div style={{ paddingTop: '35px' }} />
@@ -256,15 +298,6 @@ const Login = ({ classes }) => {
             {showCreateStuff ? 'Save New Account' : 'Create Account'}
           </Button>
           <div style={{ paddingTop: '35px' }} />
-          <Button
-            classes={{ root: classes.buttonDesktop }}
-            color="primary"
-            variant="contained"
-            // onClick={() => historyPush('/faq')}
-            onClick={() => navigate('/faq')}
-          >
-            FAQ (Requires Authentication)
-          </Button>
           <div style={{ paddingTop: '35px' }} />
           <Button
             classes={{ root: classes.buttonDesktop }}
@@ -278,7 +311,19 @@ const Login = ({ classes }) => {
             <div>Compile Date:</div>
             <div style={{ paddingLeft: 10 }}>{compileDate}</div>
           </DateDisplay>
+          <Button
+            classes={{ root: classes.buttonDesktop }}
+            color="primary"
+            variant="contained"
+            onClick={() => navigate('/faq')}
+
+          >
+            FAQ (Requires Authentication) (This is a test button, that can be removed)
+          </Button>
         </div>
+        <VerifySecretCodeModal person={authPerson} openVerifyModalDialog={openVerifyModalDialog} />
+        {/* This following test can be deleted or converted to an automated test */}
+        <ReactQuerySaveReadTest personId="1" />
       </PageContentContainer>
     </div>
   );
@@ -308,7 +353,7 @@ const A = styled('a')`
 `;
 
 const DateDisplay = styled('div')`
-  padding-top: 50px; 
+  padding: 50px 0 50px 0; 
 `;
 
 export default withStyles(styles)(Login);
