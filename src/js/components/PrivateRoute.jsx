@@ -1,15 +1,33 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router';
 import { authLog } from '../common/utils/logging';
 import { useConnectAppContext } from '../contexts/ConnectAppContext';
+import { METHOD, useFetchData } from '../react-query/WeConnectQuery';
 
 const PrivateRoute = () => {
-  const { getAppContextValue } = useConnectAppContext();
-  const isAuthenticated = getAppContextValue('isAuthenticated');
-  authLog('========= PrivateRoute =========== isAuthenticated: ', isAuthenticated);
   const location = useLocation();
+  const { getAppContextValue } = useConnectAppContext();
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" state={{ from: location }} replace />;
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
+
+  const { data: dataAuth, isSuccess: isSuccessAuth } = useFetchData(['get-auth'], {}, METHOD.POST);
+  useEffect(() => {
+    if (isSuccessAuth) {
+      console.log('useFetchData in PrivateRoute useEffect dataAuth good:', dataAuth, isSuccessAuth);
+      setIsAuthenticated(dataAuth.isAuthenticated);
+      authLog('========= PrivateRoute =========== INNER isAuthenticated: ', dataAuth.isAuthenticated);
+    }
+  }, [dataAuth, isSuccessAuth]);
+
+  const isAuth = getAppContextValue('isAuthenticated');
+
+  authLog('========= PrivateRoute =========== OUTER isAuthenticated: ', isAuthenticated, ', isAuth: ', isAuth);
+
+  if (isAuthenticated || isAuth || isAuthenticated !== false) {
+    return <Outlet />;
+  } else {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
 };
 
 export default PrivateRoute;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
 import EditQuestionDrawerMainContent from '../Questionnaire/EditQuestionDrawerMainContent';

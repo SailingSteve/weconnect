@@ -53,7 +53,10 @@ const PersonSummaryRow = ({ person, rowNumberForDisplay, teamId }) => {
   return (
     <OnePersonWrapper key={`teamMember-${person.personId}`}>
       {rowNumberForDisplay && (
-        <PersonCell id={`index-personId-${person.personId}`} cellwidth={15}>
+        <PersonCell
+          id={`index-personId-${person.personId}`}
+          cellwidth={15}
+        >
           <GraySpan>
             {rowNumberForDisplay}
           </GraySpan>
@@ -75,17 +78,15 @@ const PersonSummaryRow = ({ person, rowNumberForDisplay, teamId }) => {
       </PersonCell>
       <PersonCell
         id={`location-personId-${person.personId}`}
-        smallfont="true" // $smallfont gets rid of error message, but doesn't get passed to PersonCell styled div
-        // cellwidth="300"
         cellwidth={300}
+        $smallfont             // Fixed: $smallfont gets rid of error message, but doesn't get passed to PersonCell styled div
       >
         {person.location}
       </PersonCell>
       <PersonCell
         id={`jobTitle-personId-${person.personId}`}
-        smallestfont="true" // $smallestfont gets rid of error message, but doesn't get passed to PersonCell styled div
-        // cellwidth="225"
         cellwidth={225}
+        $smallestfont     // Fixed: $smallestfont gets rid of error message, but doesn't get passed to PersonCell styled div
       >
         {person.jobTitle}
       </PersonCell>
@@ -163,19 +164,27 @@ const OnePersonWrapper = styled('div')`
   justify-content: flex-start;
 `;
 
-const PersonCell = styled('div', {
-  shouldForwardProp: (prop) => !['smallfont', 'smallestfont', 'cellwidth'].includes(prop),
-})(({ smallfont, smallestfont, cellwidth }) => (`
+const fontSz = (smallfont, smallestfont) => {
+  if (smallfont && !smallestfont) {
+    return '.9em;';
+  } else if (smallestfont && !smallfont) {
+    return '.8em;';
+  }
+  return ';';
+};
+// ${(smallfont && !smallestfont) ? 'font-size: .9em;' : ''}
+// ${(smallestfont && !smallfont) ? 'font-size: .8em;' : ''}
+
+const PersonCell = styled.div`
   align-content: center;
   border-bottom: 1px solid #ccc;
-  ${(smallfont && !smallestfont) ? 'font-size: .9em;' : ''}
-  ${(smallestfont && !smallfont) ? 'font-size: .8em;' : ''}
+  font-size: ${(props) => (fontSz(props?.$smallfont, props?.$smallestfont))}
   height: 22px;
-  ${cellwidth ? `max-width: ${cellwidth}px;` : ''}
-  ${cellwidth ? `min-width: ${cellwidth}px;` : ''}
+  min-width: ${(props) => (props.cellwidth ? `${props.cellwidth}px;` : ';')};
+  max-width: ${(props) => (props.cellwidth ? `${props.cellwidth}px;` : ';;')};
+  width: ${(props) => (props.cellwidth ? `${props.cellwidth}px;` : ';')};
   overflow: hidden;
   white-space: nowrap;
-  ${cellwidth ? `width: ${cellwidth}px;` : ''}
-`));
+`;
 
 export default withStyles(styles)(PersonSummaryRow);

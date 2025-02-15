@@ -16,10 +16,13 @@ const weConnectQueryFn = async (queryKey, params, isGet) => {
   if (isGet) {
     url.search = new URLSearchParams(params);
   }
-  // console.log(`weConnectQueryFn ${isGet ? 'GET' : 'POST'} url.href: ${url.href}`);
+  // 2/12/24 temporarily replaced:  httpLog(`weConnectQueryFn ${isGet ? 'GET' : 'POST'} url.href: ${url.href}`); // DO NOT REMOVE, this is the only way to see if we are hitting the API server unnecessarily
+  console.log(`weConnectQueryFn ${isGet ? 'GET' : 'POST'} url.href: ${url.href}`);
 
-  const response = isGet ? await axios.get(url.href) : await axios.post(url.href, params);
-  // console.log('weConnectQueryFn  response.data: ', JSON.stringify(response.data));
+  const response = isGet ?
+    await axios.get(url.href,  { withCredentials: true }) :
+    await axios.post(url.href, params, { withCredentials: true });
+  // if needed:  httpLog('weConnectQueryFn  response.data: ', JSON.stringify(response.data));
 
   return response.data;
 };
@@ -36,7 +39,6 @@ const useFetchData = (queryKey, fetchParams, isGet) => {
   }
   return { data, isSuccess, isFetching, isStale, refetch };
 };
-
 
 export default weConnectQueryFn;
 export { useFetchData, METHOD };

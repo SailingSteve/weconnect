@@ -51,7 +51,12 @@ export const ConnectAppContextProvider = ({ children }) => {
 
   const getAppContextData = () => data;
 
-  const getAppContextValue = (key) => data[key];
+  const getAppContextValue = (key) => {
+    if (key in data) {
+      return data[key];
+    }
+    return null;   // requesting the value for a key that was never set
+  };
 
   const setAppContextValuesInBulk = (variableDict) => {
     const keysIn = Object.keys(variableDict);
@@ -99,11 +104,12 @@ export const ConnectAppContextProvider = ({ children }) => {
   useEffect(() => {
     if (isSuccessAuth) {
       console.log('useFetchData in ConnectAppContext useEffect dataAuth good:', dataAuth, isSuccessAuth, isFetchingAuth);
-      const isAuthenticated = dataAuth ? dataAuth.userId : false;
+      const { isAuthenticated } = dataAuth;
       setAppContextValue('isAuthenticated', isAuthenticated);
-      setAppContextValue('authenticatedUserId', dataAuth.userId || -1);  // TODO API should return this
+      setAppContextValue('authenticatedPersonId', dataAuth.personId);
+      setAppContextValue('authenticatedPerson', dataAuth.person);
 
-      console.log('======================================== isAuthenticated: "  ', isAuthenticated, ' =============================');
+      console.log('=============== ConnectAppContextProvider ======= isAuthenticated: ', isAuthenticated, ' ===========');
     }
   }, [dataAuth, isSuccessAuth]);
 
