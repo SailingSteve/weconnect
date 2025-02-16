@@ -17,6 +17,10 @@ const AddTeamDrawerMainContent = ({ classes }) => {  //  classes, teamId
   const [allTeamsList] = useState(Object.values(allTeamsCache));
   const [teamSearchResultsList, setTeamSearchResultsList] = useState([]);
 
+  const clearFunction = () => {
+    setTeamSearchResultsList([]);
+  };
+
   const searchFunction = (incomingSearchText) => {
     // console.log('AddTeamDrawerMainContent searchFunction incomingSearchText: ', incomingSearchText);
     const isSearching = (incomingSearchText && incomingSearchText.length > 0);
@@ -37,10 +41,6 @@ const AddTeamDrawerMainContent = ({ classes }) => {  //  classes, teamId
     } else {
       setTeamSearchResultsList([]);
     }
-  };
-
-  const clearFunction = () => {
-    setTeamSearchResultsList([]);
   };
 
   return (

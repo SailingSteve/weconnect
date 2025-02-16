@@ -1,3 +1,6 @@
+// PersonModel.js
+// Functions related to getting data from the apiDataCache, which stores data
+// received from our API servers.
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useConnectAppContext } from '../contexts/ConnectAppContext';
 import weConnectQueryFn, { METHOD } from '../react-query/WeConnectQuery';

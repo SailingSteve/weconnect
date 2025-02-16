@@ -11,7 +11,7 @@ import weConnectQueryFn, { METHOD } from '../../react-query/WeConnectQuery';
 
 const AddTeamForm = ({ classes }) => {
   renderLog('AddTeamForm');
-  const { getAppContextValue } = useConnectAppContext();
+  const { getAppContextValue, setAppContextValue } = useConnectAppContext();
 
   const teamNameFldRef = useRef('');
   const queryClient = useQueryClient();
@@ -41,6 +41,8 @@ const AddTeamForm = ({ classes }) => {
     setTeamNameCached(teamName);
     console.log('saveNewTeam data:', teamName);
     saveTeamMutation.mutate();
+    setAppContextValue('addTeamDrawerOpen', false);
+    setAppContextValue('addTeamDrawerLabel', '');
   };
 
   return (

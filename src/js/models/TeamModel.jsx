@@ -1,3 +1,6 @@
+// TeamModel.js
+// Functions related to getting data from the apiDataCache, which stores data
+// received from our API servers.
 import { useMemo } from 'react';
 import isEqual from 'lodash-es/isEqual';
 import { useMutation, useQueryClient } from '@tanstack/react-query';

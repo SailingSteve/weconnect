@@ -11,7 +11,8 @@ import { cordovaDrawerTopMargin } from '../../utils/cordovaOffsets';
 import { DrawerHeaderAnimateDownInnerContainer, DrawerHeaderAnimateDownOuterContainer, DrawerHeaderWrapper, DrawerTitle } from '../Style/drawerLayoutStyles';
 
 
-const DrawerTemplateA = ({ classes, drawerId, drawerOpenGlobalVariableName, headerFixedJsx, headerTitleJsx, mainContentJsx }) => {  //  classes, teamId
+const DrawerTemplateA = (props) => {
+  const { classes, drawerId, drawerOpenGlobalVariableName, headerFixedJsx, headerTitleJsx, mainContentJsx, onDrawerClose } = props;
   renderLog(`DrawerTemplateA (${drawerId})`);  // Set LOG_RENDER_EVENTS to log all renders
   const { getAppContextData, setAppContextValue, getAppContextValue } = useConnectAppContext();
 
@@ -28,6 +29,13 @@ const DrawerTemplateA = ({ classes, drawerId, drawerOpenGlobalVariableName, head
     }
     if (scrollTop < 200 && getAppContextValue('scrolledDownDrawer')) {
       setAppContextValue('scrolledDownDrawer', false);
+    }
+  };
+
+  const onDrawerCloseLocal = () => {
+    setAppContextValue(drawerOpenGlobalVariableName, false);
+    if (onDrawerClose) {
+      onDrawerClose();
     }
   };
 
@@ -61,7 +69,7 @@ const DrawerTemplateA = ({ classes, drawerId, drawerOpenGlobalVariableName, head
       classes={{ paper: classes.drawer }}
       direction="left"
       id={drawerId}
-      onClose={() => setAppContextValue(drawerOpenGlobalVariableName, false)}
+      onClose={onDrawerCloseLocal}
       open={drawerOpen}
     >
       <DrawerHeaderWrapper>
@@ -73,7 +81,7 @@ const DrawerTemplateA = ({ classes, drawerId, drawerOpenGlobalVariableName, head
             aria-label="Close"
             className={classes.closeButton}
             id={`${drawerId}Close`}
-            onClick={() => setAppContextValue(drawerOpenGlobalVariableName, false)}
+            onClick={onDrawerCloseLocal}
             size="large"
           >
             <span className="u-cursor--pointer">
@@ -100,6 +108,7 @@ DrawerTemplateA.propTypes = {
   mainContentJsx: PropTypes.object,
   headerTitleJsx: PropTypes.object,
   headerFixedJsx: PropTypes.object,
+  onDrawerClose: PropTypes.func,
 };
 
 const styles = () => ({
