@@ -1,24 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
-import { useConnectAppContext } from '../../contexts/ConnectAppContext';
 import EditPersonForm from './EditPersonForm';
 
 
 const EditPersonDrawerMainContent = () => {
   renderLog('EditPersonDrawerMainContent');
-  const { getAppContextValue } = useConnectAppContext();
-
-  // eslint-disable-next-line no-unused-vars
-  const [teamId, setTeamId] = useState(-1);
-
-  useEffect(() => {  // Replaces onAppObservableStoreChange and will be called whenever the context value changes
-    // console.log('EditPersonDrawerMainContent: Context value changed:', true);
-    // 2/14/25 warning  React Hook useEffect contains a call to 'setTeamId'. Without a list of dependencies, this can lead to an infinite chain of updates. To fix this, pass [getAppContextValue] as a second argument to the useEffect Hook  react-hooks/exhaustive-deps
-    const teamIdTemp = getAppContextValue('editPersonDrawerTeamId');
-    setTeamId(teamIdTemp);
-  });
-  // }, [getAppContextValue]);  // TODO DALE: commented out for now to avoid infinite loop
 
   return (
     <EditPersonDrawerMainContentWrapper>

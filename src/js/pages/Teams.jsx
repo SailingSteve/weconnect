@@ -1,10 +1,10 @@
-import { Button } from '@mui/material';
 import { withStyles } from '@mui/styles';
-import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router';
 import styled from 'styled-components';
+import SearchBar2024 from '../common/components/Search/SearchBar2024';
+import DesignTokenColors from '../common/components/Style/DesignTokenColors';
 import { renderLog } from '../common/utils/logging';
 import { SpanWithLinkStyle } from '../components/Style/linkStyles';
 import { PageContentContainer } from '../components/Style/pageLayoutStyles';
@@ -12,21 +12,33 @@ import TeamHeader from '../components/Team/TeamHeader';
 import TeamMemberList from '../components/Team/TeamMemberList';
 import webAppConfig from '../config';
 import { useConnectAppContext, useConnectDispatch } from '../contexts/ConnectAppContext';
+import { isSearchTextFoundInPerson } from '../controllers/PersonController';
+import { isSearchTextFoundInTeam } from '../controllers/TeamController';
 import capturePersonListRetrieveData from '../models/capturePersonListRetrieveData';
-import { captureTeamListRetrieveData } from '../models/TeamModel';
+import { captureTeamListRetrieveData, getTeamMembersListByTeamId } from '../models/TeamModel';
 import { METHOD, useFetchData } from '../react-query/WeConnectQuery';
 
 
 // eslint-disable-next-line no-unused-vars
-const Teams = ({ classes, match }) => {
+const Teams = () => {
   renderLog('Teams');
   const { setAppContextValue, getAppContextValue } = useConnectAppContext();
   const { apiDataCache } = useConnectAppContext();
   const { allPeopleCache, allTeamsCache } = apiDataCache;
   const dispatch = useConnectDispatch();
 
+  const [searchText, setSearchText] = useState('');
   const [showAllTeamMembers, setShowAllTeamMembers] = useState(true);
   const [teamList, setTeamList] = useState([]);
+
+  const clearFunction = () => {
+    setSearchText('');
+  };
+
+  const searchFunction = (incomingSearchText) => {
+    // console.log('AddTeamDrawerMainContent searchFunction incomingSearchText: ', incomingSearchText);
+    setSearchText(incomingSearchText);
+  };
 
   const personListRetrieveResults = useFetchData(['person-list-retrieve'], {}, METHOD.GET);
   useEffect(() => {
@@ -57,11 +69,6 @@ const Teams = ({ classes, match }) => {
     }
   }, [allPeopleCache, allTeamsCache]);
 
-  const addTeamClick = () => {
-    setAppContextValue('addTeamDrawerOpen', true);
-    setAppContextValue('AddTeamDrawerLabel', 'Add Team');
-  };
-
   useEffect(() => {
     const personProfile = getAppContextValue('personProfileDrawerOpen');
     if (personProfile === undefined) {
@@ -69,6 +76,60 @@ const Teams = ({ classes, match }) => {
       setAppContextValue('addTeamDrawerOpen', false);
     }
   }, []);
+
+  const addTeamClick = () => {
+    setAppContextValue('addTeamDrawerOpen', true);
+    setAppContextValue('AddTeamDrawerLabel', 'Add Team');
+  };
+
+  const addTeamMemberClick = () => {
+    setAppContextValue('addPersonDrawerOpen', true);
+    setAppContextValue('AddPersonDrawerLabel', 'Add Person');
+    // setAppContextValue('addPersonDrawerTeam', team);
+  };
+
+  const updateTeamMembersFoundDictWithOneTeam = (teamId, numberOfTeamMembersFound, numberOfTeamMembersFoundDictLocal) => {
+    // console.log('updateTeamMembersFoundDictWithOneTeam, teamId:, ', teamId, ', numberOfTeamMembersFound: ', numberOfTeamMembersFound);
+    const numberOfTeamMembersFoundDictRevised = { ...numberOfTeamMembersFoundDictLocal };
+    if (teamId) {
+      if (numberOfTeamMembersFoundDictLocal[teamId] !== numberOfTeamMembersFound) {
+        // console.log('original numberOfTeamMembersFoundDictLocal[teamId]: ', numberOfTeamMembersFoundDictLocal[teamId]);
+        numberOfTeamMembersFoundDictRevised[teamId] = numberOfTeamMembersFound;
+      }
+    }
+    return numberOfTeamMembersFoundDictRevised;
+  };
+
+  useEffect(() => {
+    // console.log('useEffect numberOfTeamMembersFoundDict: ', numberOfTeamMembersFoundDict);
+    const numberOfTeamMembersFoundDict = getAppContextValue('numberOfTeamMembersFoundDict');
+    let numberOfTeamMembersFoundDictRevised = { ...numberOfTeamMembersFoundDict };
+    let teamId;
+    let numberOfTeamMembersFound;
+    teamList.forEach((team) => {
+      teamId = team.teamId;
+      const updatedTeamMemberList = getTeamMembersListByTeamId(teamId, apiDataCache);
+      if (searchText) {
+        numberOfTeamMembersFound = updatedTeamMemberList.filter((person) => isSearchTextFoundInPerson(searchText, person)).length;
+      } else {
+        numberOfTeamMembersFound = updatedTeamMemberList.length;
+      }
+      numberOfTeamMembersFoundDictRevised = updateTeamMembersFoundDictWithOneTeam(teamId, numberOfTeamMembersFound, numberOfTeamMembersFoundDictRevised);
+    });
+    setAppContextValue('numberOfTeamMembersFoundDict', numberOfTeamMembersFoundDictRevised);
+  }, [apiDataCache, searchText, teamList]);
+
+  const showTeam = (team) => {
+    if (!team || team.teamId < 0) return false; // Invalid person or personId
+    if (searchText) {
+      const numberOfTeamMembersFoundDict = getAppContextValue('numberOfTeamMembersFoundDict');
+      const teamMembersFound = numberOfTeamMembersFoundDict[team.teamId] && numberOfTeamMembersFoundDict[team.teamId] > 0;
+      // console.log('showTeam teamId: ', team.teamId, ', numberOfTeamMembersFoundDict[teamId]: ', numberOfTeamMembersFoundDict[team.teamId]);
+      return !!(teamMembersFound) || isSearchTextFoundInTeam(searchText, team);
+    } else {
+      return true; // Show the team if no searchText is provided
+    }
+  };
 
   // const oneTeam = teamList.find((tm) => tm.teamId === 10);
   // console.log('teams render, team.length: ', teamList.length);
@@ -84,42 +145,68 @@ const Teams = ({ classes, match }) => {
         {/* Don't think we can do this anymore ... <link rel="canonical" href={`${webAppConfig.WECONNECT_URL_FOR_SEO}/team-home`} /> */}
       </Helmet>
       <PageContentContainer>
-        <h1>
-          Teams
-        </h1>
-        <div>
-          {showAllTeamMembers ? (
-            <SpanWithLinkStyle onClick={() => setShowAllTeamMembers(false)}>hide people</SpanWithLinkStyle>
-          ) : (
-            <SpanWithLinkStyle onClick={() => setShowAllTeamMembers(true)}>show people</SpanWithLinkStyle>
-          )}
-        </div>
+        <ActionBarWrapper>
+          <SearchBarWrapper>
+            <SearchBar2024
+              clearFunction={clearFunction}
+              placeholder="Search existing teams"
+              searchFunction={searchFunction}
+              searchUpdateDelayTime={0}
+            />
+          </SearchBarWrapper>
+          <ActionBarSection>
+            <ActionBarItem>
+              {showAllTeamMembers ? (
+                <SpanWithLinkStyle onClick={() => setShowAllTeamMembers(false)}>
+                  Collapse all
+                </SpanWithLinkStyle>
+              ) : (
+                <SpanWithLinkStyle onClick={() => setShowAllTeamMembers(true)}>
+                  Expand all
+                </SpanWithLinkStyle>
+              )}
+            </ActionBarItem>
+          </ActionBarSection>
+          <ActionBarSection>
+            <ActionBarItem>
+              <SpanWithLinkStyle onClick={() => addTeamClick()}>
+                Add team
+              </SpanWithLinkStyle>
+            </ActionBarItem>
+            <ActionBarItem>
+              <SpanWithLinkStyle onClick={() => addTeamMemberClick()}>
+                Add team member
+              </SpanWithLinkStyle>
+            </ActionBarItem>
+          </ActionBarSection>
+        </ActionBarWrapper>
         {/* NOTE: we had discussed refactoring team-list-retrieve to not include person data, */}
         {/* so that team.teamMemberList would only include the personIds of team members */}
-        {teamList.map((team, index) => (
-          <OneTeamWrapper key={`team-${team.id}`}>
-            <TeamHeader
-              team={team}
-              showHeaderLabels={(index === 0) && showAllTeamMembers && (team.teamMemberList && team.teamMemberList.length > 0)}
-              showIcons
-            />
-            {showAllTeamMembers && (
-              <>
-                {/* DO NOT REMOVE PASSED IN team */}
-                <TeamMemberList teamId={team.id} team={team} />
-              </>
-            )}
-          </OneTeamWrapper>
-        ))}
-        <Button
-          classes={{ root: classes.addTeamButtonRoot }}
-          color="primary"
-          variant="outlined"
-          onClick={addTeamClick}
-          sx={{ marginTop: '30px' }}
-        >
-          Add Team
-        </Button>
+        {teamList.map((team, index) => {
+          if (showTeam(team)) {
+            return (
+              <OneTeamWrapper key={`team-${team.id}`}>
+                <TeamHeader
+                  team={team}
+                  showHeaderLabels={(index === 0) && showAllTeamMembers && (team.teamMemberList && team.teamMemberList.length > 0)}
+                  showIcons
+                />
+                {showAllTeamMembers && (
+                  <>
+                    {/* DO NOT REMOVE PASSED IN team */}
+                    <TeamMemberList
+                      searchText={searchText}
+                      team={team}
+                      teamId={team.id}
+                    />
+                  </>
+                )}
+              </OneTeamWrapper>
+            );
+          } else {
+            return null;
+          }
+        })}
         <div style={{ padding: '100px 0 50px 0', fontWeight: '700' }}>
           <Link to="/login">
             Jump to the &quot;Sign in&quot; /login page (Temporary Link)
@@ -130,23 +217,36 @@ const Teams = ({ classes, match }) => {
   );
 };
 Teams.propTypes = {
-  classes: PropTypes.object.isRequired,
-  match: PropTypes.object,
 };
 
-const styles = (theme) => ({
-  ballotButtonIconRoot: {
-    marginRight: 8,
-  },
-  addTeamButtonRoot: {
-    width: 120,
-    [theme.breakpoints.down('md')]: {
-      width: '100%',
-    },
-  },
+const styles = () => ({
 });
 
+const ActionBarItem = styled('div')`
+  padding-right: 15px;
+`;
+
+const ActionBarSection = styled('div')`
+  align-items: center;
+  border-right: 1px solid ${DesignTokenColors.neutralUI200};
+  display: flex;
+  font-size: .8em;
+  justify-content: flex-start;
+  padding-left: 15px;
+`;
+
+const ActionBarWrapper = styled('div')`
+  align-items: center;
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 40px;  // Temporary hack
+`;
+
 const OneTeamWrapper = styled('div')`
+`;
+
+const SearchBarWrapper = styled('div')`
+  margin-right: 10px;
 `;
 
 export default withStyles(styles)(Teams);

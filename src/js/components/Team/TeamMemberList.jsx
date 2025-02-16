@@ -3,16 +3,17 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
+import { isSearchTextFoundInPerson } from '../../controllers/PersonController';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
 import { getTeamMembersListByTeamId } from '../../models/TeamModel';
 import { METHOD, useFetchData } from '../../react-query/WeConnectQuery';
 import PersonSummaryRow from '../Person/PersonSummaryRow';
 
 // DO NOT REMOVE PASSED in TEAM
-const TeamMemberList = ({ teamId, team }) => { // teamMemberList
+const TeamMemberList = ({ searchText, teamId, team }) => { // teamMemberList
   renderLog('TeamMemberList');
   const { apiDataCache } = useConnectAppContext();
-  const { allPeopleCache, allTeamsCache } = apiDataCache;
+  // const { allPeopleCache, allTeamsCache } = apiDataCache;
   const [teamMemberListApiDataCache, setTeamMemberListApiDataCache] = useState([]);
   const [teamMemberListReactQuery, setTeamMemberListReactQuery] = useState(team.teamMemberList || []);
   // const teamMemberList = useGetTeamMembersListByTeamId(teamId);
@@ -63,12 +64,20 @@ const TeamMemberList = ({ teamId, team }) => { // teamMemberList
   // console.log('====== Cached by ReactQuery teamMemberList: ', teamMemberListReactQuery);
   // console.log('====== Cached by apiDataCache teamMemberList: ', teamMemberListApiDataCache);
 
+  const showPerson = (person, searchTextLocal) => {
+    if (!person || person.id < 0) return false; // Invalid person or personId
+    if (searchTextLocal) {
+      return isSearchTextFoundInPerson(searchTextLocal, person);
+    } else {
+      return true; // Show the person if no searchText is provided
+    }
+  };
 
   return (
     <TeamMembersWrapper>
       {teamMemberListApiDataCache.map((person, index) => {
-        if (teamId === 10) console.log(`TeamMemberList teamId: ${teamId}, person: ${person} location ${person.location}`);
-        if (person) {
+        // if (teamId === 10) console.log(`TeamMemberList teamId: ${teamId}, person: ${person} location ${person.location}`);
+        if (showPerson(person, searchText)) {
           return (
             <PersonSummaryRow
               key={`teamMember-${teamId}-${person.id}`}
@@ -78,27 +87,19 @@ const TeamMemberList = ({ teamId, team }) => { // teamMemberList
             />
           );
         } else {
-          return null; // Empty row for non-existing members
+          return null; // Empty row for members we don't want to show
         }
       })}
     </TeamMembersWrapper>
   );
 };
 TeamMemberList.propTypes = {
+  searchText: PropTypes.string,
   teamId: PropTypes.any.isRequired,
   team: PropTypes.object.isRequired,
 };
 
-const styles = (theme) => ({
-  ballotButtonIconRoot: {
-    marginRight: 8,
-  },
-  addTeamButtonRoot: {
-    width: 120,
-    [theme.breakpoints.down('md')]: {
-      width: '100%',
-    },
-  },
+const styles = () => ({
 });
 
 const TeamMembersWrapper = styled('div')`
