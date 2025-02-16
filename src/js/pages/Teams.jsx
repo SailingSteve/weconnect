@@ -85,23 +85,21 @@ const Teams = () => {
   const addTeamMemberClick = () => {
     setAppContextValue('addPersonDrawerOpen', true);
     setAppContextValue('AddPersonDrawerLabel', 'Add Person');
-    // setAppContextValue('addPersonDrawerTeam', team);
   };
 
   const updateTeamMembersFoundDictWithOneTeam = (teamId, numberOfTeamMembersFound, numberOfTeamMembersFoundDictLocal) => {
-    // console.log('updateTeamMembersFoundDictWithOneTeam, teamId:, ', teamId, ', numberOfTeamMembersFound: ', numberOfTeamMembersFound);
     const numberOfTeamMembersFoundDictRevised = { ...numberOfTeamMembersFoundDictLocal };
     if (teamId) {
       if (numberOfTeamMembersFoundDictLocal[teamId] !== numberOfTeamMembersFound) {
-        // console.log('original numberOfTeamMembersFoundDictLocal[teamId]: ', numberOfTeamMembersFoundDictLocal[teamId]);
         numberOfTeamMembersFoundDictRevised[teamId] = numberOfTeamMembersFound;
       }
     }
     return numberOfTeamMembersFoundDictRevised;
   };
 
+  // Refresh the numberOfTeamMembersFoundDict as a person searches
+  // key is teamId, value is number of team members found
   useEffect(() => {
-    // console.log('useEffect numberOfTeamMembersFoundDict: ', numberOfTeamMembersFoundDict);
     const numberOfTeamMembersFoundDict = getAppContextValue('numberOfTeamMembersFoundDict');
     let numberOfTeamMembersFoundDictRevised = { ...numberOfTeamMembersFoundDict };
     let teamId;
@@ -124,7 +122,7 @@ const Teams = () => {
     if (searchText) {
       const numberOfTeamMembersFoundDict = getAppContextValue('numberOfTeamMembersFoundDict');
       const teamMembersFound = numberOfTeamMembersFoundDict[team.teamId] && numberOfTeamMembersFoundDict[team.teamId] > 0;
-      // console.log('showTeam teamId: ', team.teamId, ', numberOfTeamMembersFoundDict[teamId]: ', numberOfTeamMembersFoundDict[team.teamId]);
+      // If the team has any members matching searchText, or team itself matches searchText, show it
       return !!(teamMembersFound) || isSearchTextFoundInTeam(searchText, team);
     } else {
       return true; // Show the team if no searchText is provided
