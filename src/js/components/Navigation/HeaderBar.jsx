@@ -9,6 +9,7 @@ import { hasIPhoneNotch } from '../../common/utils/cordovaUtils';
 import { normalizedHrefPage } from '../../common/utils/hrefUtils';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
+import { clearSignedInGlobals } from '../../contexts/contextFunctions';
 import { useLogoutMutation } from '../../react-query/mutations';
 import weConnectQueryFn, { METHOD } from '../../react-query/WeConnectQuery';
 import { displayTopMenuShadow } from '../../utils/applicationUtils';
@@ -20,7 +21,7 @@ import HeaderBarLogo from './HeaderBarLogo';
 const HeaderBar = ({ hideTabs }) => {
   renderLog('HeaderBar');
   const navigate = useNavigate();
-  const { setAppContextValue, getAppContextValue } = useConnectAppContext();
+  const { getAppContextValue, setAppContextValue } = useConnectAppContext();
   const { mutate: mutateLogout } = useLogoutMutation();
 
   const [scrolledDown] = useState(false);
@@ -39,7 +40,7 @@ const HeaderBar = ({ hideTabs }) => {
   const logoutApi = async () => {
     const data = await weConnectQueryFn('logout', {}, METHOD.POST);
     console.log(`/logout response in HeaderBar -- status: '${'status'}',  data: ${JSON.stringify(data)}`);
-    setAppContextValue('isAuthenticated', false);
+    clearSignedInGlobals(setAppContextValue);
     navigate('/login');
     mutateLogout();
   };

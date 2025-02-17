@@ -94,11 +94,11 @@ const AddPersonDrawerMainContent = () => {
     };
     mutate(makeRequestParams(plainParams, {}));
     // Remove this person from the All People less Adds list (since they were added to the team)
-    const updatedRemainingPeopleToAdd = remainingPeopleToAdd.filter((person) => person.id !== person.id);
+    const updatedRemainingPeopleToAdd = remainingPeopleToAdd.filter((p) => p.id !== person.id);
     setRemainingPeopleToAdd(updatedRemainingPeopleToAdd);
     if (searchResultsList && searchResultsList.length) {
       // also remove them from the searchResultsList if it exists
-      const updatedSearchResultsList = searchResultsList.filter((person) => person.id !== person.id);
+      const updatedSearchResultsList = searchResultsList.filter((p) => p.id !== person.id);
       setSearchResultsList(updatedSearchResultsList);
       setMatchingCounter(updatedSearchResultsList);
     }
@@ -157,6 +157,7 @@ const AddPersonDrawerMainContentWrapper = styled('div')`
 const AddPersonWrapper = styled('div')`
   margin-top: 32px;
 `;
+
 const MatchingPerson = styled('div')`
   margin: 10px 0 0 10px;
   font-style: italic;

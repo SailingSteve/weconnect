@@ -6,7 +6,7 @@ import { METHOD, useFetchData } from '../react-query/WeConnectQuery';
 
 const PrivateRoute = () => {
   const location = useLocation();
-  const { getAppContextValue } = useConnectAppContext();
+  const { getAppContextValue, setAppContextValue } = useConnectAppContext();
 
   const [isAuthenticated, setIsAuthenticated] = useState(null);
 
@@ -15,6 +15,7 @@ const PrivateRoute = () => {
     if (isSuccessAuth) {
       console.log('useFetchData in PrivateRoute useEffect dataAuth good:', dataAuth, isSuccessAuth);
       setIsAuthenticated(dataAuth.isAuthenticated);
+      setAppContextValue('loggedInPersonIsAdmin', dataAuth.loggedInPersonIsAdmin);
       authLog('========= PrivateRoute =========== INNER isAuthenticated: ', dataAuth.isAuthenticated);
     }
   }, [dataAuth, isSuccessAuth]);

@@ -19,12 +19,17 @@ const weConnectQueryFn = async (queryKey, params, isGet) => {
   // 2/12/24 temporarily replaced:  httpLog(`weConnectQueryFn ${isGet ? 'GET' : 'POST'} url.href: ${url.href}`); // DO NOT REMOVE, this is the only way to see if we are hitting the API server unnecessarily
   console.log(`weConnectQueryFn ${isGet ? 'GET' : 'POST'} url.href: ${url.href}`);
 
-  const response = isGet ?
-    await axios.get(url.href,  { withCredentials: true }) :
-    await axios.post(url.href, params, { withCredentials: true });
-  // if needed:  httpLog('weConnectQueryFn  response.data: ', JSON.stringify(response.data));
+  let response;
+  try {
+    response = isGet ?
+      await axios.get(url.href, { withCredentials: true }) :
+      await axios.post(url.href, params, { withCredentials: true });
+    // if needed:  httpLog('weConnectQueryFn  response.data: ', JSON.stringify(response.data));
+  } catch (e) {
+    console.error('Axios ', (isGet ? 'axios.get' : 'axios.post'), ' error: ', e);
+  }
 
-  return response.data;
+  return response?.data;
 };
 
 const useFetchData = (queryKey, fetchParams, isGet) => {

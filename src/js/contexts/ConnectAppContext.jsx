@@ -105,9 +105,10 @@ export const ConnectAppContextProvider = ({ children }) => {
     if (isSuccessAuth) {
       console.log('useFetchData in ConnectAppContext useEffect dataAuth good:', dataAuth, isSuccessAuth, isFetchingAuth);
       const { isAuthenticated } = dataAuth;
-      setAppContextValue('isAuthenticated', isAuthenticated);
-      setAppContextValue('authenticatedPersonId', dataAuth.personId);
       setAppContextValue('authenticatedPerson', dataAuth.person);
+      setAppContextValue('authenticatedPersonId', dataAuth.personId);
+      setAppContextValue('isAuthenticated', isAuthenticated);
+      setAppContextValue('loggedInPersonIsAdmin', dataAuth.loggedInPersonIsAdmin);
 
       console.log('=============== ConnectAppContextProvider ======= isAuthenticated: ', isAuthenticated, ' ===========');
     }

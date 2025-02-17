@@ -12,12 +12,11 @@ import { SpanWithLinkStyle } from '../../components/Style/linkStyles';
 import { PageContentContainer } from '../../components/Style/pageLayoutStyles';
 import webAppConfig from '../../config';
 import { useConnectAppContext, useConnectDispatch } from '../../contexts/ConnectAppContext';
-import { METHOD, useFetchData } from '../../react-query/WeConnectQuery';
-import { captureQuestionnaireListRetrieveData } from '../../models/QuestionnaireModel';
 import capturePersonListRetrieveData from '../../models/capturePersonListRetrieveData';
-import {
-  captureTaskDefinitionListRetrieveData, captureTaskGroupListRetrieveData, captureTaskStatusListRetrieveData,
-} from '../../models/TaskModel';
+import { captureQuestionnaireListRetrieveData } from '../../models/QuestionnaireModel';
+import { captureTaskDefinitionListRetrieveData, captureTaskGroupListRetrieveData, captureTaskStatusListRetrieveData } from '../../models/TaskModel';
+import { METHOD, useFetchData } from '../../react-query/WeConnectQuery';
+import PermissionsAdministration from './PermissionsAdministration';
 
 
 const SystemSettings = ({ classes }) => {
@@ -186,6 +185,10 @@ const SystemSettings = ({ classes }) => {
             Add Task Grouping
           </Button>
         </AddButtonWrapper>
+        <SettingsSubtitle>Permissions Administration</SettingsSubtitle>
+        {/* We could choose to hide PermissionsAdministration for those without Admin privileges, but as it exists you can't
+            save without admin privileges (enforced by logic on the server). */}
+        <PermissionsAdministration />
       </PageContentContainer>
     </div>
   );
@@ -234,6 +237,7 @@ const QuestionnaireInnerWrapper = styled('div')`
 `;
 
 const SettingsSubtitle = styled('h2')`
+  margin-top: 30px;
 `;
 
 export default withStyles(styles)(SystemSettings);
