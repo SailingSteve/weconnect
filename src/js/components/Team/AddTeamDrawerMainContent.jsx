@@ -4,8 +4,9 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import SearchBar2024 from '../../common/components/Search/SearchBar2024';
 import { renderLog } from '../../common/utils/logging';
-import AddTeamForm from './AddTeamForm';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
+import { SearchBarWrapper } from '../Style/sharedStyles';
+import AddTeamForm from './AddTeamForm';
 
 
 // eslint-disable-next-line no-unused-vars
@@ -82,9 +83,6 @@ const AddTeamWrapper = styled('div')`
   margin-top: 32px;
 `;
 
-const SearchBarWrapper = styled('div')`
-  margin-bottom: 16px;
-`;
 
 const TeamItem = styled('div')`
 `;

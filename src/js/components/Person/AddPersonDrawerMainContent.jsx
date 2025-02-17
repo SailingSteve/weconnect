@@ -7,6 +7,7 @@ import { useConnectAppContext } from '../../contexts/ConnectAppContext';
 import makeRequestParams from '../../react-query/makeRequestParams';
 import { useAddPersonToTeamMutation } from '../../react-query/mutations';
 import { SpanWithLinkStyle } from '../Style/linkStyles';
+import { SearchBarWrapper, MatchingPerson } from '../Style/sharedStyles';
 import AddPersonForm from './AddPersonForm';
 
 
@@ -158,10 +159,6 @@ const AddPersonWrapper = styled('div')`
   margin-top: 32px;
 `;
 
-const MatchingPerson = styled('div')`
-  margin: 10px 0 0 10px;
-  font-style: italic;
-`;
 
 // const PersonDirectoryWrapper = styled('div')`
 //   margin-top: 16px;
@@ -179,10 +176,6 @@ const PersonListTitle = styled('div')`
 
 const PersonSearchResultsWrapper = styled('div')`
   margin-top: 16px;
-`;
-
-const SearchBarWrapper = styled('div')`
-  margin-bottom: 16px;
 `;
 
 export default AddPersonDrawerMainContent;

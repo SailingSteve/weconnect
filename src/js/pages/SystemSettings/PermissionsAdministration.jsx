@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
+import { MatchingPerson, SearchBarWrapper } from '../../components/Style/sharedStyles';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
 import { getFullNamePreferredPerson } from '../../models/PersonModel';
 import makeRequestParams from '../../react-query/makeRequestParams';
@@ -332,16 +333,6 @@ const Th = styled.th`
 
 const Td = styled.td`
   text-align: center
-`;
-
-const SearchBarWrapper = styled('div')`
-  margin-bottom: 16px;
-  display: flex;
-`;
-
-const MatchingPerson = styled('div')`
-  margin: 10px 0 0 10px;
-  font-style: italic;
 `;
 
 export default withStyles(styles)(PermissionsAdministration);
