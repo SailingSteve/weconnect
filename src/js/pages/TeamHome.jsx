@@ -33,6 +33,7 @@ const TeamHome = ({ classes }) => {
 
   // const isAddPersonDrawerOpen = document.getElementById('addPersonDrawer');
 
+  // TODO is this even used?
   const personListRetrieveResults = useFetchData(['person-list-retrieve'], {}, METHOD.GET);
   useEffect(() => {
     if (personListRetrieveResults) {

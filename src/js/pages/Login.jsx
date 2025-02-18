@@ -1,5 +1,6 @@
 import { Button, TextField } from '@mui/material';
 import { withStyles } from '@mui/styles';
+import { useQueryClient } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -12,18 +13,19 @@ import { PageContentContainer } from '../components/Style/pageLayoutStyles';
 import VerifySecretCodeModal from '../components/VerifySecretCodeModal';
 import webAppConfig from '../config';
 import { useConnectAppContext } from '../contexts/ConnectAppContext';
+import { clearSignedInGlobals } from '../contexts/contextFunctions';
 import { getFullNamePreferredPerson } from '../models/PersonModel';
-import { useGetAuthMutation, useLogoutMutation } from '../react-query/mutations';
+import { useLogoutMutation } from '../react-query/mutations';
 import weConnectQueryFn, { METHOD, useFetchData } from '../react-query/WeConnectQuery';
 import ReactQuerySaveReadTest from '../test/ReactQuerySaveReadTest';
 
 
 const Login = ({ classes }) => {
-  renderLog('Login');  // Set LOG_RENDER_EVENTS to log all renders
+  renderLog('Login');
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { setAppContextValue } = useConnectAppContext();
   const { mutate: mutateLogout } = useLogoutMutation();
-  const { mutate: mutateAuth } = useGetAuthMutation();
 
   const firstNameFldRef = useRef('');
   const lastNameFldRef = useRef('');
@@ -35,13 +37,12 @@ const Login = ({ classes }) => {
   const passwordFldRef = useRef('');
   const confirmPasswordFldRef = useRef('');
 
-  const [showCreateStuff, setShowCreateStuff] = useState(false);
-  const [warningLine, setWarningLine] = useState('');
-  const [successLine, setSuccessLine] = useState('');
   const [authPerson, setAuthPerson] = useState({});
-  // eslint-disable-next-line no-unused-vars
-  const [isAuth, setIsAuth] = useState(false);
   const [openVerifyModalDialog, setOpenVerifyModalDialog] = useState(false);
+  const [returnFromLogin, setReturnFromLogin] = useState(false);
+  const [showCreateStuff, setShowCreateStuff] = useState(false);
+  const [successLine, setSuccessLine] = useState('');
+  const [warningLine, setWarningLine] = useState('');
 
   const { data: dataAuth, isSuccess: isSuccessAuth, isFetching: isFetchingAuth } = useFetchData(['get-auth'], {}, METHOD.POST);
   useEffect(() => {
@@ -49,16 +50,16 @@ const Login = ({ classes }) => {
       console.log('useFetchData in Login useEffect dataAuth good:', dataAuth, isSuccessAuth, isFetchingAuth);
 
       const { isAuthenticated } = dataAuth;
-      setIsAuth(isAuthenticated);
       const authenticatedPerson = dataAuth.person;
       setAuthPerson(authenticatedPerson);
       const success = isAuthenticated && authenticatedPerson ? `Signed in as ${getFullNamePreferredPerson(authenticatedPerson)}` : 'Please sign in';
       setSuccessLine(success);
-      // if (isAuthenticated) {
-      //   setTimeout(() => {
-      //     navigate('/tasks');
-      //   }, 2000);
-      // }
+      setAppContextValue('loggedInPersonIsAdmin', dataAuth.loggedInPersonIsAdmin);
+      if (isAuthenticated && returnFromLogin) {
+        setTimeout(() => {
+          navigate('/tasks');
+        }, 2000);
+      }
     }
   }, [dataAuth, isSuccessAuth]);
 
@@ -79,10 +80,11 @@ const Login = ({ classes }) => {
       setSuccessLine(`Cheers person #${data.personId}!  You are signed in!`);
       setAppContextValue('isAuthenticated', true);
       setAppContextValue('authenticatedPersonId', data.personId);
+      setReturnFromLogin(true);
       if (!data.emailVerified) {
         setOpenVerifyModalDialog(true);
       }
-      mutateAuth();  // to propagate the invalidation to HeaderBar (might be a better way to do this)
+      await queryClient.invalidateQueries('get-auth');
     } else {
       setWarningLine(data.error.msg);
       setSuccessLine('');
@@ -152,8 +154,8 @@ const Login = ({ classes }) => {
     }
   };
 
-  const signOutPressed = () => {
-    setAppContextValue('personIsSignedIn', false);
+  const useSignOutPressed = () => {
+    clearSignedInGlobals(setAppContextValue);
     logoutApi().then();
   };
 
@@ -303,7 +305,7 @@ const Login = ({ classes }) => {
             classes={{ root: classes.buttonDesktop }}
             color="primary"
             variant="contained"
-            onClick={signOutPressed}
+            onClick={useSignOutPressed}
           >
             Sign Out
           </Button>

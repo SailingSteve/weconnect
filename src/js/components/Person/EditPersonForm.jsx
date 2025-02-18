@@ -42,7 +42,6 @@ const EditPersonForm = ({ classes }) => {
     // console.log('savePerson data:', JSON.stringify(activePerson));
 
     const data = {};
-    // for (const key in activePerson) {
     Object.keys(activePerson).forEach((key) => {
       const initialValue = initialPerson[key] || '';
       const activeValue = activePerson[key] || '';
@@ -55,7 +54,6 @@ const EditPersonForm = ({ classes }) => {
     };
 
     mutate(makeRequestParams(plainParams, data));
-    // personSave(makeRequestParams(plainParams, data));
     setSaveButtonActive(false);
   };
 
