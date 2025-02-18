@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import arrayContains from '../../common/utils/arrayContains';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
+import { getTeamMembersListByTeamId } from '../../models/TeamModel';
 import makeRequestParams from '../../react-query/makeRequestParams';
 import { useAddPersonToTeamMutation } from '../../react-query/mutations';
 import { SpanWithLinkStyle } from '../Style/linkStyles';
@@ -14,50 +15,68 @@ import AddPersonForm from './AddPersonForm';
 const AddPersonDrawerMainContent = () => {
   renderLog('AddPersonDrawerMainContent');
   const { apiDataCache, getAppContextValue } = useConnectAppContext();
-  const { allPeopleCache } = apiDataCache;
+  const { allPeopleCache, allTeamsCache } = apiDataCache;
   const { mutate } = useAddPersonToTeamMutation();
 
   // const params  = useParams();
   // console.log('AddPersonDrawerMainContent params: ', params);
 
+  const [addToTeamList, setAddToTeamList] = useState([]);
   const [allPeopleList, setAllPeopleList] = useState([]);
   const [remainingPeopleToAdd, setRemainingPeopleToAdd] = useState([]);
   const [searchResultsList, setSearchResultsList] = useState(undefined);
-  const [thisTeamsCurrentMembersList] = useState(getAppContextValue('addPersonDrawerTeamMemberList'));
+  const [thisTeamsCurrentMembersList, setThisTeamsCurrentMembersList] = useState([]);
   const [team] = useState(getAppContextValue('addPersonDrawerTeam'));
   const [teamMemberPersonIdList] = useState([]);
   const [matchingCountText, setMatchingCountText] = useState('');
 
   const searchStringRef = useRef('');
 
-  const initializeRemainingPeopleToAddList = () => {
+  const updateRemainingPeopleToAdd = () => {
     // console.log('initializeTheRemainingPeopleToAddListList in AddPersonDrawerMainContent');
     // Start with the passed in allPeopleList, create the remainingPeopleToAddList, by removing any people already on the team
-    if (allPeopleList && allPeopleList.length > 0) {
-      const personToDisplay = [];
-      allPeopleList.forEach((onePeople) => {
-        const isOnTeam = thisTeamsCurrentMembersList.some((obj) => obj.id === onePeople.id);
+    if (allPeopleList && allPeopleList.length > 0 && thisTeamsCurrentMembersList && thisTeamsCurrentMembersList.length >= 0) {
+      const remainingPeopleToAddTemp = [];
+      allPeopleList.forEach((onePerson) => {
+        const isOnTeam = thisTeamsCurrentMembersList.some((obj) => obj.id === onePerson.personId);
         if (!isOnTeam) {
-          personToDisplay.push(onePeople);
+          remainingPeopleToAddTemp.push(onePerson);
         }
       });
-      setRemainingPeopleToAdd(personToDisplay);
+      setRemainingPeopleToAdd(remainingPeopleToAddTemp);
     }
   };
 
   useEffect(() => {
-    initializeRemainingPeopleToAddList();
-  }, [apiDataCache]);
+    setAllPeopleList(Object.values(allPeopleCache));
+  }, [allPeopleCache]);
 
   useEffect(() => {
-    initializeRemainingPeopleToAddList();
-  }, [allPeopleList]);
+    const teamId = team ? team.teamId : -1;
+    if (teamId >= 0) {
+      const teamMembersListTemp = getTeamMembersListByTeamId(teamId, apiDataCache);
+      // console.log('useEffect in AddPersonDrawerMainContent teamMembersListTemp:', teamMembersListTemp);
+      setThisTeamsCurrentMembersList(teamMembersListTemp);
+    } else {
+      console.log('useEffect in AddPersonDrawerMainContent teamId is -1, so no teamId');
+    }
+  }, [allPeopleCache, allPeopleList, allTeamsCache, team]);
 
   useEffect(() => {
-    // console.log('useEffect in AddPersonDrawerMainContent allPeopleCache:', allPeopleCache);
+    updateRemainingPeopleToAdd();
+  }, [thisTeamsCurrentMembersList]);
+
+  useEffect(() => {
+    // TODO: Need to deal with preferred name searching and display, very possible but it will get more complicated
+    let addToTeamListTemp = searchResultsList || remainingPeopleToAdd || [];
+    addToTeamListTemp = addToTeamListTemp.filter((person) => person.firstName.length || person.lastName.length);
+    setAddToTeamList(addToTeamListTemp);
+  }, [searchResultsList, remainingPeopleToAdd]);
+
+  useEffect(() => {
+    // console.log('== INITIAL useEffect in AddPersonDrawerMainContent');
     if (allPeopleCache) {
       setAllPeopleList(Object.values(allPeopleCache));
-      setRemainingPeopleToAdd(Object.values(allPeopleCache));  // handles navigate to issues
     }
   }, []);
 
@@ -85,50 +104,52 @@ const AddPersonDrawerMainContent = () => {
     }
   };
 
-  const addClicked = (person) => {
+  const addClicked = (incomingPerson) => {
+    const personId = incomingPerson ? incomingPerson.personId : -1;
+    const teamId = team ? team.teamId : -1;
+    const teamName = team ? team.teamName : '';
     const plainParams = {
-      personId: person.id,
-      teamId: team.teamId,
-      teamMemberFirstName: person.firstName,
-      teamMemberLastName: person.lastName,
-      teamName: team.teamName,
+      personId,
+      teamId,
+      teamMemberFirstName: incomingPerson.firstName,
+      teamMemberLastName: incomingPerson.lastName,
+      teamName,
     };
     mutate(makeRequestParams(plainParams, {}));
     // Remove this person from the All People less Adds list (since they were added to the team)
-    const updatedRemainingPeopleToAdd = remainingPeopleToAdd.filter((p) => p.id !== person.id);
+
+    const updatedRemainingPeopleToAdd = remainingPeopleToAdd.filter((person) => person.personId !== incomingPerson.personId);
     setRemainingPeopleToAdd(updatedRemainingPeopleToAdd);
-    if (searchResultsList && searchResultsList.length) {
+    if (searchResultsList && searchResultsList.length >= 0) {
       // also remove them from the searchResultsList if it exists
-      const updatedSearchResultsList = searchResultsList.filter((p) => p.id !== person.id);
+      const updatedSearchResultsList = searchResultsList.filter((person) => person.personId !== incomingPerson.personId);
       setSearchResultsList(updatedSearchResultsList);
       setMatchingCounter(updatedSearchResultsList);
     }
   };
 
-  // TODO: Need to deal with preferred name searching and display, very possible but it will get more complicated
-  let displayList = searchResultsList || remainingPeopleToAdd || [];
-  displayList = displayList.filter((person) => person.firstName.length || person.lastName.length);
-
   return (
     <AddPersonDrawerMainContentWrapper>
-      <SearchBarWrapper>
-        <TextField
-          id="search_input"
-          label="Search for team members"
-          inputRef={searchStringRef}
-          name="searchByName"
-          onChange={searchFunction}
-          placeholder="Search by name"
-          defaultValue=""
-          sx={{ minWidth: '250px' }}
-        />
-        <MatchingPerson>{matchingCountText}</MatchingPerson>
-      </SearchBarWrapper>
-      {(displayList && displayList.length > 0) && (
+      {team && team.teamId >= 0 && (
+        <SearchBarWrapper>
+          <TextField
+            id="search_input"
+            label="Search for team members"
+            inputRef={searchStringRef}
+            name="searchByName"
+            onChange={searchFunction}
+            placeholder="Search by name"
+            defaultValue=""
+            sx={{ minWidth: '250px' }}
+          />
+          <MatchingPerson>{matchingCountText}</MatchingPerson>
+        </SearchBarWrapper>
+      )}
+      {(addToTeamList && addToTeamList.length > 0) && (
         <PersonSearchResultsWrapper>
           <PersonListTitle>{ searchResultsList ? 'Filtered list of people to add to team: ' : 'Can be added to team: '}</PersonListTitle>
           <PersonList>
-            {displayList.map((person) => (
+            {addToTeamList.map((person) => (
               <PersonItem key={`personResult-${person.id}`}>
                 {person.firstName}
                 {' '}

@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { createRef } from 'react';
 import styled from 'styled-components';
 import colors from '../Style/Colors';
 import normalizedImagePath from '../../utils/normalizedImagePath';
@@ -11,6 +11,13 @@ class SearchBase extends React.Component {
   constructor (props) {
     super(props);
     this.state = { searchText: '' };
+    this.inputRef = createRef();
+  }
+
+  componentDidMount () {
+    if (this.inputRef.current) {
+      this.inputRef.current.focus();
+    }
   }
 
   handleInputChange = (event) => {
@@ -40,12 +47,14 @@ class SearchBase extends React.Component {
       <SearchBaseWrapper>
         {!this.state.searchText && <SearchIcon />}
         <SearchInput
-          type="search"
-          placeholder={this.props.placeholder}
-          value={this.state.searchText}
+          autoFocus
+          maxLength={50}
           onBlur={this.props.onBlur}
           onChange={this.handleInputChange}
-          maxLength={50}
+          placeholder={this.props.placeholder}
+          ref={this.inputRef}
+          type="search"
+          value={this.state.searchText}
         />
         {this.state.searchText && <ClearButton onClick={this.handleClear} />}
       </SearchBaseWrapper>
@@ -109,7 +118,6 @@ const SearchInput = styled('input')`
   border-radius: 0.25rem;
   padding-right: 40px;
   padding-left: 12px;
-
 
   &:focus-visible {
     border: none;

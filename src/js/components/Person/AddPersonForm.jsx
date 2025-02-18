@@ -10,7 +10,7 @@ import { usePersonSaveMutation } from '../../react-query/mutations';
 
 const AddPersonForm = ({ classes }) => {  //  classes, teamId
   renderLog('AddPersonForm');
-  const { getAppContextValue } = useConnectAppContext();
+  const { getAppContextValue, setAppContextValue } = useConnectAppContext();
   const { mutate } = usePersonSaveMutation();
 
   const [teamId, setTeamId] = useState(-1);
@@ -23,10 +23,11 @@ const AddPersonForm = ({ classes }) => {  //  classes, teamId
 
   useEffect(() => {  // Replaces onAppObservableStoreChange and will be called whenever the context value changes
     // console.log('AddPersonForm: Context value changed:', true);
-    setTeamId(getAppContextValue('addPersonDrawerTeam').id);
-    setTeamName(getAppContextValue('addPersonDrawerTeam').teamName);
-  }, []);
-  // }, [getAppContextValue]);  // TODO DALE: commented out for now to avoid infinite loop
+    if (getAppContextValue('addPersonDrawerTeam')) {
+      setTeamId(getAppContextValue('addPersonDrawerTeam').id);
+      setTeamName(getAppContextValue('addPersonDrawerTeam').teamName);
+    }
+  }, [getAppContextValue]);
 
 
   const saveNewPerson = () => {
@@ -41,6 +42,9 @@ const AddPersonForm = ({ classes }) => {  //  classes, teamId
       teamName,
     };
     mutate(makeRequestParams(plainParams, data));
+    setAppContextValue('addPersonDrawerOpen', false);
+    setAppContextValue('addPersonDrawerLabel', '');
+    setAppContextValue('addPersonDrawerTeam', undefined);
   };
 
   const updateSaveButton = () => {
@@ -52,7 +56,6 @@ const AddPersonForm = ({ classes }) => {  //  classes, teamId
       }
     }
   };
-
 
   return (
     <AddPersonFormWrapper>
