@@ -5,6 +5,7 @@ import { Link } from 'react-router';
 import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
+import { viewerCanSeeOrDo } from '../../models/AuthModel';
 import { useRemoveTeamMutation } from '../../react-query/mutations';
 import { DeleteStyled, EditStyled } from '../Style/iconStyles';
 
@@ -12,7 +13,8 @@ import { DeleteStyled, EditStyled } from '../Style/iconStyles';
 // eslint-disable-next-line no-unused-vars
 const TeamHeader = ({ classes, showHeaderLabels, showIcons, team }) => {
   renderLog('TeamHeader');
-  const { getAppContextValue, setAppContextValue } = useConnectAppContext();
+  const { apiDataCache, getAppContextValue, setAppContextValue } = useConnectAppContext();
+  const { viewerAccessRights } = apiDataCache;
   const { mutate } = useRemoveTeamMutation();
 
   let teamLocal = team;
@@ -51,15 +53,23 @@ const TeamHeader = ({ classes, showHeaderLabels, showIcons, team }) => {
       </TeamHeaderCell>
       {/* Edit icon */}
       {showIcons && (
-        <TeamHeaderCell cellwidth={20} onClick={editTeamClick}>
-          <EditStyled />
-        </TeamHeaderCell>
+        <>
+          {viewerCanSeeOrDo('canEditTeamAnyTeam', viewerAccessRights) && (
+            <TeamHeaderCell cellwidth={20} onClick={editTeamClick}>
+              <EditStyled />
+            </TeamHeaderCell>
+          )}
+        </>
       )}
       {/* Delete icon */}
       {showIcons && (
-        <TeamHeaderCell cellwidth={20} onClick={removeTeamClick}>
-          <DeleteStyled />
-        </TeamHeaderCell>
+        <>
+          {viewerCanSeeOrDo('canRemoveTeam', viewerAccessRights) && (
+            <TeamHeaderCell cellwidth={20} onClick={removeTeamClick}>
+              <DeleteStyled />
+            </TeamHeaderCell>
+          )}
+        </>
       )}
     </OneTeamHeader>
   );

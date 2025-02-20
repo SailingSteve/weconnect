@@ -1,10 +1,44 @@
 // PersonModel.js
 // Functions related to getting data from the apiDataCache, which stores data
 // received from our API servers.
+import isEqual from 'lodash-es/isEqual';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useConnectAppContext } from '../contexts/ConnectAppContext';
 import weConnectQueryFn, { METHOD } from '../react-query/WeConnectQuery';
 
+export function capturePersonRetrieveData (incomingResults = {}, apiDataCache = {}, dispatch) {
+  const { data, isSuccess } = incomingResults;
+  const allPeopleCache = apiDataCache.allPeopleCache || {};
+  let changeResults = {
+    allPeopleCache,
+    allPeopleCacheChanged: false,
+  };
+  const allPeopleCacheNew = { ...allPeopleCache };
+  // We need to only update allPeopleCache the first time we have received new data from the API server
+  if (data && data.personId && isSuccess === true) {
+    let newDataReceived = false;
+    const person = data;
+    if (person && person.personId && person.personId >= 0) {
+      if (!allPeopleCacheNew[person.personId]) {
+        allPeopleCacheNew[person.personId] = person;
+        newDataReceived = true;
+      } else if (!isEqual(person, allPeopleCacheNew[person.personId])) {
+        allPeopleCacheNew[person.personId] = person;
+        newDataReceived = true;
+      }
+    }
+    // console.log('person-retrieve setting allPeopleCacheNew:', allPeopleCacheNew, ', newDataReceived:', newDataReceived);
+    if (newDataReceived) {
+      // setAppContextValue('allPeopleCache', allPeopleCache);
+      dispatch({ type: 'updateByKeyValue', key: 'allPeopleCache', value: allPeopleCacheNew });
+      changeResults = {
+        allPeopleCache: allPeopleCacheNew,
+        allPeopleCacheChanged: true,
+      };
+    }
+  }
+  return changeResults;
+}
 
 export const useGetPersonById = (personId) => {
   const { apiDataCache } = useConnectAppContext();

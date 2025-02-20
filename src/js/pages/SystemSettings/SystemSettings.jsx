@@ -17,13 +17,13 @@ import { captureQuestionnaireListRetrieveData } from '../../models/Questionnaire
 import { captureTaskDefinitionListRetrieveData, captureTaskGroupListRetrieveData, captureTaskStatusListRetrieveData } from '../../models/TaskModel';
 import { METHOD, useFetchData } from '../../react-query/WeConnectQuery';
 import PermissionsAdministration from './PermissionsAdministration';
+import { viewerCanSeeOrDo } from '../../models/AuthModel';
 
 
 const SystemSettings = ({ classes }) => {
   renderLog('SystemSettings');
-  const { setAppContextValue } = useConnectAppContext();
-  const { apiDataCache } = useConnectAppContext();
-  const { allPeopleCache, allTaskGroupsCache, allQuestionnairesCache } = apiDataCache;
+  const { apiDataCache, setAppContextValue } = useConnectAppContext();
+  const { viewerAccessRights, allPeopleCache, allTaskGroupsCache, allQuestionnairesCache } = apiDataCache;
   const dispatch = useConnectDispatch();
 
   const [personIdsList, setPersonIdsList] = useState([]);
@@ -119,6 +119,14 @@ const SystemSettings = ({ classes }) => {
 
     navigate(`/questionnaire/${questionnaire.questionnaireId}`);
   };
+
+  if (!viewerCanSeeOrDo('canViewSystemSettings', viewerAccessRights)) {
+    return (
+      <PageContentContainer>
+        <h1>You do not have permission to access this page.</h1>
+      </PageContentContainer>
+    );
+  }
 
   return (
     <div>

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
@@ -9,14 +10,12 @@ import { METHOD, useFetchData } from '../../react-query/WeConnectQuery';
 import { captureQuestionnaireListRetrieveData } from '../../models/QuestionnaireModel';
 
 
-const PersonProfile = () => {
+const PersonProfile = ({ personId }) => {
   renderLog('PersonProfile');  // Set LOG_RENDER_EVENTS to log all renders
-  const { getAppContextValue } = useConnectAppContext();
   const { apiDataCache } = useConnectAppContext();
   const { allQuestionnairesCache } = apiDataCache;
   const dispatch = useConnectDispatch();
 
-  const [personId] = useState(getAppContextValue('personDrawersPersonId'));
   const [questionnaireList, setQuestionnaireList] = useState([]);
   const [showQuestionnaireList, setShowQuestionnaireList] = useState(false);
 
@@ -65,6 +64,9 @@ const PersonProfile = () => {
       )}
     </PersonProfileWrapper>
   );
+};
+PersonProfile.propTypes = {
+  personId: PropTypes.number,
 };
 
 const FullName = styled('h2')`

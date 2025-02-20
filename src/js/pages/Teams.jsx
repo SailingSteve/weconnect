@@ -15,16 +15,15 @@ import { useConnectAppContext, useConnectDispatch } from '../contexts/ConnectApp
 import { isSearchTextFoundInPerson } from '../controllers/PersonController';
 import { isSearchTextFoundInTeam } from '../controllers/TeamController';
 import capturePersonListRetrieveData from '../models/capturePersonListRetrieveData';
+import { viewerCanSeeOrDo } from '../models/AuthModel';
 import { captureTeamListRetrieveData, getTeamMembersListByTeamId } from '../models/TeamModel';
 import { METHOD, useFetchData } from '../react-query/WeConnectQuery';
 
 
-// eslint-disable-next-line no-unused-vars
 const Teams = () => {
   renderLog('Teams');
-  const { setAppContextValue, getAppContextValue } = useConnectAppContext();
-  const { apiDataCache } = useConnectAppContext();
-  const { allPeopleCache, allTeamsCache } = apiDataCache;
+  const { apiDataCache, setAppContextValue, getAppContextValue } = useConnectAppContext();
+  const { viewerAccessRights, allPeopleCache, allTeamsCache } = apiDataCache;
   const dispatch = useConnectDispatch();
 
   const [searchText, setSearchText] = useState('');
@@ -166,16 +165,20 @@ const Teams = () => {
             </ActionBarItem>
           </ActionBarSection>
           <ActionBarSection>
-            <ActionBarItem>
-              <SpanWithLinkStyle onClick={() => addTeamClick()}>
-                Add team
-              </SpanWithLinkStyle>
-            </ActionBarItem>
-            <ActionBarItem>
-              <SpanWithLinkStyle onClick={() => addTeamMemberClick()}>
-                Add team member
-              </SpanWithLinkStyle>
-            </ActionBarItem>
+            {viewerCanSeeOrDo('canAddTeam', viewerAccessRights) && (
+              <ActionBarItem>
+                <SpanWithLinkStyle onClick={() => addTeamClick()}>
+                  Add team
+                </SpanWithLinkStyle>
+              </ActionBarItem>
+            )}
+            {viewerCanSeeOrDo('canAddTeamMemberAnyTeam', viewerAccessRights) && (
+              <ActionBarItem>
+                <SpanWithLinkStyle onClick={() => addTeamMemberClick()}>
+                  Add team member
+                </SpanWithLinkStyle>
+              </ActionBarItem>
+            )}
           </ActionBarSection>
         </ActionBarWrapper>
         {/* NOTE: we had discussed refactoring team-list-retrieve to not include person data, */}

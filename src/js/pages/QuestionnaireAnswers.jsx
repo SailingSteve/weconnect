@@ -9,49 +9,31 @@ import DesignTokenColors from '../common/components/Style/DesignTokenColors';
 import { renderLog } from '../common/utils/logging';
 import { PageContentContainer } from '../components/Style/pageLayoutStyles';
 import webAppConfig from '../config';
-import { getFullNamePreferredPerson } from '../models/PersonModel';
+import { useConnectAppContext, useConnectDispatch } from '../contexts/ConnectAppContext';
+import { useGetFullNamePreferred } from '../models/PersonModel'; // capturePersonRetrieveData
+import { captureQuestionListRetrieveData } from '../models/QuestionnaireModel';
 import { METHOD, useFetchData } from '../react-query/WeConnectQuery';
 
 
 // eslint-disable-next-line no-unused-vars
-const QuestionnaireAnswers = ({ classes, match }) => {
+const QuestionnaireAnswers = ({ classes }) => {
   renderLog('QuestionnaireAnswers');
-  const [questionnaireId] = useState(parseInt(useParams().questionnaireId));
+  const { apiDataCache } = useConnectAppContext();
+  const { allQuestionsCache } = apiDataCache;
+  const dispatch = useConnectDispatch();
+
   const [personId] = useState(parseInt(useParams().personId));
-  const [person, setPerson] = useState(undefined);
   const [questionList, setQuestionList] = useState(undefined);
   const [questionnaire] = useState({});
+  const [questionnaireId] = useState(parseInt(useParams().questionnaireId));
 
-  const { data: dataQL, isSuccess: isSuccessQL, isFetching: isFetchingQL } = useFetchData(['question-list-retrieve'], {}, METHOD.GET);
+  const questionListRetrieveResults = useFetchData(['question-list-retrieve'], { questionnaireId: questionnaireId || '-1' }, METHOD.GET);
   useEffect(() => {
-    console.log('useFetchData in QuestionnaireAnswers (question-list-retrieve) useEffect:', dataQL, isSuccessQL);
-    if (isSuccessQL) {
-      setQuestionList(dataQL ? dataQL.questionList : undefined);
+    if (questionListRetrieveResults) {
+      captureQuestionListRetrieveData(questionListRetrieveResults, apiDataCache, dispatch);
     }
-  }, [dataQL, isSuccessQL, isFetchingQL]);
+  }, [questionListRetrieveResults, allQuestionsCache]);
 
-  const { data: dataPerson, isSuccess: isSuccessPerson, isFetching: isFetchingPerson } = useFetchData(['person-retrieve'], { personId }, METHOD.GET);
-  useEffect(() => {
-    console.log('useFetchData in QuestionnaireAnswers (person-retrieve) useEffect:', dataPerson, isSuccessPerson);
-    if (isSuccessPerson) {
-      setPerson(dataPerson);  // hack
-    }
-  }, [dataPerson, isSuccessPerson, isFetchingPerson]);
-
-  const { data: dataQuestionList, isSuccess: isSuccessQuestionList, isFetching: isFetchingQuestionList } =
-    useFetchData(['question-list-retrieve'], { questionnaireId }, METHOD.GET);
-  useEffect(() => {
-    console.log('useFetchData question-list-retrieve in QuestionnaireAnswers useEffect:', dataQuestionList, isSuccessQuestionList, isFetchingQuestionList);
-    if (dataQuestionList !== undefined && isFetchingQuestionList === false) {
-      console.log('useFetchData question-list-retrieve in QuestionnaireAnswers useEffect data is good:', dataQuestionList, isSuccessQuestionList, isFetchingQuestionList);
-      const questionListTemp = dataQuestionList.questionList;
-      console.log('Successfully retrieved question-list-retrieve... questionListTemp', questionListTemp);
-      setQuestionList(dataQuestionList.questionList);
-    }
-  }, [dataQuestionList, isFetchingQuestionList]);
-
-  /* eslint-disable arrow-body-style */
-  // eslint-disable-next-line no-unused-vars
   const getAnswerValue = (questionId) => {
     // if (allAnswersCache && allAnswersCache[questionId]) {
     //   const questionAnswer = allAnswersCache[questionId];
@@ -59,6 +41,13 @@ const QuestionnaireAnswers = ({ classes, match }) => {
     // }
     return '';
   };
+
+  useEffect(() => {
+    // console.log('useEffect in QuestionnaireAnswers (question-list-retrieve)');
+    // if (allQuestionsCache) {
+    //   setQuestionList(Object.values(allQuestionsCache));
+    // }
+  }, [allQuestionsCache]);
 
   return (
     <div>
@@ -79,8 +68,8 @@ const QuestionnaireAnswers = ({ classes, match }) => {
         <AnsweredBy>
           Answered by:
           {' '}
-          {/* <AnsweredBySpan>{useGetFullNamePreferred(person)}</AnsweredBySpan> */}
-          <AnsweredBySpan>{person ? getFullNamePreferredPerson(person) : 'tbd'}</AnsweredBySpan>
+          <AnsweredBySpan>{useGetFullNamePreferred(personId)}</AnsweredBySpan>
+          {/* <AnsweredBySpan>{person ? getFullNamePreferredPerson(person) : 'tbd'}</AnsweredBySpan> */}
         </AnsweredBy>
         <FormControl classes={{ root: classes.formControl }}>
           {questionList && questionList.map((question) => (
@@ -114,7 +103,6 @@ const QuestionnaireAnswers = ({ classes, match }) => {
 };
 QuestionnaireAnswers.propTypes = {
   classes: PropTypes.object.isRequired,
-  match: PropTypes.object.isRequired,
 };
 
 const styles = (theme) => ({

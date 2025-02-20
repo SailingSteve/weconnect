@@ -38,6 +38,7 @@ const HeaderBar = ({ hideTabs }) => {
   }, [isAuth]);
 
   const logoutApi = async () => {
+    // I don't think we want to make the weConnectQueryFn call here since we are about to call mutateLogout
     const data = await weConnectQueryFn('logout', {}, METHOD.POST);
     console.log(`/logout response in HeaderBar -- status: '${'status'}',  data: ${JSON.stringify(data)}`);
     clearSignedInGlobals(setAppContextValue);

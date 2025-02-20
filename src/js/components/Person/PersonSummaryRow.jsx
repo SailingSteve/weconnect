@@ -11,16 +11,17 @@ import {
 } from '../../models/PersonModel';
 import { useRemoveTeamMemberMutation } from '../../react-query/mutations';
 import { DeleteStyled, EditStyled } from '../Style/iconStyles';
+import { viewerCanSeeOrDo } from '../../models/AuthModel';
 // import { useRemoveTeamMemberMutationDiverged } from '../../models/TeamModel';
 
 
 const PersonSummaryRow = ({ person, rowNumberForDisplay, teamId }) => {
   renderLog('PersonSummaryRow');  // Set LOG_RENDER_EVENTS to log all renders
-  // console.log('PersonSummaryRow location: ', person && person.location);
+  const { apiDataCache, setAppContextValue } = useConnectAppContext();
+  const { viewerAccessRights } = apiDataCache;
+  const { mutate } = useRemoveTeamMemberMutation();
 
   // const [person, setPerson] = useState(useGetPersonById(personId));  2/5/2025 does not work
-  const { setAppContextValue } = useConnectAppContext();
-  const { mutate } = useRemoveTeamMemberMutation();
 
   const removeTeamMemberClick = () => {
     const params = { personId: person.personId, teamId };
@@ -90,7 +91,7 @@ const PersonSummaryRow = ({ person, rowNumberForDisplay, teamId }) => {
       >
         {person.jobTitle}
       </PersonCell>
-      {hasEditRights ? (
+      {viewerCanSeeOrDo('canEditPersonAnyone', viewerAccessRights) ? (
         <PersonCell
           id={`editPerson-personId-${person.personId}`}
           onClick={() => editPersonClick(hasEditRights)}
@@ -102,7 +103,6 @@ const PersonSummaryRow = ({ person, rowNumberForDisplay, teamId }) => {
         </PersonCell>
       ) : (
         <PersonCell
-          id={`editPerson-personId-${person.personId}`}
           // cellwidth="20"
           cellwidth={20}
         >
@@ -111,7 +111,7 @@ const PersonSummaryRow = ({ person, rowNumberForDisplay, teamId }) => {
       )}
       {teamId > 0 && (
         <>
-          {hasEditRights ? (
+          {viewerCanSeeOrDo('canRemoveTeamMemberAnyTeam', viewerAccessRights) ? (
             <PersonCell
               id={`removeMember-personId-${person.personId}`}
               onClick={() => removeTeamMemberClick(person)}
@@ -123,8 +123,6 @@ const PersonSummaryRow = ({ person, rowNumberForDisplay, teamId }) => {
             </PersonCell>
           ) : (
             <PersonCell
-              id={`removeMember-personId-${person.personId}`}
-              onClick={() => removeTeamMemberClick(person)}
               // cellwidth="20"
               cellwidth={20}
             >

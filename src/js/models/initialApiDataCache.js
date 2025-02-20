@@ -3,6 +3,7 @@ const initialApiDataCache = () => {
   // These are the "AppContextValues" (i.e., global state variables) used in the PersonModel
   // console.log('initialApiDataCache called');  // This is worth logging, to see if we are reinitializing the apiDataCache unintentionally
   const initialGlobalPersonVariables = {
+    viewerAccessRights: {}, // This is a dictionary with what this person visiting the site can do
     allPeopleCache: {}, // This is a dictionary key: personId, value: person dict
     mostRecentPersonIdSaved: -1,
     mostRecentPersonSaved: {
@@ -11,6 +12,7 @@ const initialApiDataCache = () => {
       personId: '',
     },
     searchResults: [],
+    teamViewerAccessRights: {}, // This is a dictionary key: personId, value/2nd key: teamId, value: dict with what this person can do on that team
   };
 
   // These are the "AppContextValues" (i.e., global state variables) used in the PersonModel

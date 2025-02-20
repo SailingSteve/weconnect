@@ -41,7 +41,7 @@ const QuestionnaireResponsesList = ({ personId }) => {
       {questionnaireList.length > 0 && (
         <>
           <QuestionnaireResponses>
-            Questionnaire Responses
+            Answered
           </QuestionnaireResponses>
           <QuestionnaireListWrapper>
             {questionnaireList.map((questionnaire) => (
@@ -49,7 +49,7 @@ const QuestionnaireResponsesList = ({ personId }) => {
                 <QuestionText>
                   {questionnaire.questionnaireName}
                 </QuestionText>
-                <CopyQuestionnaireLink personId={personId} questionnaireId={questionnaire.id} />
+                {/* <CopyQuestionnaireLink personId={personId} questionnaireId={questionnaire.id} /> */}
                 <Suspense fallback={<></>}>
                   <OpenExternalWebSite
                     linkIdAttribute="view answers"
@@ -108,8 +108,7 @@ const QuestionText = styled('div')`
 `;
 
 const QuestionnaireListWrapper = styled('div')`
-  margin-top: 30px;
-  margin-left: 10px;
+  margin-bottom: 30px;
 `;
 
 export default QuestionnaireResponsesList;
