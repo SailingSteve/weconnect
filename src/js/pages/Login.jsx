@@ -12,8 +12,9 @@ import compileDate from '../compileDate';
 import { PageContentContainer } from '../components/Style/pageLayoutStyles';
 import VerifySecretCodeModal from '../components/VerifySecretCodeModal';
 import webAppConfig from '../config';
-import { useConnectAppContext } from '../contexts/ConnectAppContext';
-import { clearSignedInGlobals } from '../contexts/contextFunctions';
+import { useConnectAppContext, useConnectDispatch } from '../contexts/ConnectAppContext';
+// import { clearSignedInGlobals } from '../contexts/contextFunctions';
+import { captureAccessRightsData } from '../models/AuthModel';
 import { getFullNamePreferredPerson } from '../models/PersonModel';
 import { useLogoutMutation } from '../react-query/mutations';
 import weConnectQueryFn, { METHOD, useFetchData } from '../react-query/WeConnectQuery';
@@ -24,7 +25,8 @@ const Login = ({ classes }) => {
   renderLog('Login');
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { setAppContextValue } = useConnectAppContext();
+  const { apiDataCache, setAppContextValue } = useConnectAppContext();
+  const dispatch = useConnectDispatch();
   const { mutate: mutateLogout } = useLogoutMutation();
 
   const firstNameFldRef = useRef('');
@@ -54,7 +56,8 @@ const Login = ({ classes }) => {
       setAuthPerson(authenticatedPerson);
       const success = isAuthenticated && authenticatedPerson ? `Signed in as ${getFullNamePreferredPerson(authenticatedPerson)}` : 'Please sign in';
       setSuccessLine(success);
-      setAppContextValue('loggedInPersonIsAdmin', dataAuth.loggedInPersonIsAdmin);
+      // setAppContextValue('loggedInPersonIsAdmin', dataAuth.loggedInPersonIsAdmin);
+      captureAccessRightsData(dataAuth, isSuccessAuth, apiDataCache, dispatch);
       if (isAuthenticated && returnFromLogin) {
         setTimeout(() => {
           navigate('/tasks');
@@ -155,7 +158,8 @@ const Login = ({ classes }) => {
   };
 
   const useSignOutPressed = () => {
-    clearSignedInGlobals(setAppContextValue);
+    // clearSignedInGlobals is also called in logoutApi, so isn't needed here
+    // clearSignedInGlobals(setAppContextValue);
     logoutApi().then();
   };
 

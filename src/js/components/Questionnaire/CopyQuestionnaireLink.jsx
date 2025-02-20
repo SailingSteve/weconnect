@@ -46,7 +46,7 @@ const styles = () => ({
 });
 
 
-const CopyQuestionnaireLinkWrapper = styled('div')`
+const CopyQuestionnaireLinkWrapper = styled('span')`
 `;
 
 export default withStyles(styles)(CopyQuestionnaireLink);

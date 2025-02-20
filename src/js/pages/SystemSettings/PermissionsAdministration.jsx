@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
 import { MatchingPerson, SearchBarWrapper } from '../../components/Style/sharedStyles';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
+import { viewerCanSeeOrDo } from '../../models/AuthModel';
 import { getFullNamePreferredPerson } from '../../models/PersonModel';
 import makeRequestParams from '../../react-query/makeRequestParams';
 import { usePersonSaveMutation } from '../../react-query/mutations';
@@ -17,28 +18,19 @@ const PermissionsAdministration = ({ classes }) => {
   renderLog('PermissionsAdministration');
 
   const { mutate } = usePersonSaveMutation();
-  const { getAppContextValue, apiDataCache: { allPeopleCache } } = useConnectAppContext();
+  const { apiDataCache } = useConnectAppContext();
+  const { allPeopleCache, viewerAccessRights } = apiDataCache;
+
   const [peopleWorkingArray, setPeopleWorkingArray] = useState(); // Object.values(allPeopleCacheCopy1));
   const [updateCount, setUpdateCount] = useState(0);
-  const [isSignedInAdmin, setIsSignedInAdmin] = useState(getAppContextValue('loggedInPersonIsAdmin'));
-  const [errorText, setErrorText] = useState(getAppContextValue('loggedInPersonIsAdmin') ? '' :
-    'These checkmarks are read-only since you do not have Admin privileges');
+  const [canEditPermissionsAnyone, setCanEditPermissionsAnyone] = useState(false);
 
   const searchByNameRef = useRef('');
   const searchByEmailRef = useRef('');
 
   useEffect(() => {
-    const isLoggedInAdmin = getAppContextValue('loggedInPersonIsAdmin');
-    if (isLoggedInAdmin !== null) {
-      setIsSignedInAdmin(getAppContextValue('loggedInPersonIsAdmin'));
-      if (isLoggedInAdmin) {
-        setErrorText('');
-      }
-      console.log('  useEffect(() => getAppContextValue(\'loggedInPersonIsAdmin\') updated to: ', isLoggedInAdmin);
-    } else {
-      console.log('  useEffect(() body skipped since \'loggedInPersonIsAdmin\': ', isLoggedInAdmin);
-    }
-  }, [isSignedInAdmin]);
+    setCanEditPermissionsAnyone(viewerCanSeeOrDo('canEditPermissionsAnyone', viewerAccessRights));
+  }, [viewerAccessRights]);
 
   useEffect(() => {
     const allPeopleCacheCopy2 = JSON.parse(JSON.stringify(allPeopleCache));
@@ -109,7 +101,7 @@ const PermissionsAdministration = ({ classes }) => {
   const onClickCheckbox = (event) => {
     console.log(event);
     // eslint-disable-next-line no-unused-vars
-    if (isSignedInAdmin) {
+    if (canEditPermissionsAnyone) {
       const pieces = event.target.id.split('-');
       const personId = parseInt(pieces[2]);
       const person = peopleWorkingArray.find((p) => p.id === personId);
@@ -178,7 +170,11 @@ const PermissionsAdministration = ({ classes }) => {
         />
         <MatchingPerson>Search is not yet implemented</MatchingPerson>
       </SearchBarWrapper>
-      <ErrorText>{errorText}</ErrorText>
+      {!canEditPermissionsAnyone && (
+        <ErrorText>
+          These checkmarks are read-only since you do not have Admin privileges.
+        </ErrorText>
+      )}
       <table style={{ paddingTop: 20, borderCollapse: 'collapse' }}>
         <thead>
           <tr>
@@ -274,10 +270,14 @@ const PermissionsAdministration = ({ classes }) => {
                 />
               </Td>
               <Td>
-                {isSignedInAdmin && <Button id={`person-save-${person.id}`} size="small" onClick={saveClicked}>Save</Button>}
+                {canEditPermissionsAnyone && (
+                  <Button id={`person-save-${person.id}`} size="small" onClick={saveClicked}>Save</Button>
+                )}
               </Td>
               <Td>
-                {isSignedInAdmin && <Button id={`person-cancel-${person.id}`} size="small" onClick={cancelClicked}>Cancel</Button>}
+                {canEditPermissionsAnyone && (
+                  <Button id={`person-cancel-${person.id}`} size="small" onClick={cancelClicked}>Cancel</Button>
+                )}
               </Td>
             </Tr>
           ))}

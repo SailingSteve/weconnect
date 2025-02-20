@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router';
 import { authLog } from '../common/utils/logging';
-import { useConnectAppContext } from '../contexts/ConnectAppContext';
+import { useConnectAppContext, useConnectDispatch } from '../contexts/ConnectAppContext';
 import { METHOD, useFetchData } from '../react-query/WeConnectQuery';
+import { captureAccessRightsData } from '../models/AuthModel';
 
 const PrivateRoute = () => {
   const location = useLocation();
-  const { getAppContextValue, setAppContextValue } = useConnectAppContext();
+  const { apiDataCache, getAppContextValue } = useConnectAppContext();
+  const dispatch = useConnectDispatch();
 
   const [isAuthenticated, setIsAuthenticated] = useState(null);
 
@@ -15,7 +17,8 @@ const PrivateRoute = () => {
     if (isSuccessAuth) {
       console.log('useFetchData in PrivateRoute useEffect dataAuth good:', dataAuth, isSuccessAuth);
       setIsAuthenticated(dataAuth.isAuthenticated);
-      setAppContextValue('loggedInPersonIsAdmin', dataAuth.loggedInPersonIsAdmin);
+      // setAppContextValue('loggedInPersonIsAdmin', dataAuth.loggedInPersonIsAdmin);
+      captureAccessRightsData(dataAuth, isSuccessAuth, apiDataCache, dispatch);
       authLog('========= PrivateRoute =========== INNER isAuthenticated: ', dataAuth.isAuthenticated);
     }
   }, [dataAuth, isSuccessAuth]);

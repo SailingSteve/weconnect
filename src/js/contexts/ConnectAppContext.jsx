@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useReducer, useState } fro
 import initialApiDataCache from '../models/initialApiDataCache';
 // import capturePersonListRetrieveData from '../models/capturePersonListRetrieveData';
 import { METHOD, useFetchData } from '../react-query/WeConnectQuery';
+import { captureAccessRightsData } from '../models/AuthModel';
 // import { getInitialGlobalPersonVariables, PersonListRetrieveDataCapture } from '../models/PersonModel';
 // import { getInitialGlobalTaskVariables } from '../models/TaskModel';
 // import { getInitialGlobalTeamVariables } from '../models/TeamModel';
@@ -66,39 +67,6 @@ export const ConnectAppContextProvider = ({ children }) => {
     }
   };
 
-  // const { data: dataP, isSuccess: isSuccessP, isFetching: isFetchingP, isStale: isStaleP } = useFetchData(['person-list-retrieve'], {}, METHOD.GET);
-  // const personListRetrieveResults = useFetchData(['person-list-retrieve'], {}, METHOD.GET);
-  // This is not currently the right place to pass these values, but I'm saving these here for the next 30 days until we work out the correct place.
-  // {
-  //   cacheTime: 0,
-  //   networkMode: 'no-cache', <-- This is not a solution, it just covers up some problem in our code, while disabling the biggest benefit of ReactQueries.
-  //   refetchOnMount: true,
-  //   refetchOnWindowFocus: true,
-  //   refetchInterval: 0,
-  //   staleTime: 0,
-  // }
-
-  // Moved to root pages: Teams, TeamHome, etc.
-  // useEffect(() => {
-  //   // console.log('useFetchData person-list-retrieve in Teams useEffect:', personListRetrieveResults);
-  //   if (personListRetrieveResults) {
-  //     // console.log('In useEffect apiDataCache:', apiDataCache);
-  //     // const changeResults =
-  //     capturePersonListRetrieveData(personListRetrieveResults, apiDataCache, dispatch);
-  //     // console.log('ConnectAppContext useEffect capturePersonListRetrieveData changeResults:', changeResults);
-  //   }
-  // }, [personListRetrieveResults]);
-
-  // const { data: dataP, isSuccess: isSuccessP, isFetching: isFetchingP } = personListRetrieveResults;
-  // useEffect(() => {
-  //   // console.log('useFetchData in TeamHome (person-list-retrieve) useEffect:', dataP, isSuccessP, isFetchingP, isStaleP);
-  //   if (isSuccessP) {
-  //     // console.log('useFetchData in TeamHome (person-list-retrieve)useEffect data good:', dataP, isSuccessP, isFetchingP, isStaleP);
-  //     setAppContextValue('allPeopleList', dataP ? dataP.personList : []);
-  //     // console.log('ConnectAppContext useEffect allPeopleList fetched');
-  //   }
-  // }, [dataP, isSuccessP, isFetchingP]);
-
   // The following prints console log errors
   const { data: dataAuth, isSuccess: isSuccessAuth, isFetching: isFetchingAuth } = useFetchData(['get-auth'], {}, METHOD.POST);
   useEffect(() => {
@@ -108,7 +76,8 @@ export const ConnectAppContextProvider = ({ children }) => {
       setAppContextValue('authenticatedPerson', dataAuth.person);
       setAppContextValue('authenticatedPersonId', dataAuth.personId);
       setAppContextValue('isAuthenticated', isAuthenticated);
-      setAppContextValue('loggedInPersonIsAdmin', dataAuth.loggedInPersonIsAdmin);
+      // setAppContextValue('loggedInPersonIsAdmin', dataAuth.loggedInPersonIsAdmin);
+      captureAccessRightsData(dataAuth, isSuccessAuth, apiDataCache, dispatch);
 
       console.log('=============== ConnectAppContextProvider ======= isAuthenticated: ', isAuthenticated, ' ===========');
     }
