@@ -17,7 +17,7 @@ const weConnectQueryFn = async (queryKey, params, isGet) => {
     url.search = new URLSearchParams(params);
   }
   // 2/12/24 temporarily replaced:  httpLog(`weConnectQueryFn ${isGet ? 'GET' : 'POST'} url.href: ${url.href}`); // DO NOT REMOVE, this is the only way to see if we are hitting the API server unnecessarily
-  console.log(`weConnectQueryFn ${isGet ? 'GET' : 'POST'} url.href: ${url.href}`);
+  // console.log(`weConnectQueryFn ${isGet ? 'GET' : 'POST'} url.href: ${url.href}`);
 
   let response;
   try {

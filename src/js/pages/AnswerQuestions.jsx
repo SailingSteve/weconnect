@@ -104,7 +104,7 @@ const AnswerQuestions = ({ classes, setShowHeaderFooter }) => {
         if (`questionAnswer-${question.id}` in inputValuesRevised) {
           answerValue = inputValuesRevised[`questionAnswer-${question.id}`];
         } else {
-          answerValue = getAnswerValueToQuestion(personId, question.id, allAnswersCache);
+          answerValue = getAnswerValueToQuestion(question.id, personId, allAnswersCache);
         }
         if (answerValue === undefined || answerValue === null || answerValue === '') {
           requiredValueMissing = true;
@@ -253,13 +253,13 @@ const AnswerQuestions = ({ classes, setShowHeaderFooter }) => {
                 <AnswerText>
                   YOU ANSWERED:
                   {' '}
-                  {getAnswerValueToQuestion(personId, question.id, allAnswersCache)}
+                  {getAnswerValueToQuestion(question.id, personId, allAnswersCache)}
                 </AnswerText>
               ) : (
                 <QuestionFormWrapper>
                   <TextField
                     classes={(question.answerType === 'INTEGER') ? {} : { root: classes.formControl }}
-                    defaultValue={getAnswerValueToQuestion(personId, question.id, allAnswersCache)}
+                    defaultValue={getAnswerValueToQuestion(question.id, personId, allAnswersCache)}
                     error={isQuestionIdInError(question.id)}
                     helperText={isQuestionIdInError(question.id) ? helperTextIfQuestionIdInError(question.id) : ''}
                     id={`questionAnswer-${question.id}`}

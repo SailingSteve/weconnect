@@ -4,7 +4,8 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
 import { isSearchTextFoundInPerson } from '../../controllers/PersonController';
-import { useConnectAppContext } from '../../contexts/ConnectAppContext';
+import { useConnectAppContext, useConnectDispatch } from '../../contexts/ConnectAppContext';
+import capturePersonListRetrieveData from '../../models/capturePersonListRetrieveData';
 import { getTeamMembersListByTeamId } from '../../models/TeamModel';
 import { METHOD, useFetchData } from '../../react-query/WeConnectQuery';
 import PersonSummaryRow from '../Person/PersonSummaryRow';
@@ -13,11 +14,20 @@ import PersonSummaryRow from '../Person/PersonSummaryRow';
 const TeamMemberList = ({ searchText, teamId, team }) => { // teamMemberList
   renderLog('TeamMemberList');
   const { apiDataCache } = useConnectAppContext();
-  // const { allPeopleCache, allTeamsCache } = apiDataCache;
+  const { allPeopleCache } = apiDataCache;
+  const dispatch = useConnectDispatch();
+
   const [teamMemberListApiDataCache, setTeamMemberListApiDataCache] = useState([]);
   const [teamMemberListReactQuery, setTeamMemberListReactQuery] = useState(team.teamMemberList || []);
   // const teamMemberList = useGetTeamMembersListByTeamId(teamId);
   // console.log('TeamMemberList teamMemberList:', teamMemberList);
+
+  const personListRetrieveResults = useFetchData(['person-list-retrieve'], {}, METHOD.GET);
+  useEffect(() => {
+    if (personListRetrieveResults) {
+      capturePersonListRetrieveData(personListRetrieveResults, apiDataCache, dispatch);
+    }
+  }, [personListRetrieveResults, allPeopleCache, dispatch]);
 
   const { data: dataTLR, isSuccess: isSuccessTLR, isFetching: isFetchingTLR } = useFetchData(['team-list-retrieve'], {}, METHOD.GET);
   // console.log('useFetchData in TeamMemberList:', dataTLR, isSuccessTLR, isFetchingTLR);

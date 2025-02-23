@@ -4,23 +4,25 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useParams } from 'react-router';
+import convertToInteger from '../common/utils/convertToInteger';
 import { renderLog } from '../common/utils/logging';
 import { PageContentContainer } from '../components/Style/pageLayoutStyles';
 import TeamHeader from '../components/Team/TeamHeader';
 import TeamMemberList from '../components/Team/TeamMemberList';
 import webAppConfig from '../config';
 import { useConnectAppContext, useConnectDispatch } from '../contexts/ConnectAppContext';
-import capturePersonListRetrieveData from '../models/capturePersonListRetrieveData';
+import { viewerCanSeeOrDo } from '../models/AuthModel';
 import { captureTeamListRetrieveData, useGetTeamById } from '../models/TeamModel';
+import { useRemoveTeamMutation } from '../react-query/mutations';
 import { METHOD, useFetchData } from '../react-query/WeConnectQuery';
-import convertToInteger from '../common/utils/convertToInteger';
 
 
 const TeamHome = ({ classes }) => {
   renderLog('TeamHome');
   const { apiDataCache, setAppContextValue } = useConnectAppContext();
-  const { allPeopleCache, allTeamsCache } = apiDataCache;
+  const { allTeamsCache, viewerAccessRights } = apiDataCache;
   const dispatch = useConnectDispatch();
+  const { mutate: removeTeamMutation } = useRemoveTeamMutation();
 
   const params  = useParams();
   const [team, setTeam] = useState(useGetTeamById(convertToInteger(params.teamId)));
@@ -33,24 +35,22 @@ const TeamHome = ({ classes }) => {
 
   // const isAddPersonDrawerOpen = document.getElementById('addPersonDrawer');
 
-  // TODO is this even used?
-  const personListRetrieveResults = useFetchData(['person-list-retrieve'], {}, METHOD.GET);
-  useEffect(() => {
-    if (personListRetrieveResults) {
-      capturePersonListRetrieveData(personListRetrieveResults, apiDataCache, dispatch);
-    }
-  }, [personListRetrieveResults, allPeopleCache, dispatch]);
+  // Steve question: is this even used?
+  // Dale answer: I moved this 'person-list-retrieve' call to TeamMemberList to be next to where the data is used, although
+  // it might be better to leave common API calls here on the page level, TBD.
+  // const personListRetrieveResults = useFetchData(['person-list-retrieve'], {}, METHOD.GET);
+  // useEffect(() => {
+  //   if (personListRetrieveResults) {
+  //     capturePersonListRetrieveData(personListRetrieveResults, apiDataCache, dispatch);
+  //   }
+  // }, [personListRetrieveResults, allPeopleCache, dispatch]);
 
   const teamListRetrieveResults = useFetchData(['team-list-retrieve'], {}, METHOD.GET);
   useEffect(() => {
-    // console.log('useFetchData team-list-retrieve in TeamHome useEffect:', teamListRetrieveResults);
     if (teamListRetrieveResults) {
-      // console.log('In useEffect apiDataCache:', apiDataCache);
-      // const changeResults =
       captureTeamListRetrieveData(teamListRetrieveResults, apiDataCache, dispatch);
-      // console.log('Teams useEffect changeResults:', changeResults);
     }
-  }, [teamListRetrieveResults, allTeamsCache, dispatch]);
+  }, [teamListRetrieveResults, allTeamsCache, apiDataCache, dispatch]);
 
   useEffect(() => {
     // console.log('TeamHome teamId: ', teamId, ', allTeamsCache:', allTeamsCache);
@@ -64,6 +64,11 @@ const TeamHome = ({ classes }) => {
     setAppContextValue('addPersonDrawerOpen', true);
     setAppContextValue('AddPersonDrawerLabel', 'Add Team Member');
     setAppContextValue('addPersonDrawerTeam', team);
+  };
+
+  const removeTeamClick = () => {
+    // console.log('removeTeamMutation team: ', teamLocal.id);
+    removeTeamMutation({ teamId });
   };
 
   return (
@@ -103,15 +108,32 @@ const TeamHome = ({ classes }) => {
             />
           </>
         )}
-        <Button
-          classes={{ root: classes.addTeamMemberButtonRoot }}
-          color="primary"
-          variant="outlined"
-          onClick={addTeamMemberClick}
-          sx={{ marginTop: '30px' }}
-        >
-          Add Team Member
-        </Button>
+        {viewerCanSeeOrDo('canAddTeamMemberAnyTeam', viewerAccessRights) && (
+          <div>
+            <Button
+              classes={{ root: classes.addTeamMemberButtonRoot }}
+              color="primary"
+              variant="outlined"
+              onClick={addTeamMemberClick}
+              sx={{ marginTop: '30px' }}
+            >
+              Add Team Member
+            </Button>
+          </div>
+        )}
+        {viewerCanSeeOrDo('canRemoveTeam', viewerAccessRights) && (
+          <div>
+            <Button
+              classes={{ root: classes.deleteTeamButtonRoot }}
+              color="primary"
+              variant="outlined"
+              onClick={removeTeamClick}
+              sx={{ marginTop: '30px' }}
+            >
+              Delete Team
+            </Button>
+          </div>
+        )}
       </PageContentContainer>
     </div>
   );
@@ -126,6 +148,12 @@ const styles = (theme) => ({
     marginRight: 8,
   },
   addTeamMemberButtonRoot: {
+    width: 180,
+    [theme.breakpoints.down('md')]: {
+      width: '100%',
+    },
+  },
+  deleteTeamButtonRoot: {
     width: 180,
     [theme.breakpoints.down('md')]: {
       width: '100%',

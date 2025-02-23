@@ -6,16 +6,18 @@ import styled from 'styled-components';
 import DesignTokenColors from '../../common/components/Style/DesignTokenColors';
 import { renderLog } from '../../common/utils/logging';
 import webAppConfig from '../../config';
-import { useConnectAppContext } from '../../contexts/ConnectAppContext';
+import { useConnectAppContext, useConnectDispatch } from '../../contexts/ConnectAppContext';
 import { useGetPersonById } from '../../models/PersonModel';
 import { METHOD, useFetchData } from '../../react-query/WeConnectQuery';
-import CopyQuestionnaireLink from './CopyQuestionnaireLink';
+import { captureQuestionnaireListRetrieveData } from '../../models/QuestionnaireModel';
 
 const OpenExternalWebSite = React.lazy(() => import(/* webpackChunkName: 'OpenExternalWebSite' */ '../../common/components/Widgets/OpenExternalWebSite'));
 
 const QuestionnaireResponsesList = ({ personId }) => {
   renderLog('QuestionnaireList');  // Set LOG_RENDER_EVENTS to log all renders
-  const { getAppContextValue } = useConnectAppContext();
+  const { apiDataCache, getAppContextValue } = useConnectAppContext();
+  const { allQuestionsCache } = apiDataCache;
+  const dispatch = useConnectDispatch();
 
   // const [person] = useState(getAppContextValue('personDrawersPerson'));
   const [person] = useState(useGetPersonById(getAppContextValue('personDrawersPersonId')));
@@ -24,17 +26,27 @@ const QuestionnaireResponsesList = ({ personId }) => {
   // Although we are sending a list, there will only be one person id, if there were more, just append them with commas
   const requestParams = `personIdList[]=${person.id}`;
 
-  const { data: dataQRL, isSuccess: isSuccessQRL, isFetching: isFetchingQRL } = useFetchData(['questionnaire-responses-list-retrieve'], requestParams, METHOD.GET);
-  if (isFetchingQRL) {
-    console.log('isFetching  ------------ \'questionnaire-responses-list-retrieve\'');
-  }
+  const questionnaireResponsesListRetrieveResults = useFetchData(['questionnaire-responses-list-retrieve'], requestParams, METHOD.GET);
+  // const { data: dataQRL, isSuccess: isSuccessQRL, isFetching: isFetchingQRL } = responsesRetrieveResults;
+  const { data: dataQRL, isFetching: isFetchingQRL } = questionnaireResponsesListRetrieveResults;
+  // if (isFetchingQRL) {
+  //   console.log('isFetching  ------------ \'questionnaire-responses-list-retrieve\'');
+  // }
+  // useEffect(() => {
+  //   if (dataQRL !== undefined && isFetchingQRL === false && person) {
+  //     console.log('useFetchData in QuestionnaireResponsesList useEffect dataQRL is good:', dataQRL, isSuccessQRL, isFetchingQRL);
+  //     console.log('Successfully retrieved QuestionnaireResponsesList...');
+  //     setQuestionnaireList(dataQRL.questionnaireList);
+  //   }
+  // }, [dataQRL, isFetchingQRL, isSuccessQRL, person]);
   useEffect(() => {
-    if (dataQRL !== undefined && isFetchingQRL === false && person) {
-      console.log('useFetchData in QuestionnaireResponsesList useEffect dataQRL is good:', dataQRL, isSuccessQRL, isFetchingQRL);
-      console.log('Successfully retrieved QuestionnaireResponsesList...');
-      setQuestionnaireList(dataQRL.questionnaireList);
+    if (questionnaireResponsesListRetrieveResults) {
+      captureQuestionnaireListRetrieveData(questionnaireResponsesListRetrieveResults, apiDataCache, dispatch);
+      if (dataQRL && dataQRL.questionnaireList && isFetchingQRL === false) {
+        setQuestionnaireList(dataQRL.questionnaireList);
+      }
     }
-  }, [dataQRL, isFetchingQRL, isSuccessQRL, person]);
+  }, [questionnaireResponsesListRetrieveResults, allQuestionsCache]);
 
   return (
     <div>
