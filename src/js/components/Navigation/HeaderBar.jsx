@@ -10,6 +10,7 @@ import { normalizedHrefPage } from '../../common/utils/hrefUtils';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
 import { clearSignedInGlobals } from '../../contexts/contextFunctions';
+import { viewerCanSeeOrDo } from '../../models/AuthModel';
 import { useLogoutMutation } from '../../react-query/mutations';
 import weConnectQueryFn, { METHOD } from '../../react-query/WeConnectQuery';
 import { displayTopMenuShadow } from '../../utils/applicationUtils';
@@ -21,7 +22,8 @@ import HeaderBarLogo from './HeaderBarLogo';
 const HeaderBar = ({ hideTabs }) => {
   renderLog('HeaderBar');
   const navigate = useNavigate();
-  const { getAppContextValue, setAppContextValue } = useConnectAppContext();
+  const { apiDataCache, getAppContextValue, setAppContextValue } = useConnectAppContext();
+  const { viewerAccessRights } = apiDataCache;
   const { mutate: mutateLogout } = useLogoutMutation();
 
   const [scrolledDown] = useState(false);
@@ -141,7 +143,9 @@ const HeaderBar = ({ hideTabs }) => {
             >
               <Tab value="1" label="Dashboard" onClick={() => handleTabChangeClick('1')} />
               <Tab value="2" label="Teams" onClick={() => handleTabChangeClick('2')} />
-              <Tab value="3" label="Settings" onClick={() => handleTabChangeClick('3')} />
+              {viewerCanSeeOrDo('canViewSystemSettings', viewerAccessRights) && (
+                <Tab value="3" label="Settings" onClick={() => handleTabChangeClick('3')} />
+              )}
             </Tabs>
           )}
         </TopRowOneMiddleContainer>

@@ -18,7 +18,7 @@ const DrawerTemplateA = (props) => {
 
   // eslint-disable-next-line no-unused-vars
   const [scrolledDown, setScrolledDown] = useState(false);
-  const drawerOpen = getAppContextValue(drawerOpenGlobalVariableName);
+  const drawerOpen = getAppContextValue(drawerOpenGlobalVariableName) || false;
 
   // console.log('DrawerTemplateA drawerOpen: ', drawerOpenGlobalVariableName, drawerOpen);
 

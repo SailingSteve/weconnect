@@ -6,29 +6,21 @@ import styled from 'styled-components';
 import { renderLog } from '../../common/utils/logging';
 import { useConnectAppContext } from '../../contexts/ConnectAppContext';
 import { viewerCanSeeOrDo } from '../../models/AuthModel';
-import { useRemoveTeamMutation } from '../../react-query/mutations';
-import { DeleteStyled, EditStyled } from '../Style/iconStyles';
+import { EditStyled } from '../Style/iconStyles';
 
 
-// eslint-disable-next-line no-unused-vars
-const TeamHeader = ({ classes, showHeaderLabels, showIcons, team }) => {
+const TeamHeader = ({ showHeaderLabels, showIcons, team }) => {
   renderLog('TeamHeader');
   const { apiDataCache, getAppContextValue, setAppContextValue } = useConnectAppContext();
   const { viewerAccessRights } = apiDataCache;
-  const { mutate } = useRemoveTeamMutation();
 
   let teamLocal = team;
   if (!teamLocal || !teamLocal.teamName) {
     teamLocal = getAppContextValue('teamForAddTeamDrawer');
   }
 
-  const removeTeamClick = () => {
-    console.log('removeTeamMutation team: ', teamLocal.id);
-    mutate({ teamId: teamLocal.id });
-  };
-
   const editTeamClick = () => {
-    console.log('editTeamClick: ', teamLocal);
+    // console.log('editTeamClick: ', teamLocal);
     setAppContextValue('addTeamDrawerOpen', true);
     setAppContextValue('AddTeamDrawerLabel', 'Edit Team Name');
     setAppContextValue('teamForAddTeamDrawer', teamLocal);
@@ -61,21 +53,14 @@ const TeamHeader = ({ classes, showHeaderLabels, showIcons, team }) => {
           )}
         </>
       )}
-      {/* Delete icon */}
+      {/* Delete icon - Moved to TeamHome */}
       {showIcons && (
-        <>
-          {viewerCanSeeOrDo('canRemoveTeam', viewerAccessRights) && (
-            <TeamHeaderCell cellwidth={20} onClick={removeTeamClick}>
-              <DeleteStyled />
-            </TeamHeaderCell>
-          )}
-        </>
+        <></>
       )}
     </OneTeamHeader>
   );
 };
 TeamHeader.propTypes = {
-  classes: PropTypes.object.isRequired,
   showHeaderLabels: PropTypes.bool,
   team: PropTypes.object,
   showIcons: PropTypes.bool,

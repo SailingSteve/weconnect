@@ -198,7 +198,7 @@ export const getAnswerToQuestion = (personId, questionId, allAnswersCache) => {
   return answer;
 };
 
-export const getAnswerValueToQuestion = (personId, questionId, allAnswersCache) => {
+export const getAnswerValueToQuestion = (questionId, personId, allAnswersCache) => {
   const answer = getAnswerToQuestion(personId, questionId, allAnswersCache) || {};
   if (!answer || !answer.answerType) {
     // console.log(`No answer found for questionId: ${questionId}`);

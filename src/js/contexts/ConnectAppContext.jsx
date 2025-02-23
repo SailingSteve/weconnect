@@ -71,7 +71,7 @@ export const ConnectAppContextProvider = ({ children }) => {
   const { data: dataAuth, isSuccess: isSuccessAuth, isFetching: isFetchingAuth } = useFetchData(['get-auth'], {}, METHOD.POST);
   useEffect(() => {
     if (isSuccessAuth) {
-      console.log('useFetchData in ConnectAppContext useEffect dataAuth good:', dataAuth, isSuccessAuth, isFetchingAuth);
+      // console.log('useFetchData in ConnectAppContext useEffect dataAuth good:', dataAuth, isSuccessAuth, isFetchingAuth);
       const { isAuthenticated } = dataAuth;
       setAppContextValue('authenticatedPerson', dataAuth.person);
       setAppContextValue('authenticatedPersonId', dataAuth.personId);

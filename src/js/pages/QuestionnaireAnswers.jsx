@@ -10,8 +10,15 @@ import { renderLog } from '../common/utils/logging';
 import { PageContentContainer } from '../components/Style/pageLayoutStyles';
 import webAppConfig from '../config';
 import { useConnectAppContext, useConnectDispatch } from '../contexts/ConnectAppContext';
-import { useGetFullNamePreferred } from '../models/PersonModel'; // capturePersonRetrieveData
-import { captureQuestionListRetrieveData } from '../models/QuestionnaireModel';
+import { useGetFullNamePreferred } from '../models/PersonModel';
+import capturePersonListRetrieveData from '../models/capturePersonListRetrieveData';
+import {
+  captureAnswerListRetrieveData,
+  captureQuestionListRetrieveData,
+  captureQuestionnaireListRetrieveData,
+  getAnswerValueToQuestion,
+  getQuestionsForQuestionnaire,
+} from '../models/QuestionnaireModel';
 import { METHOD, useFetchData } from '../react-query/WeConnectQuery';
 
 
@@ -19,13 +26,20 @@ import { METHOD, useFetchData } from '../react-query/WeConnectQuery';
 const QuestionnaireAnswers = ({ classes }) => {
   renderLog('QuestionnaireAnswers');
   const { apiDataCache } = useConnectAppContext();
-  const { allQuestionsCache } = apiDataCache;
+  const { allAnswersCache, allPeopleCache, allQuestionnairesCache, allQuestionsCache } = apiDataCache;
   const dispatch = useConnectDispatch();
 
   const [personId] = useState(parseInt(useParams().personId));
   const [questionList, setQuestionList] = useState(undefined);
-  const [questionnaire] = useState({});
+  const [questionnaire, setQuestionnaire] = useState({});
   const [questionnaireId] = useState(parseInt(useParams().questionnaireId));
+
+  const personListRetrieveResults = useFetchData(['person-list-retrieve'], {}, METHOD.GET);
+  useEffect(() => {
+    if (personListRetrieveResults) {
+      capturePersonListRetrieveData(personListRetrieveResults, apiDataCache, dispatch);
+    }
+  }, [personListRetrieveResults, allPeopleCache, dispatch]);
 
   const questionListRetrieveResults = useFetchData(['question-list-retrieve'], { questionnaireId: questionnaireId || '-1' }, METHOD.GET);
   useEffect(() => {
@@ -34,28 +48,36 @@ const QuestionnaireAnswers = ({ classes }) => {
     }
   }, [questionListRetrieveResults, allQuestionsCache]);
 
-  const getAnswerValue = (questionId) => {
-    // if (allAnswersCache && allAnswersCache[questionId]) {
-    //   const questionAnswer = allAnswersCache[questionId];
-    //   return getAnswerValueFromAnswerDict(questionAnswer);
-    // }
-    return '';
-  };
+  const requestParams = `personIdList[]=${personId}`;
+  const answersListRetrieveResults = useFetchData(['questionnaire-responses-list-retrieve'], requestParams, METHOD.GET);
+  useEffect(() => {
+    if (answersListRetrieveResults) {
+      captureQuestionnaireListRetrieveData(answersListRetrieveResults, apiDataCache, dispatch);
+      captureAnswerListRetrieveData(answersListRetrieveResults, apiDataCache, dispatch);
+    }
+  }, [answersListRetrieveResults, apiDataCache, dispatch]);
+
+  useEffect(() => {
+    // console.log('useEffect in QuestionnaireAnswers questionnaireId:', questionnaireId);
+    // console.log('allQuestionnairesCache:', allQuestionnairesCache);
+    if (allQuestionnairesCache && allQuestionnairesCache[questionnaireId]) {
+      setQuestionnaire(allQuestionnairesCache[questionnaireId]);
+    }
+  }, [allQuestionnairesCache, questionnaireId]);
 
   useEffect(() => {
     // console.log('useEffect in QuestionnaireAnswers (question-list-retrieve)');
-    // if (allQuestionsCache) {
-    //   setQuestionList(Object.values(allQuestionsCache));
-    // }
+    if (allQuestionsCache) {
+      setQuestionList(getQuestionsForQuestionnaire(questionnaireId, allQuestionsCache));
+    }
   }, [allQuestionsCache]);
 
+  const titleString = `${questionnaire.questionnaireName ? questionnaire.questionnaireName : 'Questionnaire Answers'} - ${webAppConfig.NAME_FOR_BROWSER_TAB_TITLE}`;
   return (
     <div>
       <Helmet>
         <title>
-          Questionnaire Answers -
-          {' '}
-          {webAppConfig.NAME_FOR_BROWSER_TAB_TITLE}
+          {titleString}
         </title>
         <meta name="robots" content="noindex" data-react-helmet="true" />
       </Helmet>
@@ -73,7 +95,7 @@ const QuestionnaireAnswers = ({ classes }) => {
         </AnsweredBy>
         <FormControl classes={{ root: classes.formControl }}>
           {questionList && questionList.map((question) => (
-            <OneQuestionWrapper key={`questionnaire-${question.id}`}>
+            <OneQuestionWrapper key={`question-${question.id}`}>
               <QuestionText>
                 {question.questionText}
                 {question.requireAnswer && <RequiredStar> *</RequiredStar>}
@@ -91,7 +113,7 @@ const QuestionnaireAnswers = ({ classes }) => {
                   margin="dense"
                   variant="outlined"
                   placeholder={question.questionPlaceholder || ''}
-                  value={getAnswerValue(question.id)}
+                  value={getAnswerValueToQuestion(question.id, personId, allAnswersCache)}
                 />
               </QuestionFormWrapper>
             </OneQuestionWrapper>
@@ -121,10 +143,10 @@ const styles = (theme) => ({
 });
 
 const AnsweredBy = styled('div')`
+  align-content: center;
   font-size: 1.3em;
   font-weight: 300;
-  height: 100px;
-  align-content: center;
+  margin-bottom: 16px;
 `;
 
 const AnsweredBySpan = styled('span')`
@@ -134,6 +156,7 @@ const AnsweredBySpan = styled('span')`
 const OneQuestionWrapper = styled('div')`
   border-top: 1px solid ${DesignTokenColors.neutralUI200};
   margin-top: 24px;
+  padding-top: 6px;
 `;
 
 const QuestionInstructions = styled('div')`
@@ -153,7 +176,7 @@ const RequiredStar = styled('span')`
 `;
 
 const TitleWrapper = styled('h1')`
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 `;
 
 export default withStyles(styles)(QuestionnaireAnswers);

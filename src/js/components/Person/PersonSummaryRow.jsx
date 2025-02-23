@@ -11,14 +11,14 @@ import {
 } from '../../models/PersonModel';
 import { useRemoveTeamMemberMutation } from '../../react-query/mutations';
 import { DeleteStyled, EditStyled } from '../Style/iconStyles';
-import { viewerCanSeeOrDo } from '../../models/AuthModel';
+import { viewerCanSeeOrDo, viewerCanSeeOrDoForThisTeam } from '../../models/AuthModel';
 // import { useRemoveTeamMemberMutationDiverged } from '../../models/TeamModel';
 
 
 const PersonSummaryRow = ({ person, rowNumberForDisplay, teamId }) => {
   renderLog('PersonSummaryRow');  // Set LOG_RENDER_EVENTS to log all renders
   const { apiDataCache, setAppContextValue } = useConnectAppContext();
-  const { viewerAccessRights } = apiDataCache;
+  const { viewerAccessRights, viewerTeamAccessRights } = apiDataCache;
   const { mutate } = useRemoveTeamMemberMutation();
 
   // const [person, setPerson] = useState(useGetPersonById(personId));  2/5/2025 does not work
@@ -50,6 +50,7 @@ const PersonSummaryRow = ({ person, rowNumberForDisplay, teamId }) => {
   //   }
   // }, [apiDataCache]);
 
+  const canEditPerson = viewerCanSeeOrDo('canEditPersonAnyone', viewerAccessRights) || viewerCanSeeOrDoForThisTeam('canEditPersonThisTeam', teamId, viewerTeamAccessRights);
   const hasEditRights = true;
   return (
     <OnePersonWrapper key={`teamMember-${person.personId}`}>
@@ -91,7 +92,7 @@ const PersonSummaryRow = ({ person, rowNumberForDisplay, teamId }) => {
       >
         {person.jobTitle}
       </PersonCell>
-      {viewerCanSeeOrDo('canEditPersonAnyone', viewerAccessRights) ? (
+      {canEditPerson ? (
         <PersonCell
           id={`editPerson-personId-${person.personId}`}
           onClick={() => editPersonClick(hasEditRights)}
