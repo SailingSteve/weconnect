@@ -21,22 +21,22 @@ const EditPersonForm = ({ classes }) => {
   // const [initialPerson] = useState(useGetPersonById(getAppContextValue('personDrawersPersonId')));
   const [activePerson, setActivePerson] = useState({ ...initialPerson });
 
-  const emailPersonal = useRef('');
-  const firstName = useRef('');
-  const firstNamePreferred = useRef('');
-  const jobTitle = useRef('');
-  const lastName = useRef('');
-  const location = useRef('');
-  const stateCode = useRef('');
+  const emailPersonalInputRef = useRef('');
+  const firstNameInputRef = useRef('');
+  const firstNamePreferredInputRef = useRef('');
+  const jobTitleInputRef = useRef('');
+  const lastNameInputRef = useRef('');
+  const locationInputRef = useRef('');
+  const stateCodeInputRef = useRef('');
 
   const savePerson = () => {
-    activePerson.emailPersonal = emailPersonal.current.value;
-    activePerson.firstName = firstName.current.value;
-    activePerson.firstNamePreferred = firstNamePreferred.current.value;
-    activePerson.jobTitle = jobTitle.current.value;
-    activePerson.lastName = lastName.current.value;
-    activePerson.location = location.current.value;
-    activePerson.stateCode = stateCode.current.value;
+    activePerson.emailPersonal = emailPersonalInputRef.current.value;
+    activePerson.firstName = firstNameInputRef.current.value;
+    activePerson.firstNamePreferred = firstNamePreferredInputRef.current.value;
+    activePerson.jobTitle = jobTitleInputRef.current.value;
+    activePerson.lastName = lastNameInputRef.current.value;
+    activePerson.location = locationInputRef.current.value;
+    activePerson.stateCode = stateCodeInputRef.current.value;
     setActivePerson(activePerson);
 
     // console.log('savePerson data:', JSON.stringify(activePerson));
@@ -64,7 +64,7 @@ const EditPersonForm = ({ classes }) => {
           autoFocus
           defaultValue={activePerson.firstName || ''}
           id="firstNameToBeSaved"
-          inputRef={firstName}
+          inputRef={firstNameInputRef}
           label="First (Legal) Name"
           margin="dense"
           name="firstName"
@@ -75,7 +75,7 @@ const EditPersonForm = ({ classes }) => {
         <TextField
           defaultValue={activePerson.firstNamePreferred || ''}
           id="firstNamePreferredToBeSaved"
-          inputRef={firstNamePreferred}
+          inputRef={firstNamePreferredInputRef}
           label="First (Preferred) if different from legal"
           margin="dense"
           name="firstNamePreferred"
@@ -86,7 +86,7 @@ const EditPersonForm = ({ classes }) => {
         <TextField
           defaultValue={activePerson.lastName || ''}
           id="lastNameToBeSaved"
-          inputRef={lastName}
+          inputRef={lastNameInputRef}
           label="Last Name"
           margin="dense"
           name="lastName"
@@ -99,7 +99,7 @@ const EditPersonForm = ({ classes }) => {
           id="emailPersonalToBeSaved"
           label="Email Address, Personal"
           name="emailPersonal"
-          inputRef={emailPersonal}
+          inputRef={emailPersonalInputRef}
           margin="dense"
           variant="outlined"
           onChange={() => setSaveButtonActive(true)}
@@ -108,7 +108,7 @@ const EditPersonForm = ({ classes }) => {
         <TextField
           defaultValue={activePerson.location || ''}
           id="locationToBeSaved"
-          inputRef={location}
+          inputRef={locationInputRef}
           label="Location"
           margin="dense"
           name="location"
@@ -119,7 +119,7 @@ const EditPersonForm = ({ classes }) => {
         <TextField
           defaultValue={activePerson.stateCode || ''}
           id="stateCodeToBeSaved"
-          inputRef={stateCode}
+          inputRef={stateCodeInputRef}
           label="State Code"
           margin="dense"
           name="stateCode"
@@ -130,7 +130,7 @@ const EditPersonForm = ({ classes }) => {
         <TextField
           defaultValue={activePerson.jobTitle || ''}
           id="jobTitleToBeSaved"
-          inputRef={jobTitle}
+          inputRef={jobTitleInputRef}
           label={`Job Title (at ${webAppConfig.ORGANIZATION_NAME})`}
           margin="dense"
           name="jobTitle"
