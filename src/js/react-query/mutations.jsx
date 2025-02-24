@@ -79,6 +79,15 @@ const useGroupSaveMutation = () => {
   });
 };
 
+const usePersonAwaySaveMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (params) => weConnectQueryFn('person-away-save', params, METHOD.GET),
+    onError: (error) => console.log('error in usePersonAwaySaveMutation: ', error),
+    onSuccess: () => queryClient.invalidateQueries('person-away-list-retrieve'),
+  });
+};
+
 // Moved to /models/PersonModel.jsx with a non-conflicting function name
 const usePersonSaveMutation = () => {
   const queryClient = useQueryClient();
@@ -121,6 +130,7 @@ const useGetAuthMutation = () => {
 
 export { useRemoveTeamMutation, useRemoveTeamMemberMutation, useAddPersonToTeamMutation,
   useQuestionnaireSaveMutation, useTaskDefinitionSaveMutation, useGroupSaveMutation,
+  usePersonAwaySaveMutation,
   useQuestionSaveMutation, usePersonSaveMutation, useSaveTaskMutation, useAnswerListSaveMutation,
   useLogoutMutation, useGetAuthMutation };
 

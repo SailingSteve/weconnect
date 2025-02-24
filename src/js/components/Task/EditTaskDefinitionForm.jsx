@@ -22,7 +22,7 @@ import { useTaskDefinitionSaveMutation } from '../../react-query/mutations';
 const EditTaskDefinitionForm = ({ classes }) => {
   renderLog('EditTaskDefinitionForm');  // Set LOG_RENDER_EVENTS to log all renders
   const { getAppContextValue, setAppContextValue } = useConnectAppContext();
-  const { mutate } = useTaskDefinitionSaveMutation();
+  const { mutate: taskDefinitionSave } = useTaskDefinitionSaveMutation();
 
   const [taskGroup] = useState(getAppContextValue('editTaskDefinitionDrawerTaskGroup'));
   const [taskDefinition] = useState(getAppContextValue('editTaskDefinitionDrawerTaskDefinition'));
@@ -61,7 +61,7 @@ const EditTaskDefinitionForm = ({ classes }) => {
       taskInstructions: taskInstFldRef.current.value,
       taskActionUrl: taskUrlFldRef.current.value,
     });
-    mutate(requestParams);
+    taskDefinitionSave(requestParams);
     setSaveButtonActive(false);
     setAppContextValue('editTaskDefinitionDrawerOpen', false);
     setAppContextValue('editTaskDefinitionDrawerTaskDefinition', undefined);
